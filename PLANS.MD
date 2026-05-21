@@ -107,6 +107,9 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 - Observação: O upload de imagem foi validado com um SVG local e o arquivo temporário foi removido após o teste.
   Evidência: `curl.exe -F image=@frontend/public/favicon.svg` retornou URL em `/uploads/...`; `backend/public/uploads/.gitkeep` mantém a pasta versionada.
 
+- Observação: O vídeo do hero foi substituído pelo usuário em `assets/video_hero.mp4` e sincronizado com o asset usado pelo frontend.
+  Evidência: `frontend/assets/video_hero.mp4` foi atualizado via `Copy-Item` a partir de `assets/video_hero.mp4`.
+
 ---
 
 # Decision Log
@@ -810,6 +813,8 @@ Invoke-RestMethod -Uri http://localhost:8080/api/auth/admin/login -Method Post
 Invoke-WebRequest -Uri http://localhost:5173
 Invoke-RestMethod -Uri http://localhost:8080/api/orders -Method Post
 curl.exe -X POST http://localhost:8080/api/uploads/image -H "Authorization: Bearer vertex-admin-token" -F "image=@frontend/public/favicon.svg"
+Get-Item -LiteralPath assets/video_hero.mp4, frontend/assets/video_hero.mp4
+Copy-Item -LiteralPath assets/video_hero.mp4 -Destination frontend/assets/video_hero.mp4 -Force
 ```
 
 Validação realizada:
@@ -834,6 +839,8 @@ backend Docker login admin: OK
 backend Docker criar pedido: OK
 backend Docker upload de imagem: OK
 frontend Docker em http://localhost:5173: HTTP 200
+video_hero.mp4 sincronizado entre assets/ e frontend/assets/: OK
+frontend Docker apos troca do video: HTTP 200
 ```
 
 Commit criado:
