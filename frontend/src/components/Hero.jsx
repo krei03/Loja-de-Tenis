@@ -80,12 +80,6 @@ export function Hero() {
         <source src={heroVideo} type="video/mp4" />
       </video>
 
-      <div className="hero-cinema" aria-hidden="true">
-        <div className="hero-frame hero-frame-top"></div>
-        <div className="hero-frame hero-frame-bottom"></div>
-        <div className="hero-depth-line"></div>
-      </div>
-
       <div className="hero-copy">
         <motion.p
           className="eyebrow"
@@ -122,12 +116,6 @@ export function Hero() {
           <span>FW26 / Curadoria premium</span>
         </motion.div>
       </div>
-
-      <aside className="hero-campaign" aria-label="Resumo da campanha Vertex">
-        <span>Campaign 01</span>
-        <strong>Scroll film</strong>
-        <p>4 silhuetas / drops verificados / envio rastreado</p>
-      </aside>
 
       <div className="scroll-cue">
         <ArrowDown size={18} />

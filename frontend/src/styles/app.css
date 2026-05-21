@@ -161,52 +161,6 @@ video {
     linear-gradient(0deg, #050505 0%, rgba(5, 5, 5, 0.2) 20%, transparent 64%, rgba(5, 5, 5, 0.82));
 }
 
-.hero-cinema {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: calc(0.94 - (var(--hero-progress) * 0.26));
-}
-
-.hero-cinema::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(245, 245, 245, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245, 245, 245, 0.05) 1px, transparent 1px);
-  background-size: 100% 25%, 25% 100%;
-  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
-}
-
-.hero-frame {
-  position: absolute;
-  left: clamp(18px, 4vw, 56px);
-  right: clamp(18px, 4vw, 56px);
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(245, 245, 245, 0.48), transparent);
-}
-
-.hero-frame-top {
-  top: 86px;
-}
-
-.hero-frame-bottom {
-  bottom: 86px;
-}
-
-.hero-depth-line {
-  position: absolute;
-  right: clamp(24px, 5vw, 84px);
-  top: 22vh;
-  width: 1px;
-  height: 48vh;
-  background: linear-gradient(180deg, transparent, rgba(198, 255, 0, 0.74), transparent);
-  transform: scaleY(calc(0.45 + (var(--hero-progress) * 0.55)));
-  transform-origin: top;
-}
-
 .hero-copy {
   position: fixed;
   left: max(clamp(18px, 5vw, 72px), calc((100vw - var(--page-max)) / 2 + 48px));
@@ -277,34 +231,6 @@ video {
   color: rgba(245, 245, 245, 0.68);
   font-size: 0.84rem;
   font-weight: 800;
-  text-transform: uppercase;
-}
-
-.hero-campaign {
-  position: fixed;
-  right: clamp(18px, 5vw, 78px);
-  bottom: 108px;
-  z-index: 3;
-  width: min(270px, calc(100% - 36px));
-  display: grid;
-  gap: 6px;
-  padding-left: 18px;
-  border-left: 1px solid rgba(198, 255, 0, 0.58);
-  color: var(--ice);
-}
-
-.hero-campaign span,
-.hero-campaign p {
-  margin: 0;
-  color: rgba(245, 245, 245, 0.62);
-  font-size: 0.76rem;
-  line-height: 1.45;
-  text-transform: uppercase;
-}
-
-.hero-campaign strong {
-  font-size: 1.35rem;
-  line-height: 1;
   text-transform: uppercase;
 }
 
@@ -967,10 +893,6 @@ main {
     width: min(520px, calc(100% - 36px));
   }
 
-  .hero-campaign {
-    display: none;
-  }
-
   .trust-band,
   .detail-grid,
   .cart-grid,
@@ -1029,14 +951,6 @@ main {
   .hero-actions {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .hero-frame-top {
-    top: 74px;
-  }
-
-  .hero-frame-bottom {
-    bottom: 74px;
   }
 
   .gallery,
