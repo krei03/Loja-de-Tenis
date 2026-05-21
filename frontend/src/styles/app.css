@@ -156,7 +156,6 @@ video {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 70% 44%, rgba(198, 255, 0, 0.14), transparent 24%),
     linear-gradient(90deg, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.2) 52%, rgba(0, 0, 0, 0.62)),
     linear-gradient(0deg, #050505 0%, rgba(5, 5, 5, 0.2) 20%, transparent 64%, rgba(5, 5, 5, 0.82));
 }
@@ -257,8 +256,7 @@ video {
   height: 34vh;
   pointer-events: none;
   background:
-    linear-gradient(180deg, transparent, rgba(5, 5, 5, 0.72) 42%, var(--black) 88%),
-    linear-gradient(90deg, rgba(198, 255, 0, 0.1), transparent 28%, transparent 72%, rgba(198, 255, 0, 0.08));
+    linear-gradient(180deg, transparent, rgba(5, 5, 5, 0.72) 42%, var(--black) 88%);
 }
 
 main {
