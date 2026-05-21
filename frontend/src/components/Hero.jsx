@@ -15,7 +15,7 @@ export function Hero() {
     }
 
     const playSlowly = () => {
-      video.playbackRate = 0.45
+      video.playbackRate = 1
       video.play().catch(() => {
         // Muted autoplay can still be blocked until the browser is ready.
       })

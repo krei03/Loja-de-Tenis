@@ -6,7 +6,7 @@ const viewports = [
 ]
 
 for (const viewport of viewports) {
-  test(`hero video plays slowly on ${viewport.name}`, async ({ page }) => {
+  test(`hero video plays automatically on ${viewport.name}`, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height })
     await page.goto('http://localhost:5173', { waitUntil: 'networkidle' })
 
@@ -33,6 +33,6 @@ for (const viewport of viewports) {
 
     expect(box?.height).toBe(viewport.height)
     expect(after).toBeGreaterThan(before)
-    expect(playbackRate).toBeLessThan(1)
+    expect(playbackRate).toBe(1)
   })
 }
