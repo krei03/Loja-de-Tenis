@@ -8,75 +8,32 @@ export function Hero() {
   const videoRef = useRef(null)
 
   useEffect(() => {
-    const hero = heroRef.current
     const video = videoRef.current
 
-    if (!hero || !video) {
+    if (!video) {
       return undefined
     }
 
-    let heroTop = 0
-    let scrollable = 1
-    let duration = 0
-    let frameId = 0
-
-    const clampProgress = (value) => Math.min(Math.max(value, 0), 1)
-
-    const updateVideoTime = () => {
-      if (!duration) {
-        return
-      }
-
-      const progress = clampProgress((window.scrollY - heroTop) / scrollable)
-      const nextTime = duration * progress
-      hero.style.setProperty('--hero-progress', progress.toFixed(4))
-
-      if (Math.abs(video.currentTime - nextTime) > 0.012) {
-        video.currentTime = nextTime
-      }
+    const playSlowly = () => {
+      video.playbackRate = 0.45
+      video.play().catch(() => {
+        // Muted autoplay can still be blocked until the browser is ready.
+      })
     }
 
-    const syncVideo = () => {
-      updateVideoTime()
-      cancelAnimationFrame(frameId)
-      frameId = requestAnimationFrame(updateVideoTime)
-    }
-
-    const measureHero = () => {
-      const rect = hero.getBoundingClientRect()
-      heroTop = rect.top + window.scrollY
-      scrollable = Math.max(hero.offsetHeight - window.innerHeight, 1)
-      syncVideo()
-    }
-
-    const prepareVideo = () => {
-      video.pause()
-      duration = Number.isFinite(video.duration) ? video.duration : 0
-      measureHero()
-    }
-
-    video.pause()
-    video.load()
-    video.addEventListener('loadedmetadata', prepareVideo)
-    video.addEventListener('durationchange', prepareVideo)
-    window.addEventListener('scroll', syncVideo, { passive: true })
-    window.addEventListener('resize', measureHero)
-    window.addEventListener('orientationchange', measureHero)
-    measureHero()
+    video.addEventListener('loadedmetadata', playSlowly)
+    video.addEventListener('canplay', playSlowly)
+    playSlowly()
 
     return () => {
-      video.removeEventListener('loadedmetadata', prepareVideo)
-      video.removeEventListener('durationchange', prepareVideo)
-      window.removeEventListener('scroll', syncVideo)
-      window.removeEventListener('resize', measureHero)
-      window.removeEventListener('orientationchange', measureHero)
-      cancelAnimationFrame(frameId)
+      video.removeEventListener('loadedmetadata', playSlowly)
+      video.removeEventListener('canplay', playSlowly)
     }
   }, [])
 
   return (
     <section className="hero" ref={heroRef}>
-      <video ref={videoRef} muted playsInline preload="auto" className="hero-video">
+      <video ref={videoRef} muted playsInline preload="auto" autoPlay loop className="hero-video">
         <source src={heroVideo} type="video/mp4" />
       </video>
 

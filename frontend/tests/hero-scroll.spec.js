@@ -6,7 +6,7 @@ const viewports = [
 ]
 
 for (const viewport of viewports) {
-  test(`hero video follows scroll on ${viewport.name}`, async ({ page }) => {
+  test(`hero video plays slowly on ${viewport.name}`, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height })
     await page.goto('http://localhost:5173', { waitUntil: 'networkidle' })
 
@@ -26,12 +26,13 @@ for (const viewport of viewports) {
     )
 
     const before = await video.evaluate((element) => element.currentTime)
-    await page.evaluate(() => window.scrollTo(0, Math.round(window.innerHeight * 0.8)))
-    await page.waitForTimeout(160)
+    await page.waitForTimeout(500)
     const after = await video.evaluate((element) => element.currentTime)
+    const playbackRate = await video.evaluate((element) => element.playbackRate)
     const box = await video.boundingBox()
 
     expect(box?.height).toBe(viewport.height)
     expect(after).toBeGreaterThan(before)
+    expect(playbackRate).toBeLessThan(1)
   })
 }
