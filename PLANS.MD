@@ -71,7 +71,14 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 - [x] Evitar sensação de vídeo “pesado”, travado ou desalinhado ao rolar para baixo.
 - [x] Ajustar suavização para o vídeo acompanhar o scroll sem atraso perceptível.
 - [x] Testar o hero em desktop e mobile após a correção.
-
+- [x] Melhorar a experiência visual do hero para parecer uma campanha premium de sneakers.
+- [x] Corrigir e refinar a sincronização do vídeo com o scroll.
+- [x] Reduzir qualquer atraso entre rolagem e avanço do vídeo.
+- [x] Garantir que o vídeo avance ao descer e retorne ao subir sem travar.
+- [x] Otimizar performance do hero em desktop e mobile.
+- [x] Melhorar transição entre o hero cinematográfico e as seções de produtos.
+- [x] Adicionar estética mais premium ao hero com overlay, contraste e sensação de profundidade.
+- [x] Evitar que o hero pareça apenas um vídeo comum no fundo da página.
 ---
 
 # Surprises & Discoveries
@@ -120,6 +127,12 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 
 - Observação: O teste automatizado do hero confirma avanço do vídeo no desktop e no mobile.
   Evidência: `npm run test:hero` executou 2 testes Playwright em viewports 1440x900 e 390x844, ambos aprovados.
+
+- Observação: O hero precisava de linguagem visual de campanha, não apenas vídeo fullscreen.
+  Evidência: Foram adicionados moldura cinematográfica, grade sutil, linha de profundidade, painel de campanha, CTA editorial e transição escura para a vitrine.
+
+- Observação: A variável CSS `--hero-progress` permite que o tratamento visual acompanhe a rolagem sem cálculos pesados adicionais no CSS.
+  Evidência: `frontend/src/components/Hero.jsx` atualiza `--hero-progress` junto com `video.currentTime`, e `frontend/src/styles/app.css` usa a variável em brilho e profundidade.
 
 ---
 
@@ -177,6 +190,14 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
   Justificativa: O item pendente exigia testar a correção em desktop e mobile; o teste evita regressão no comportamento de scroll-sync.
   Data/Autor: 2026-05-21 / Codex
 
+- Decisão: Transformar o hero em uma composição de campanha usando camadas CSS leves em vez de novos assets pesados.
+  Justificativa: Aumenta a sensação premium/cinematográfica sem prejudicar a performance nem depender de imagens extras.
+  Data/Autor: 2026-05-21 / Codex
+
+- Decisão: Manter o painel de campanha oculto no breakpoint mobile.
+  Justificativa: Preserva impacto visual e evita sobreposição em telas estreitas.
+  Data/Autor: 2026-05-21 / Codex
+
 ---
 
 # Outcomes & Retrospective
@@ -192,6 +213,10 @@ O projeto agora possui MySQL no Docker, seed automático, filtros por marca/tama
 Terceira etapa funcional concluída em 2026-05-21.
 
 O hero foi ajustado para sincronizar com menos atraso usando geometria cacheada e atualização imediata do `currentTime`; a validação automatizada desktop/mobile foi adicionada.
+
+Quarta etapa funcional concluída em 2026-05-21.
+
+O hero recebeu tratamento de campanha premium com moldura cinematográfica, profundidade, overlay reativo ao scroll, CTA editorial e transição visual mais suave para a vitrine de produtos.
 
 Pendência recomendada para evolução: autenticação robusta com hash/JWT, edição visual de produtos, histórico de pedidos no admin e integração de pagamento real.
 
@@ -383,7 +408,24 @@ O backend possuirá:
 ```txt
 frontend/src/components/Hero.jsx
 ```
+- Melhorar o componente do hero para transformar o vídeo principal em uma experiência cinematográfica premium.
 
+- Revisar a lógica atual de sincronização do vídeo com o scroll, pois o vídeo está apresentando sensação de atraso quando o usuário rola a página para baixo.
+
+- A lógica deverá ser ajustada para que o progresso do scroll controle o `video.currentTime` de forma mais precisa e fluida.
+
+- O evento de scroll não deve executar cálculos pesados o tempo inteiro.
+
+- A implementação deverá usar `requestAnimationFrame` para controlar a atualização do vídeo com mais performance.
+
+- Também deverá ser feito cache dos valores de posição e altura do hero, evitando uso excessivo de `getBoundingClientRect()` durante a rolagem.
+
+- A geometria do hero deverá ser recalculada apenas quando necessário, como em:
+
+```txt
+resize
+orientationchange
+loadedmetadata
 
 ---
 
@@ -843,6 +885,9 @@ npx playwright install chromium
 npm install -D @playwright/test
 npm run test:hero
 Remove-Item -Recurse -Force -LiteralPath frontend/test-results
+npm run build
+npm run lint
+Invoke-WebRequest -Uri http://localhost:5173
 ```
 
 Validação realizada:
@@ -872,6 +917,10 @@ frontend Docker apos troca do video: HTTP 200
 frontend npm run build apos ajuste do hero: OK
 frontend npm run lint apos ajuste do hero: OK
 frontend npm run test:hero: OK, 2 testes aprovados em desktop e mobile
+frontend npm run build apos camada premium do hero: OK
+frontend npm run lint apos camada premium do hero: OK
+frontend npm run test:hero apos camada premium do hero: OK, 2 testes aprovados em desktop e mobile
+frontend Docker apos camada premium do hero: HTTP 200
 ```
 
 Commit criado:
@@ -880,6 +929,7 @@ Commit criado:
 feat: criar ecommerce premium de tenis
 feat: adicionar admin mysql e checkout
 fix: sincronizar hero com scroll sem atraso
+feat: aprimorar hero premium
 ```
 
 ---

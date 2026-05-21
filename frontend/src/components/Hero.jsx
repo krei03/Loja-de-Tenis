@@ -29,6 +29,7 @@ export function Hero() {
 
       const progress = clampProgress((window.scrollY - heroTop) / scrollable)
       const nextTime = duration * progress
+      hero.style.setProperty('--hero-progress', progress.toFixed(4))
 
       if (Math.abs(video.currentTime - nextTime) > 0.012) {
         video.currentTime = nextTime
@@ -79,6 +80,12 @@ export function Hero() {
         <source src={heroVideo} type="video/mp4" />
       </video>
 
+      <div className="hero-cinema" aria-hidden="true">
+        <div className="hero-frame hero-frame-top"></div>
+        <div className="hero-frame hero-frame-bottom"></div>
+        <div className="hero-depth-line"></div>
+      </div>
+
       <div className="hero-copy">
         <motion.p
           className="eyebrow"
@@ -105,11 +112,28 @@ export function Hero() {
           Drops selecionados, experiencia cinematografica e curadoria para quem compra
           tenis como peca central do look.
         </motion.p>
+        <motion.div
+          className="hero-actions"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.28 }}
+        >
+          <a href="#launches">Ver drops</a>
+          <span>FW26 / Curadoria premium</span>
+        </motion.div>
       </div>
+
+      <aside className="hero-campaign" aria-label="Resumo da campanha Vertex">
+        <span>Campaign 01</span>
+        <strong>Scroll film</strong>
+        <p>4 silhuetas / drops verificados / envio rastreado</p>
+      </aside>
 
       <div className="scroll-cue">
         <ArrowDown size={18} />
       </div>
+
+      <div className="hero-transition" aria-hidden="true"></div>
     </section>
   )
 }
