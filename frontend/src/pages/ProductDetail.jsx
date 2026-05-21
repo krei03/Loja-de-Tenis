@@ -37,6 +37,7 @@ export function ProductDetail({ products, onAdd }) {
           <p>{product.badge}</p>
           <h1>{product.name}</h1>
           <strong>{money.format(product.price)}</strong>
+          <small>{product.brand} / estoque {product.stock ?? 0}</small>
           <span>{product.description}</span>
 
           <div className="sizes">

@@ -5,6 +5,7 @@ import { Cart } from './components/Cart'
 import { Home } from './pages/Home'
 import { ProductDetail } from './pages/ProductDetail'
 import { Admin } from './pages/Admin'
+import { Checkout } from './pages/Checkout'
 import { api } from './services/api'
 
 function App() {
@@ -52,6 +53,10 @@ function App() {
     setCart((items) => items.filter((item) => item.id !== id))
   }
 
+  const refreshProducts = () => {
+    api.getProducts().then(setProducts)
+  }
+
   return (
     <BrowserRouter>
       <Navbar cartCount={cartCount} />
@@ -69,7 +74,11 @@ function App() {
             />
           }
         />
-        <Route path="/admin" element={<Admin products={products} />} />
+        <Route path="/checkout" element={<Checkout cart={cart} onOrderPlaced={() => setCart([])} />} />
+        <Route
+          path="/admin"
+          element={<Admin products={products} onProductsChanged={refreshProducts} />}
+        />
       </Routes>
     </BrowserRouter>
   )

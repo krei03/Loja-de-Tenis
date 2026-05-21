@@ -16,15 +16,21 @@ export function Hero() {
     }
 
     video.pause()
+    video.currentTime = 0
+    let frameId = 0
 
     const syncVideo = () => {
-      const rect = hero.getBoundingClientRect()
-      const scrollable = hero.offsetHeight - window.innerHeight
-      const progress = Math.min(Math.max(Math.abs(rect.top) / scrollable, 0), 1)
+      cancelAnimationFrame(frameId)
+      frameId = requestAnimationFrame(() => {
+        const rect = hero.getBoundingClientRect()
+        const scrollable = hero.offsetHeight - window.innerHeight
+        const rawProgress = -rect.top / scrollable
+        const progress = Math.min(Math.max(rawProgress, 0), 1)
 
-      if (Number.isFinite(video.duration)) {
-        video.currentTime = video.duration * progress
-      }
+        if (Number.isFinite(video.duration)) {
+          video.currentTime = video.duration * progress
+        }
+      })
     }
 
     video.addEventListener('loadedmetadata', syncVideo)
@@ -36,6 +42,7 @@ export function Hero() {
       video.removeEventListener('loadedmetadata', syncVideo)
       window.removeEventListener('scroll', syncVideo)
       window.removeEventListener('resize', syncVideo)
+      cancelAnimationFrame(frameId)
     }
   }, [])
 

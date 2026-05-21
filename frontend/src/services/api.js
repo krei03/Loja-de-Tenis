@@ -1,6 +1,19 @@
 import { categories as localCategories, products as localProducts } from '../data/products'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const API_ORIGIN = API_URL.replace(/\/api$/, '')
+
+function buildQuery(params = {}) {
+  const search = new URLSearchParams()
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '' && value !== 'all') {
+      search.set(key, value)
+    }
+  })
+
+  return search.toString() ? `?${search.toString()}` : ''
+}
 
 async function request(path, options) {
   try {
@@ -8,6 +21,10 @@ async function request(path, options) {
 
     if (!response.ok) {
       throw new Error(`API error ${response.status}`)
+    }
+
+    if (response.status === 204) {
+      return null
     }
 
     return await response.json()
@@ -25,8 +42,47 @@ async function request(path, options) {
 }
 
 export const api = {
-  getProducts: () => request('/products'),
+  getProducts: (params) => request(`/products${buildQuery(params)}`),
   getCategories: () => request('/categories'),
+  loginAdmin: (payload) =>
+    request('/auth/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+  createProduct: (payload, token) =>
+    request('/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    }),
+  deleteProduct: (id, token) =>
+    request(`/products/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+  uploadImage: async (file, token) => {
+    const body = new FormData()
+    body.append('image', file)
+
+    const result = await request('/uploads/image', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body,
+    })
+
+    return {
+      ...result,
+      url: result.url?.startsWith('/uploads') ? `${API_ORIGIN}${result.url}` : result.url,
+    }
+  },
   createOrder: (payload) =>
     request('/orders', {
       method: 'POST',

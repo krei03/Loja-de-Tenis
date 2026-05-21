@@ -1,4 +1,4 @@
-export const categories = [
+export const seedCategories = [
   { id: 'all', name: 'Todos' },
   { id: 'launch', name: 'Lancamentos' },
   { id: 'running', name: 'Performance' },
@@ -6,7 +6,7 @@ export const categories = [
   { id: 'limited', name: 'Limitados' },
 ]
 
-export const products = [
+export const seedProducts = [
   {
     id: 'aero-volt-01',
     name: 'Aero Volt 01',

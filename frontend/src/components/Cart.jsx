@@ -1,4 +1,5 @@
-import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Minus, Plus, ShieldCheck, ShoppingBag, Trash2, Truck } from 'lucide-react'
 
 const money = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -50,7 +51,15 @@ export function Cart({ cart, onIncrement, onDecrement, onRemove }) {
           <aside className="checkout-panel">
             <p>Subtotal</p>
             <strong>{money.format(subtotal)}</strong>
-            <button type="button">Finalizar pedido</button>
+            <span>
+              <Truck size={16} />
+              Frete gratis acima de R$ 1.200
+            </span>
+            <span>
+              <ShieldCheck size={16} />
+              Compra protegida
+            </span>
+            <Link to="/checkout">Finalizar pedido</Link>
           </aside>
         </div>
       )}

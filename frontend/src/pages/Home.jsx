@@ -8,22 +8,34 @@ import { api } from '../services/api'
 export function Home({ onAdd }) {
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
-  const [activeCategory, setActiveCategory] = useState('all')
+  const [filters, setFilters] = useState({
+    category: 'all',
+    brand: 'all',
+    size: '',
+    minPrice: '',
+    maxPrice: '',
+  })
 
   useEffect(() => {
-    Promise.all([api.getProducts(), api.getCategories()]).then(([productData, categoryData]) => {
+    Promise.all([api.getProducts(filters), api.getCategories()]).then(([productData, categoryData]) => {
       setProducts(productData)
       setCategories(categoryData)
     })
-  }, [])
+  }, [filters])
 
-  const visibleProducts = useMemo(() => {
-    if (activeCategory === 'all') {
-      return products
-    }
+  const brands = useMemo(() => [...new Set(products.map((product) => product.brand))], [products])
+  const sizes = useMemo(
+    () => [...new Set(products.flatMap((product) => product.sizes || []))].sort((a, b) => a - b),
+    [products],
+  )
 
-    return products.filter((product) => product.category === activeCategory)
-  }, [activeCategory, products])
+  const updateFilter = (event) => {
+    setFilters((current) => ({ ...current, [event.target.name]: event.target.value }))
+  }
+
+  const setCategory = (category) => {
+    setFilters((current) => ({ ...current, category }))
+  }
 
   return (
     <>
@@ -37,7 +49,7 @@ export function Home({ onAdd }) {
           </div>
 
           <div className="product-grid">
-            {visibleProducts.map((product) => (
+            {products.map((product) => (
               <ProductCard product={product} key={product.id} onAdd={onAdd} />
             ))}
           </div>
@@ -54,13 +66,34 @@ export function Home({ onAdd }) {
               <button
                 type="button"
                 key={category.id}
-                className={activeCategory === category.id ? 'active' : ''}
-                onClick={() => setActiveCategory(category.id)}
+                className={filters.category === category.id ? 'active' : ''}
+                onClick={() => setCategory(category.id)}
               >
                 <Filter size={16} />
                 {category.name}
               </button>
             ))}
+          </div>
+
+          <div className="advanced-filters">
+            <select name="brand" value={filters.brand} onChange={updateFilter}>
+              <option value="all">Todas as marcas</option>
+              {brands.map((brand) => (
+                <option value={brand} key={brand}>
+                  {brand}
+                </option>
+              ))}
+            </select>
+            <select name="size" value={filters.size} onChange={updateFilter}>
+              <option value="">Todos os tamanhos</option>
+              {sizes.map((size) => (
+                <option value={size} key={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+            <input name="minPrice" type="number" placeholder="Preco min." value={filters.minPrice} onChange={updateFilter} />
+            <input name="maxPrice" type="number" placeholder="Preco max." value={filters.maxPrice} onChange={updateFilter} />
           </div>
         </section>
 

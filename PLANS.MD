@@ -55,6 +55,17 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 - [x] Implementar responsividade.
 - [x] Criar animações suaves.
 - [x] Finalizar identidade visual premium.
+- [x] Melhorar painel admin
+- [x] Criar login do admin
+- [x] Conectar produtos em banco MySQL
+- [x] Criar cadastro real de produtos
+- [x] Criar upload de imagens dos tênis
+- [x] Criar checkout/pedidos
+- [x] Melhorar carrinho
+- [x] Criar página de finalização de compra
+- [x] Criar filtros por marca, tamanho e preço
+- [x] Melhorar versão mobile
+- [x] Otimizar hero com vídeo no scroll
 
 ---
 
@@ -81,8 +92,20 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 - Observação: A validação temporária do backend via `npm run start` excedeu o timeout porque o servidor permanece ativo, como esperado.
   Evidência: A validação foi refeita com processo temporário e chamada HTTP para `/health`.
 
-- Observação: O backend usa armazenamento em memória nesta etapa.
-  Evidência: Os dados ficam em `backend/src/database/store.js`; a dependência `mysql2` foi instalada conforme plano, mas ainda não foi conectada a um banco real.
+- Observação: A primeira versão do backend usava armazenamento em memória; isso foi mantido apenas como fallback local.
+  Evidência: Os dados iniciais foram extraídos para `backend/src/database/seed.js` e o Docker usa MySQL real via `backend/src/database/mysql.js`.
+
+- Observação: Nesta etapa o plano vivo passou a estar na raiz como `PLANS.MD`, enquanto `assets/PLANS.MD` aparece removido no Git.
+  Evidência: `Get-Content -Raw -LiteralPath PLANS.MD` funcionou e `assets/PLANS.MD` retornou caminho inexistente.
+
+- Observação: A porta local `3306` já estava ocupada durante a primeira subida do MySQL no Docker.
+  Evidência: `docker compose up --build -d` falhou com erro de bind em `0.0.0.0:3306`; a publicação da porta foi removida porque o backend usa a rede interna do Compose.
+
+- Observação: O backend agora inicializa MySQL com retry e usa fallback em memória fora do Docker.
+  Evidência: Localmente `/health` retornou `database: memory`; no Docker `/health` retornou `database: mysql`.
+
+- Observação: O upload de imagem foi validado com um SVG local e o arquivo temporário foi removido após o teste.
+  Evidência: `curl.exe -F image=@frontend/public/favicon.svg` retornou URL em `/uploads/...`; `backend/public/uploads/.gitkeep` mantém a pasta versionada.
 
 ---
 
@@ -120,6 +143,18 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
   Justificativa: Garante impacto visual imediato nos cards e galerias enquanto não houver catálogo próprio de imagens.
   Data/Autor: 2026-05-21 / Codex
 
+- Decisão: Adicionar MySQL 8.4 ao Docker Compose sem expor a porta `3306` no host.
+  Justificativa: Evita conflito com MySQL local e mantém o banco acessível ao backend pela rede interna do Docker.
+  Data/Autor: 2026-05-21 / Codex
+
+- Decisão: Proteger CRUD administrativo com token simples retornado pelo login admin.
+  Justificativa: Entrega fluxo admin funcional sem adicionar complexidade de JWT/bcrypt nesta etapa.
+  Data/Autor: 2026-05-21 / Codex
+
+- Decisão: Otimizar o scroll-sync do hero com `requestAnimationFrame`.
+  Justificativa: Reduz atraso perceptível entre rolagem e atualização de `video.currentTime`.
+  Data/Autor: 2026-05-21 / Codex
+
 ---
 
 # Outcomes & Retrospective
@@ -128,7 +163,11 @@ Primeira versão funcional concluída em 2026-05-21.
 
 O projeto possui frontend React/Vite, backend Express, Docker Compose, hero cinematográfico com vídeo sincronizado ao scroll, catálogo, categorias, página de produto, carrinho e painel admin simples.
 
-Pendência recomendada para evolução: persistência real em MySQL, autenticação/admin completo e checkout/pedidos com fluxo de pagamento.
+Segunda etapa funcional concluída em 2026-05-21.
+
+O projeto agora possui MySQL no Docker, seed automático, filtros por marca/tamanho/preço, login admin, cadastro real de produtos, upload de imagem, checkout com criação de pedido e hero com sincronização otimizada.
+
+Pendência recomendada para evolução: autenticação robusta com hash/JWT, edição visual de produtos, histórico de pedidos no admin e integração de pagamento real.
 
 ---
 
@@ -303,7 +342,22 @@ O backend possuirá:
 - gerenciamento de pedidos;
 - painel admin simples.
 
-O projeto deverá funcionar completamente dentro do Docker.
+- O projeto deverá funcionar completamente dentro do Docker.
+- Transformar o ecommerce de uma versão visual/demonstrativa para uma loja mais real, com produtos salvos no banco, admin funcional e fluxo de compra mais completo.
+
+
+- Corrigir o comportamento do vídeo cinematográfico do hero, pois atualmente existe um atraso entre o movimento do scroll e a atualização do tempo do vídeo.
+
+- A lógica atual de sincronização deverá ser revisada para garantir que o `currentTime` do vídeo acompanhe o progresso real do scroll de forma mais precisa.
+
+- A correção deve evitar que o vídeo pareça estar “atrasado” em relação à rolagem, principalmente quando o usuário desce a página rapidamente.
+
+- O componente responsável pelo hero, provavelmente em:
+
+```txt
+frontend/src/components/Hero.jsx
+```
+
 
 ---
 
@@ -705,6 +759,16 @@ frontend/src/pages/Home.jsx
 frontend/src/pages/ProductDetail.jsx
 frontend/src/services/api.js
 frontend/src/styles/app.css
+frontend/src/pages/Checkout.jsx
+backend/src/controllers/authController.js
+backend/src/controllers/uploadController.js
+backend/src/database/mysql.js
+backend/src/database/seed.js
+backend/src/middleware/adminAuth.js
+backend/src/routes/authRoutes.js
+backend/src/routes/uploadRoutes.js
+backend/public/uploads/.gitkeep
+PLANS.MD
 ```
 
 Comandos executados nesta execução:
@@ -736,6 +800,16 @@ git add .
 git commit -m "feat: criar ecommerce premium de tenis"
 git commit --amend --no-edit
 git log --oneline -1
+npm install multer
+Get-Content -Raw -LiteralPath PLANS.MD
+docker compose down
+docker compose up --build -d
+Invoke-RestMethod -Uri http://localhost:8080/health
+Invoke-RestMethod -Uri "http://localhost:8080/api/products?brand=Vertex%20Lab"
+Invoke-RestMethod -Uri http://localhost:8080/api/auth/admin/login -Method Post
+Invoke-WebRequest -Uri http://localhost:5173
+Invoke-RestMethod -Uri http://localhost:8080/api/orders -Method Post
+curl.exe -X POST http://localhost:8080/api/uploads/image -H "Authorization: Bearer vertex-admin-token" -F "image=@frontend/public/favicon.svg"
 ```
 
 Validação realizada:
@@ -750,12 +824,23 @@ frontend Docker em http://localhost:5173: HTTP 200
 backend Docker em http://localhost:8080/health: OK
 backend Docker em http://localhost:8080/api/categories: OK
 docker compose down: OK
+frontend npm run build apos melhorias: OK
+frontend npm run lint apos melhorias: OK
+backend local /health: OK com fallback memory
+backend local /api/products?brand=Vertex%20Lab: OK
+backend Docker /health: OK com database mysql
+backend Docker filtro por marca: OK
+backend Docker login admin: OK
+backend Docker criar pedido: OK
+backend Docker upload de imagem: OK
+frontend Docker em http://localhost:5173: HTTP 200
 ```
 
 Commit criado:
 
 ```txt
 feat: criar ecommerce premium de tenis
+feat: adicionar admin mysql e checkout
 ```
 
 ---

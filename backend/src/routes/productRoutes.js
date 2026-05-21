@@ -6,11 +6,12 @@ import {
   getProducts,
   updateProduct,
 } from '../controllers/productController.js'
+import { requireAdmin } from '../middleware/adminAuth.js'
 
 export const productRoutes = Router()
 
 productRoutes.get('/', getProducts)
 productRoutes.get('/:id', getProductById)
-productRoutes.post('/', createProduct)
-productRoutes.put('/:id', updateProduct)
-productRoutes.delete('/:id', deleteProduct)
+productRoutes.post('/', requireAdmin, createProduct)
+productRoutes.put('/:id', requireAdmin, updateProduct)
+productRoutes.delete('/:id', requireAdmin, deleteProduct)
