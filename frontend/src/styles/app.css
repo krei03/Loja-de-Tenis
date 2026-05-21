@@ -144,6 +144,8 @@ video {
   height: 100vh;
   object-fit: cover;
   filter: saturate(0.98) contrast(1.05) brightness(0.66);
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .hero::after {

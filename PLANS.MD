@@ -66,6 +66,11 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 - [x] Criar filtros por marca, tamanho e preço
 - [x] Melhorar versão mobile
 - [x] Otimizar hero com vídeo no scroll
+- [x] Corrigir atraso/delay entre o scroll da página e o tempo do vídeo no hero.
+- [x] Melhorar sincronização do `video.currentTime` com o progresso real do scroll.
+- [x] Evitar sensação de vídeo “pesado”, travado ou desalinhado ao rolar para baixo.
+- [x] Ajustar suavização para o vídeo acompanhar o scroll sem atraso perceptível.
+- [x] Testar o hero em desktop e mobile após a correção.
 
 ---
 
@@ -109,6 +114,12 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 
 - Observação: O vídeo do hero foi substituído pelo usuário em `assets/video_hero.mp4` e sincronizado com o asset usado pelo frontend.
   Evidência: `frontend/assets/video_hero.mp4` foi atualizado via `Copy-Item` a partir de `assets/video_hero.mp4`.
+
+- Observação: O atraso perceptível do hero estava ligado ao cálculo de layout durante o scroll e ao uso do `requestAnimationFrame` como único momento de atualização.
+  Evidência: A implementação antiga lia `getBoundingClientRect()` em todo scroll e atualizava `video.currentTime` apenas dentro do frame seguinte.
+
+- Observação: O teste automatizado do hero confirma avanço do vídeo no desktop e no mobile.
+  Evidência: `npm run test:hero` executou 2 testes Playwright em viewports 1440x900 e 390x844, ambos aprovados.
 
 ---
 
@@ -158,6 +169,14 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
   Justificativa: Reduz atraso perceptível entre rolagem e atualização de `video.currentTime`.
   Data/Autor: 2026-05-21 / Codex
 
+- Decisão: Cachear a geometria do hero e atualizar `video.currentTime` imediatamente no evento de scroll, usando `requestAnimationFrame` apenas como correção final do frame.
+  Justificativa: Evita leitura de layout em cada scroll e reduz a sensação de atraso entre rolagem e vídeo.
+  Data/Autor: 2026-05-21 / Codex
+
+- Decisão: Adicionar `@playwright/test` e um teste específico do hero em desktop/mobile.
+  Justificativa: O item pendente exigia testar a correção em desktop e mobile; o teste evita regressão no comportamento de scroll-sync.
+  Data/Autor: 2026-05-21 / Codex
+
 ---
 
 # Outcomes & Retrospective
@@ -169,6 +188,10 @@ O projeto possui frontend React/Vite, backend Express, Docker Compose, hero cine
 Segunda etapa funcional concluída em 2026-05-21.
 
 O projeto agora possui MySQL no Docker, seed automático, filtros por marca/tamanho/preço, login admin, cadastro real de produtos, upload de imagem, checkout com criação de pedido e hero com sincronização otimizada.
+
+Terceira etapa funcional concluída em 2026-05-21.
+
+O hero foi ajustado para sincronizar com menos atraso usando geometria cacheada e atualização imediata do `currentTime`; a validação automatizada desktop/mobile foi adicionada.
 
 Pendência recomendada para evolução: autenticação robusta com hash/JWT, edição visual de produtos, histórico de pedidos no admin e integração de pagamento real.
 
@@ -763,6 +786,7 @@ frontend/src/pages/ProductDetail.jsx
 frontend/src/services/api.js
 frontend/src/styles/app.css
 frontend/src/pages/Checkout.jsx
+frontend/tests/hero-scroll.spec.js
 backend/src/controllers/authController.js
 backend/src/controllers/uploadController.js
 backend/src/database/mysql.js
@@ -815,6 +839,10 @@ Invoke-RestMethod -Uri http://localhost:8080/api/orders -Method Post
 curl.exe -X POST http://localhost:8080/api/uploads/image -H "Authorization: Bearer vertex-admin-token" -F "image=@frontend/public/favicon.svg"
 Get-Item -LiteralPath assets/video_hero.mp4, frontend/assets/video_hero.mp4
 Copy-Item -LiteralPath assets/video_hero.mp4 -Destination frontend/assets/video_hero.mp4 -Force
+npx playwright install chromium
+npm install -D @playwright/test
+npm run test:hero
+Remove-Item -Recurse -Force -LiteralPath frontend/test-results
 ```
 
 Validação realizada:
@@ -841,6 +869,9 @@ backend Docker upload de imagem: OK
 frontend Docker em http://localhost:5173: HTTP 200
 video_hero.mp4 sincronizado entre assets/ e frontend/assets/: OK
 frontend Docker apos troca do video: HTTP 200
+frontend npm run build apos ajuste do hero: OK
+frontend npm run lint apos ajuste do hero: OK
+frontend npm run test:hero: OK, 2 testes aprovados em desktop e mobile
 ```
 
 Commit criado:
@@ -848,6 +879,7 @@ Commit criado:
 ```txt
 feat: criar ecommerce premium de tenis
 feat: adicionar admin mysql e checkout
+fix: sincronizar hero com scroll sem atraso
 ```
 
 ---

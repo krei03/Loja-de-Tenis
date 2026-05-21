@@ -15,33 +15,60 @@ export function Hero() {
       return undefined
     }
 
-    video.pause()
-    video.currentTime = 0
+    let heroTop = 0
+    let scrollable = 1
+    let duration = 0
     let frameId = 0
 
-    const syncVideo = () => {
-      cancelAnimationFrame(frameId)
-      frameId = requestAnimationFrame(() => {
-        const rect = hero.getBoundingClientRect()
-        const scrollable = hero.offsetHeight - window.innerHeight
-        const rawProgress = -rect.top / scrollable
-        const progress = Math.min(Math.max(rawProgress, 0), 1)
+    const clampProgress = (value) => Math.min(Math.max(value, 0), 1)
 
-        if (Number.isFinite(video.duration)) {
-          video.currentTime = video.duration * progress
-        }
-      })
+    const updateVideoTime = () => {
+      if (!duration) {
+        return
+      }
+
+      const progress = clampProgress((window.scrollY - heroTop) / scrollable)
+      const nextTime = duration * progress
+
+      if (Math.abs(video.currentTime - nextTime) > 0.012) {
+        video.currentTime = nextTime
+      }
     }
 
-    video.addEventListener('loadedmetadata', syncVideo)
+    const syncVideo = () => {
+      updateVideoTime()
+      cancelAnimationFrame(frameId)
+      frameId = requestAnimationFrame(updateVideoTime)
+    }
+
+    const measureHero = () => {
+      const rect = hero.getBoundingClientRect()
+      heroTop = rect.top + window.scrollY
+      scrollable = Math.max(hero.offsetHeight - window.innerHeight, 1)
+      syncVideo()
+    }
+
+    const prepareVideo = () => {
+      video.pause()
+      duration = Number.isFinite(video.duration) ? video.duration : 0
+      measureHero()
+    }
+
+    video.pause()
+    video.load()
+    video.addEventListener('loadedmetadata', prepareVideo)
+    video.addEventListener('durationchange', prepareVideo)
     window.addEventListener('scroll', syncVideo, { passive: true })
-    window.addEventListener('resize', syncVideo)
-    syncVideo()
+    window.addEventListener('resize', measureHero)
+    window.addEventListener('orientationchange', measureHero)
+    measureHero()
 
     return () => {
-      video.removeEventListener('loadedmetadata', syncVideo)
+      video.removeEventListener('loadedmetadata', prepareVideo)
+      video.removeEventListener('durationchange', prepareVideo)
       window.removeEventListener('scroll', syncVideo)
-      window.removeEventListener('resize', syncVideo)
+      window.removeEventListener('resize', measureHero)
+      window.removeEventListener('orientationchange', measureHero)
       cancelAnimationFrame(frameId)
     }
   }, [])
