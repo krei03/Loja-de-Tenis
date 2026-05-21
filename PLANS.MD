@@ -79,6 +79,15 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 - [x] Melhorar transição entre o hero cinematográfico e as seções de produtos.
 - [x] Adicionar estética mais premium ao hero com overlay, contraste e sensação de profundidade.
 - [x] Evitar que o hero pareça apenas um vídeo comum no fundo da página.
+- [x] Corrigir responsividade geral do ecommerce.
+- [x] Ajustar hero para funcionar bem em notebook, desktop e mobile.
+- [x] Reduzir tamanho dos textos grandes no hero e nas seções.
+- [x] Corrigir quebra feia do título “Seleção premium em tempo real”.
+- [x] Ajustar grid de produtos para não ficar espremido.
+- [x] Melhorar espaçamento entre hero e seção de lançamentos.
+- [x] Corrigir navbar em telas menores.
+- [x] Garantir que cards de produtos tenham tamanho proporcional.
+- [x] Testar layout em 390px, 768px, 1024px, 1366px e 1920px.
 ---
 
 # Surprises & Discoveries
@@ -133,6 +142,12 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 
 - Observação: A variável CSS `--hero-progress` permite que o tratamento visual acompanhe a rolagem sem cálculos pesados adicionais no CSS.
   Evidência: `frontend/src/components/Hero.jsx` atualiza `--hero-progress` junto com `video.currentTime`, e `frontend/src/styles/app.css` usa a variável em brilho e profundidade.
+
+- Observação: O teste responsivo revelou que, antes do ajuste final, os cards ainda ficavam apertados em 1024px e o título de lançamentos ficava alto em 1366px/1920px.
+  Evidência: A primeira execução de `npm run test:responsive` falhou em notebook, desktop e wide; depois do ajuste de grid/tipografia, os 5 viewports passaram.
+
+- Observação: O ESLint tentou ler a pasta temporária `frontend/test-results` criada pelo Playwright.
+  Evidência: `npm run lint` retornou erro `ENOENT` para `frontend/test-results`; `frontend/eslint.config.js` foi atualizado para ignorar `test-results` e `playwright-report`.
 
 ---
 
@@ -198,6 +213,14 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
   Justificativa: Preserva impacto visual e evita sobreposição em telas estreitas.
   Data/Autor: 2026-05-21 / Codex
 
+- Decisão: Trocar o grid rígido de produtos por `auto-fit` com largura mínima maior para cards.
+  Justificativa: Evita cards esmagados em notebook/tablet e preserva proporção premium em desktop.
+  Data/Autor: 2026-05-21 / Codex
+
+- Decisão: Centralizar seções com `--page-max` e reduzir a escala dos títulos principais.
+  Justificativa: Impede textos gigantes em notebooks e corrige a quebra visual de “Seleção premium em tempo real”.
+  Data/Autor: 2026-05-21 / Codex
+
 ---
 
 # Outcomes & Retrospective
@@ -217,6 +240,10 @@ O hero foi ajustado para sincronizar com menos atraso usando geometria cacheada 
 Quarta etapa funcional concluída em 2026-05-21.
 
 O hero recebeu tratamento de campanha premium com moldura cinematográfica, profundidade, overlay reativo ao scroll, CTA editorial e transição visual mais suave para a vitrine de produtos.
+
+Quinta etapa funcional concluída em 2026-05-21.
+
+A responsividade geral foi refinada para 390px, 768px, 1024px, 1366px e 1920px, com grid fluido, títulos menores, seções centralizadas, navbar mais compacta e cards proporcionais.
 
 Pendência recomendada para evolução: autenticação robusta com hash/JWT, edição visual de produtos, histórico de pedidos no admin e integração de pagamento real.
 
@@ -449,6 +476,20 @@ Estrutura esperada:
 frontend/
 backend/
 ```
+
+- Revisar toda a responsividade do frontend, principalmente o hero, navbar e seção de produtos.
+
+- O site atualmente ainda parece quebrado em telas de notebook, com textos muito grandes, cards apertados e seções desalinhadas.
+
+- O componente do hero deverá ser ajustado para usar tamanhos responsivos com `clamp()`, evitando títulos gigantes em telas menores.
+
+- A seção de lançamentos deverá ter largura máxima centralizada, espaçamento melhor e grid responsivo usando `auto-fit` ou breakpoints bem definidos.
+
+- A navbar deverá ser adaptada para telas menores, reduzindo espaçamentos e, se necessário, escondendo links secundários ou criando menu mobile.
+
+- O objetivo é fazer o site parecer premium em qualquer tamanho de tela, sem textos quebrados, sem cards esmagados e sem excesso de altura visual.
+
+
 
 ---
 
@@ -829,6 +870,8 @@ frontend/src/services/api.js
 frontend/src/styles/app.css
 frontend/src/pages/Checkout.jsx
 frontend/tests/hero-scroll.spec.js
+frontend/tests/responsive-layout.spec.js
+frontend/eslint.config.js
 backend/src/controllers/authController.js
 backend/src/controllers/uploadController.js
 backend/src/database/mysql.js
@@ -888,6 +931,10 @@ Remove-Item -Recurse -Force -LiteralPath frontend/test-results
 npm run build
 npm run lint
 Invoke-WebRequest -Uri http://localhost:5173
+docker compose restart frontend
+npm run test:responsive
+npm run test:hero
+Remove-Item -Recurse -Force -LiteralPath frontend/test-results
 ```
 
 Validação realizada:
@@ -921,6 +968,11 @@ frontend npm run build apos camada premium do hero: OK
 frontend npm run lint apos camada premium do hero: OK
 frontend npm run test:hero apos camada premium do hero: OK, 2 testes aprovados em desktop e mobile
 frontend Docker apos camada premium do hero: HTTP 200
+frontend npm run build apos ajuste responsivo: OK
+frontend npm run lint apos ajuste responsivo: OK
+frontend npm run test:hero apos ajuste responsivo: OK, 2 testes aprovados
+frontend npm run test:responsive: OK, 5 testes aprovados em 390px, 768px, 1024px, 1366px e 1920px
+frontend Docker apos ajuste responsivo: HTTP 200
 ```
 
 Commit criado:
@@ -930,6 +982,7 @@ feat: criar ecommerce premium de tenis
 feat: adicionar admin mysql e checkout
 fix: sincronizar hero com scroll sem atraso
 feat: aprimorar hero premium
+fix: ajustar responsividade geral
 ```
 
 ---

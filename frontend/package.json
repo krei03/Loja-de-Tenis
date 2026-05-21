@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:hero": "playwright test tests/hero-scroll.spec.js"
+    "test:hero": "playwright test tests/hero-scroll.spec.js",
+    "test:responsive": "playwright test tests/responsive-layout.spec.js"
   },
   "dependencies": {
     "framer-motion": "^12.40.0",
