@@ -59,6 +59,15 @@ export const api = {
       },
       body: JSON.stringify(payload),
     }),
+  updateProduct: (id, payload, token) =>
+    request(`/products/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    }),
   deleteProduct: (id, token) =>
     request(`/products/${id}`, {
       method: 'DELETE',

@@ -88,6 +88,12 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 - [x] Corrigir navbar em telas menores.
 - [x] Garantir que cards de produtos tenham tamanho proporcional.
 - [x] Testar layout em 390px, 768px, 1024px, 1366px e 1920px.
+- [x] Adicionar botão de editar produto ao lado da lixeira no painel admin.
+- [x] Corrigir dropdown/listas brancas no admin onde os itens não aparecem para seleção.
+- [x] Corrigir seleção de tamanho do tênis que atualmente está estática e sem interação visual.
+- [x] Melhorar comportamento visual do seletor de tamanhos.
+- [x] Corrigir imagem dos produtos ficando exageradamente grande após aplicar filtros.
+- [x] Ajustar proporção dos cards filtrados para manter visual premium.
 ---
 
 # Surprises & Discoveries
@@ -148,6 +154,18 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 
 - Observação: O ESLint tentou ler a pasta temporária `frontend/test-results` criada pelo Playwright.
   Evidência: `npm run lint` retornou erro `ENOENT` para `frontend/test-results`; `frontend/eslint.config.js` foi atualizado para ignorar `test-results` e `playwright-report`.
+
+- Observação: A API do backend já possuía rota protegida para edição de produto, mas o frontend ainda não chamava essa interface.
+  Evidência: `backend/src/routes/productRoutes.js` possui `productRoutes.put('/:id', requireAdmin, updateProduct)`, enquanto `frontend/src/services/api.js` não tinha `updateProduct`.
+
+- Observação: O seletor de tamanho estava visualmente clicável, mas não guardava estado nem entrava no carrinho.
+  Evidência: `frontend/src/pages/ProductDetail.jsx` renderizava botões sem `onClick`, sem estado ativo e chamava `onAdd(product)` sem tamanho selecionado.
+
+- Observação: O crescimento exagerado dos cards filtrados vinha do grid permitindo que uma única coluna ocupasse todo o espaço disponível.
+  Evidência: `.product-grid` usava `auto-fit` com máximo `1fr`, fazendo um único card esticar no resultado filtrado.
+
+- Observação: O plano ainda descreve o hero como vídeo sincronizado com scroll, mas a direção mais recente do usuário pediu vídeo em autoplay normal sem interação de scroll.
+  Evidência: `frontend/src/components/Hero.jsx` e `frontend/tests/hero-scroll.spec.js` validam autoplay com `playbackRate = 1`.
 
 ---
 
@@ -221,6 +239,22 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
   Justificativa: Impede textos gigantes em notebooks e corrige a quebra visual de “Seleção premium em tempo real”.
   Data/Autor: 2026-05-21 / Codex
 
+- Decisão: Reaproveitar o `PUT /api/products/:id` já existente para implementar edição no painel admin.
+  Justificativa: Mantém a interface alinhada ao backend atual sem criar rotas novas ou duplicar lógica.
+  Data/Autor: 2026-05-21 / Codex
+
+- Decisão: Tratar itens do carrinho por `cartKey` baseada em produto e tamanho selecionado.
+  Justificativa: Permite que o mesmo tênis em tamanhos diferentes seja tratado como escolhas distintas.
+  Data/Autor: 2026-05-21 / Codex
+
+- Decisão: Limitar a largura das colunas do grid de produtos em vez de alterar o componente do card.
+  Justificativa: Corrige o card gigante após filtros preservando o visual existente dos cards em todas as listas.
+  Data/Autor: 2026-05-21 / Codex
+
+- Decisão: Preservar o hero em autoplay normal durante esta execução.
+  Justificativa: O pedido mais recente do usuário sobre o hero foi remover o controle por scroll e manter velocidade normal.
+  Data/Autor: 2026-05-21 / Codex
+
 ---
 
 # Outcomes & Retrospective
@@ -245,7 +279,11 @@ Quinta etapa funcional concluída em 2026-05-21.
 
 A responsividade geral foi refinada para 390px, 768px, 1024px, 1366px e 1920px, com grid fluido, títulos menores, seções centralizadas, navbar mais compacta e cards proporcionais.
 
-Pendência recomendada para evolução: autenticação robusta com hash/JWT, edição visual de produtos, histórico de pedidos no admin e integração de pagamento real.
+Sexta etapa funcional concluída em 2026-05-21.
+
+O painel admin agora permite editar produtos existentes ao lado da ação de deletar, os selects do admin/filtros mantêm contraste em dark mode, o seletor de tamanhos da página de produto possui estado ativo e envia o tamanho para o carrinho, e os cards filtrados mantêm proporção premium sem imagem gigante.
+
+Pendência recomendada para evolução: autenticação robusta com hash/JWT, histórico de pedidos no admin, persistência do tamanho selecionado no pedido e integração de pagamento real.
 
 ---
 
@@ -358,6 +396,22 @@ Backend:
 - Dotenv
 - Mysql2
 
+- O painel admin ainda possui alguns problemas visuais e de usabilidade que precisam ser corrigidos.
+
+- Atualmente existe apenas o botão de excluir produto (lixeira), porém também é necessário um botão de editar produto ao lado da ação de deletar.
+
+- Os selects/dropdowns do admin estão aparecendo totalmente brancos, impossibilitando visualizar os itens da lista ao selecionar opções.
+
+- O seletor de tamanho do tênis na página do produto também não está funcional visualmente e aparenta estar estático.
+
+- Os tamanhos precisam funcionar como seleção interativa premium, semelhante a ecommerce modernos de sneakers.
+
+- Outro problema visual acontece após aplicar filtros de produtos.
+
+- Quando o usuário filtra um tênis, a imagem do produto fica exageradamente grande, quebrando o layout premium dos cards.
+
+- Os ajustes devem manter a identidade visual premium do ecommerce.
+
 ---
 
 # Plan of Work
@@ -377,6 +431,31 @@ Na home page será desenvolvido um hero cinematográfico fullscreen utilizando o
 ```txt
 frontend/assets/video_hero.mp4
 ```
+Adicionar ação de editar produto dentro do painel admin, posicionando o botão ao lado do botão de deletar.
+
+O botão deverá abrir modo de edição do produto ou preencher novamente o formulário admin com os dados atuais do item selecionado.
+
+Revisar os componentes de select/dropdown do admin, pois atualmente os textos e fundos estão brancos, dificultando visualizar as opções.
+
+Os selects precisam possuir contraste correto com dark mode premium.
+
+O seletor de tamanhos da página de produto deverá ser transformado em um componente realmente interativo.
+
+Os tamanhos precisam responder ao clique, destacar o tamanho selecionado e atualizar visualmente o estado ativo.
+
+Também deverá existir hover premium nos tamanhos.
+
+Os cards filtrados precisam manter proporção consistente após aplicação de filtros.
+
+Atualmente as imagens estão crescendo excessivamente, quebrando o layout premium.
+
+A grid de produtos deverá manter:
+
+- altura consistente;
+- imagens proporcionais;
+- cards alinhados;
+- tamanho premium;
+- comportamento responsivo.
 
 O hero deverá:
 
@@ -883,6 +962,18 @@ backend/public/uploads/.gitkeep
 PLANS.MD
 ```
 
+Arquivos alterados nesta execução:
+
+```txt
+PLANS.MD
+frontend/src/App.jsx
+frontend/src/components/Cart.jsx
+frontend/src/pages/Admin.jsx
+frontend/src/pages/ProductDetail.jsx
+frontend/src/services/api.js
+frontend/src/styles/app.css
+```
+
 Comandos executados nesta execução:
 
 ```bash
@@ -935,6 +1026,26 @@ docker compose restart frontend
 npm run test:responsive
 npm run test:hero
 Remove-Item -Recurse -Force -LiteralPath frontend/test-results
+Get-Content -Path PLANS.MD
+Get-Content -Path frontend/src/pages/Admin.jsx
+Get-Content -Path frontend/src/pages/ProductDetail.jsx
+Get-Content -Path frontend/src/App.jsx
+Get-Content -Path frontend/src/components/Cart.jsx
+Get-Content -Path frontend/src/services/api.js
+rg -n "product-grid|size-grid|form-panel select|advanced-filters|admin-table|admin-actions|product-card" frontend/src/styles/app.css
+npm run lint
+npm run build
+npm run test:hero
+npm run test:responsive
+git status --short
+git diff --check -- frontend/src/App.jsx frontend/src/components/Cart.jsx frontend/src/pages/Admin.jsx frontend/src/pages/ProductDetail.jsx frontend/src/services/api.js frontend/src/styles/app.css PLANS.MD
+git log --oneline -5
+git add PLANS.MD frontend/src/App.jsx frontend/src/components/Cart.jsx frontend/src/pages/Admin.jsx frontend/src/pages/ProductDetail.jsx frontend/src/services/api.js frontend/src/styles/app.css
+git commit -m "feat: aprimorar admin e selecao de tamanhos"
+git add PLANS.MD
+git commit --amend --no-edit
+git log --oneline -1
+git show --stat --oneline --name-only HEAD
 ```
 
 Validação realizada:
@@ -973,6 +1084,10 @@ frontend npm run lint apos ajuste responsivo: OK
 frontend npm run test:hero apos ajuste responsivo: OK, 2 testes aprovados
 frontend npm run test:responsive: OK, 5 testes aprovados em 390px, 768px, 1024px, 1366px e 1920px
 frontend Docker apos ajuste responsivo: HTTP 200
+frontend npm run build apos ajustes de admin/tamanho/cards filtrados: OK
+frontend npm run lint apos ajustes de admin/tamanho/cards filtrados: OK
+frontend npm run test:hero apos ajustes de admin/tamanho/cards filtrados: OK, 2 testes aprovados em desktop e mobile
+frontend npm run test:responsive apos ajustes de admin/tamanho/cards filtrados: OK, 5 testes aprovados em 390px, 768px, 1024px, 1366px e 1920px
 ```
 
 Commit criado:
@@ -983,6 +1098,11 @@ feat: adicionar admin mysql e checkout
 fix: sincronizar hero com scroll sem atraso
 feat: aprimorar hero premium
 fix: ajustar responsividade geral
+fix: remover overlay do hero
+fix: remover tom verde do hero
+fix: deixar hero em autoplay lento
+fix: restaurar velocidade normal do hero
+feat: aprimorar admin e selecao de tamanhos
 ```
 
 ---

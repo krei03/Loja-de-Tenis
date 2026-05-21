@@ -22,35 +22,37 @@ function App() {
   )
 
   const addToCart = (product) => {
+    const cartKey = product.selectedSize ? `${product.id}-${product.selectedSize}` : product.id
+
     setCart((items) => {
-      const existing = items.find((item) => item.id === product.id)
+      const existing = items.find((item) => item.cartKey === cartKey)
 
       if (existing) {
         return items.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item,
+          item.cartKey === cartKey ? { ...item, quantity: item.quantity + 1 } : item,
         )
       }
 
-      return [...items, { ...product, quantity: 1 }]
+      return [...items, { ...product, cartKey, quantity: 1 }]
     })
   }
 
-  const increment = (id) => {
+  const increment = (cartKey) => {
     setCart((items) =>
-      items.map((item) => (item.id === id ? { ...item, quantity: item.quantity + 1 } : item)),
+      items.map((item) => (item.cartKey === cartKey ? { ...item, quantity: item.quantity + 1 } : item)),
     )
   }
 
-  const decrement = (id) => {
+  const decrement = (cartKey) => {
     setCart((items) =>
       items
-        .map((item) => (item.id === id ? { ...item, quantity: item.quantity - 1 } : item))
+        .map((item) => (item.cartKey === cartKey ? { ...item, quantity: item.quantity - 1 } : item))
         .filter((item) => item.quantity > 0),
     )
   }
 
-  const remove = (id) => {
-    setCart((items) => items.filter((item) => item.id !== id))
+  const remove = (cartKey) => {
+    setCart((items) => items.filter((item) => item.cartKey !== cartKey))
   }
 
   const refreshProducts = () => {

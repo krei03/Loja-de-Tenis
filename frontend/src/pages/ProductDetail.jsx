@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ChevronLeft, Ruler, ShieldCheck, ShoppingBag } from 'lucide-react'
 
@@ -9,6 +10,8 @@ const money = new Intl.NumberFormat('pt-BR', {
 export function ProductDetail({ products, onAdd }) {
   const { id } = useParams()
   const product = products.find((item) => item.id === id)
+  const [selectedSizeByProduct, setSelectedSizeByProduct] = useState({})
+  const selectedSize = product ? selectedSizeByProduct[product.id] ?? product.sizes?.[0] ?? null : null
 
   if (!product) {
     return (
@@ -47,14 +50,24 @@ export function ProductDetail({ products, onAdd }) {
             </div>
             <div className="size-grid">
               {product.sizes.map((size) => (
-                <button type="button" key={size}>
+                <button
+                  type="button"
+                  key={size}
+                  className={selectedSize === size ? 'selected' : undefined}
+                  aria-pressed={selectedSize === size}
+                  onClick={() => setSelectedSizeByProduct((current) => ({ ...current, [product.id]: size }))}
+                >
                   {size}
                 </button>
               ))}
             </div>
           </div>
 
-          <button className="primary-action" type="button" onClick={() => onAdd(product)}>
+          <button
+            className="primary-action"
+            type="button"
+            onClick={() => onAdd({ ...product, selectedSize })}
+          >
             <ShoppingBag size={19} />
             Adicionar ao carrinho
           </button>

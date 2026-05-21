@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ImagePlus, LockKeyhole, PackagePlus, Save, Tags, Trash2 } from 'lucide-react'
+import { ImagePlus, LockKeyhole, PackagePlus, Pencil, Save, Tags, Trash2, X } from 'lucide-react'
 import { api } from '../services/api'
 
 const money = new Intl.NumberFormat('pt-BR', {
@@ -24,6 +24,7 @@ export function Admin({ products, onProductsChanged }) {
   const [credentials, setCredentials] = useState({ username: 'admin', password: 'vertex123' })
   const [session, setSession] = useState(null)
   const [productForm, setProductForm] = useState(emptyProduct)
+  const [editingProductId, setEditingProductId] = useState(null)
   const [message, setMessage] = useState('')
 
   const totalInventory = products.length
@@ -57,21 +58,48 @@ export function Admin({ products, onProductsChanged }) {
     setMessage('Imagem enviada.')
   }
 
-  const createProduct = async (event) => {
+  const buildProductPayload = () => ({
+    ...productForm,
+    price: Number(productForm.price),
+    stock: Number(productForm.stock),
+    sizes: productForm.sizes,
+    gallery: productForm.image,
+  })
+
+  const resetProductForm = () => {
+    setEditingProductId(null)
+    setProductForm(emptyProduct)
+  }
+
+  const editProduct = (product) => {
+    setEditingProductId(product.id)
+    setProductForm({
+      name: product.name || '',
+      brand: product.brand || '',
+      category: product.category || 'launch',
+      price: product.price ?? '',
+      badge: product.badge || '',
+      color: product.color || '',
+      sizes: product.sizes?.join(',') || '',
+      image: product.image || '',
+      description: product.description || '',
+      stock: product.stock ?? 0,
+    })
+    setMessage(`Editando ${product.name}.`)
+  }
+
+  const saveProduct = async (event) => {
     event.preventDefault()
 
-    await api.createProduct(
-      {
-        ...productForm,
-        price: Number(productForm.price),
-        stock: Number(productForm.stock),
-        sizes: productForm.sizes,
-        gallery: productForm.image,
-      },
-      session.token,
-    )
-    setProductForm(emptyProduct)
-    setMessage('Produto cadastrado.')
+    if (editingProductId) {
+      await api.updateProduct(editingProductId, buildProductPayload(), session.token)
+      setMessage('Produto atualizado.')
+    } else {
+      await api.createProduct(buildProductPayload(), session.token)
+      setMessage('Produto cadastrado.')
+    }
+
+    resetProductForm()
     onProductsChanged()
   }
 
@@ -140,8 +168,8 @@ export function Admin({ products, onProductsChanged }) {
         </article>
       </section>
 
-      <form className="admin-product-form form-panel" onSubmit={createProduct}>
-        <h2>Cadastrar produto</h2>
+      <form className="admin-product-form form-panel" onSubmit={saveProduct}>
+        <h2>{editingProductId ? 'Editar produto' : 'Cadastrar produto'}</h2>
         <div className="form-grid">
           <input required name="name" placeholder="Nome" value={productForm.name} onChange={updateProduct} />
           <input required name="brand" placeholder="Marca" value={productForm.brand} onChange={updateProduct} />
@@ -172,10 +200,18 @@ export function Admin({ products, onProductsChanged }) {
           </label>
           <input required name="image" placeholder="URL da imagem" value={productForm.image} onChange={updateProduct} />
         </div>
-        <button type="submit">
-          <Save size={18} />
-          Salvar produto
-        </button>
+        <div className="form-actions">
+          <button type="submit">
+            <Save size={18} />
+            {editingProductId ? 'Atualizar produto' : 'Salvar produto'}
+          </button>
+          {editingProductId && (
+            <button type="button" className="secondary-action" onClick={resetProductForm}>
+              <X size={18} />
+              Cancelar
+            </button>
+          )}
+        </div>
         {message && <p className="admin-message">{message}</p>}
       </form>
 
@@ -188,9 +224,14 @@ export function Admin({ products, onProductsChanged }) {
               <p>{product.brand} / {product.category} / estoque {product.stock ?? 0}</p>
             </div>
             <span>{product.badge}</span>
-            <button type="button" onClick={() => deleteProduct(product.id)} aria-label="Remover produto">
-              <Trash2 size={18} />
-            </button>
+            <div className="admin-actions">
+              <button type="button" onClick={() => editProduct(product)} aria-label={`Editar ${product.name}`}>
+                <Pencil size={18} />
+              </button>
+              <button type="button" onClick={() => deleteProduct(product.id)} aria-label="Remover produto">
+                <Trash2 size={18} />
+              </button>
+            </div>
           </article>
         ))}
       </section>
