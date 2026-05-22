@@ -34,12 +34,16 @@ export function Checkout({ cart, onOrderPlaced }) {
     event.preventDefault()
     const order = await api.createOrder({
       customer: form,
-      items: cart.map(({ id, name, price, quantity, image }) => ({
+      items: cart.map(({ brand, color, id, image, name, price, quantity, selectedSize }) => ({
+        brand,
+        color,
         id,
+        image,
         name,
         price,
         quantity,
-        image,
+        selectedSize,
+        total: price * quantity,
       })),
     })
 

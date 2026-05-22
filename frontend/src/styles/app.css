@@ -44,24 +44,54 @@ body {
 }
 
 :root[data-theme='light'] .navbar {
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffffff;
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.18);
 }
 
 :root[data-theme='light'] .navbar.scrolled,
 :root[data-theme='light'] .mobile-menu {
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(0, 0, 0, 0.94);
 }
 
 :root[data-theme='light'] .nav-search {
-  background: #eeeeea;
+  background: #f5f5f5;
   color: #111;
+}
+
+:root[data-theme='light'] .navbar .brand,
+:root[data-theme='light'] .navbar .nav-links,
+:root[data-theme='light'] .navbar .nav-links a,
+:root[data-theme='light'] .navbar .icon-button,
+:root[data-theme='light'] .navbar .sell-link,
+:root[data-theme='light'] .mobile-menu a {
+  color: #ffffff;
+}
+
+:root[data-theme='light'] .navbar .brand span {
+  background: #ffffff;
+  color: #050505;
+}
+
+:root[data-theme='light'] .navbar .icon-button {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 :root[data-theme='light'] .hero::after {
   background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.08) 52%, rgba(0, 0, 0, 0.44)),
-    linear-gradient(0deg, #f7f7f5 0%, rgba(247, 247, 245, 0.2) 20%, transparent 64%, rgba(5, 5, 5, 0.58));
+    linear-gradient(90deg, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.12) 52%, rgba(0, 0, 0, 0.36)),
+    linear-gradient(0deg, rgba(5, 5, 5, 0.24) 0%, transparent 34%, transparent 70%, rgba(5, 5, 5, 0.42));
+}
+
+:root[data-theme='light'] .hero-transition {
+  background: linear-gradient(180deg, transparent, rgba(5, 5, 5, 0.2) 58%, rgba(247, 247, 245, 0.12) 100%);
+}
+
+:root[data-theme='light'] .hero h1,
+:root[data-theme='light'] .hero-subtitle,
+:root[data-theme='light'] .hero-actions span {
+  color: #ffffff;
 }
 
 :root[data-theme='light'] .launches,
@@ -75,6 +105,37 @@ body {
 :root[data-theme='light'] .cart-item,
 :root[data-theme='light'] .admin-table article {
   background: rgba(255, 255, 255, 0.76);
+}
+
+:root[data-theme='light'] .product-media span {
+  background: rgba(5, 5, 5, 0.82);
+  color: #ffffff;
+}
+
+:root[data-theme='light'] .site-footer {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: #000000;
+  color: #ffffff;
+}
+
+:root[data-theme='light'] .footer-grid h2,
+:root[data-theme='light'] .footer-grid a,
+:root[data-theme='light'] .footer-bottom {
+  color: #ffffff;
+}
+
+:root[data-theme='light'] .social-row a,
+:root[data-theme='light'] .app-badges span,
+:root[data-theme='light'] .payment-row span,
+:root[data-theme='light'] .rating-badge {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+:root[data-theme='light'] .carousel-logo-preview,
+:root[data-theme='light'] .carousel-admin-logo {
+  background: #ffffff;
+  color: #050505;
 }
 
 button,
@@ -631,25 +692,6 @@ main {
     linear-gradient(180deg, #080808 0%, var(--black) 100%);
 }
 
-.trust-band {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--line);
-  padding-block: 1px;
-}
-
-.trust-item {
-  min-height: 140px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: var(--black);
-  color: var(--ice);
-  font-weight: 800;
-}
-
 .product-detail {
   padding-top: 116px;
 }
@@ -670,13 +712,13 @@ main {
 }
 
 .gallery-shell {
+  position: sticky;
+  top: 96px;
   display: grid;
   gap: 12px;
 }
 
 .gallery-main {
-  position: sticky;
-  top: 96px;
   overflow: hidden;
   border-radius: 8px;
   background: var(--panel);
@@ -734,7 +776,8 @@ main {
 }
 
 .detail-panel h1 {
-  font-size: clamp(2.4rem, 5vw, 5rem);
+  font-size: clamp(2rem, 3.8vw, 3.8rem);
+  line-height: 0.96;
 }
 
 .detail-panel > strong {
@@ -887,7 +930,8 @@ main {
 }
 
 .cart-shell,
-.admin-page {
+.admin-page,
+.sales-report-page {
   padding-top: 118px;
   min-height: 100vh;
 }
@@ -909,7 +953,6 @@ main {
   background: var(--black);
 }
 
-.brand-hero,
 .brand-catalog-layout {
   width: min(100%, var(--page-max));
   margin-inline: auto;
@@ -944,7 +987,6 @@ main {
   object-fit: contain;
 }
 
-.brand-hero p,
 .brand-results-heading p {
   margin: 0 0 8px;
   color: var(--accent);
@@ -953,11 +995,10 @@ main {
   text-transform: uppercase;
 }
 
-.brand-hero h1,
 .brand-results-heading h2 {
   margin: 0;
-  font-size: clamp(2.4rem, 7vw, 6rem);
-  line-height: 0.92;
+  font-size: clamp(2rem, 4vw, 4rem);
+  line-height: 1;
 }
 
 .brand-hero span {
@@ -992,7 +1033,7 @@ main {
 }
 
 .brand-filter-title,
-.brand-filter-panel button {
+.brand-filter-group > button {
   min-height: 58px;
   display: flex;
   align-items: center;
@@ -1008,10 +1049,90 @@ main {
   font-weight: 800;
 }
 
+.brand-filter-group {
+  border-bottom: 1px solid var(--line);
+}
+
+.brand-filter-group > button {
+  width: 100%;
+  border-bottom: 0;
+}
+
+.brand-filter-group > button[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.brand-filter-group > button[aria-expanded='true'] {
+  background: rgba(255, 255, 255, 0.06);
+  padding-inline: 12px;
+}
+
+.brand-filter-group svg {
+  transition: transform 180ms ease;
+}
+
 .brand-filter-title {
   justify-content: flex-start;
   color: var(--accent);
   text-transform: uppercase;
+}
+
+.brand-size-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 4px 0 18px;
+}
+
+.brand-size-grid button {
+  min-height: 52px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--graphite);
+  color: var(--ice);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.brand-size-grid button:hover,
+.brand-size-grid button.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #050505;
+}
+
+.brand-option-list {
+  display: grid;
+  gap: 18px;
+  padding: 16px 0 22px;
+}
+
+.brand-option-list label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--ice);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.brand-option-list input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--ice);
+}
+
+.brand-filter-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 700;
 }
 
 .brand-product-area {
@@ -1090,7 +1211,11 @@ main {
 }
 
 .checkout-panel,
-.admin-metrics article {
+.admin-metrics article,
+.admin-metric-link,
+.sales-summary article,
+.monthly-report,
+.sales-order-card {
   display: grid;
   gap: 12px;
   padding: 22px;
@@ -1139,16 +1264,32 @@ main {
 
 .admin-metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 20px;
 }
 
-.admin-metrics span {
+.admin-metric-link {
+  color: inherit;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease;
+}
+
+.admin-metric-link:hover {
+  transform: translateY(-2px);
+  border-color: rgba(198, 255, 0, 0.36);
+}
+
+.admin-metrics span,
+.sales-summary span,
+.monthly-report span,
+.sales-order-card span {
   color: var(--muted);
 }
 
-.admin-metrics strong {
+.admin-metrics strong,
+.sales-summary strong {
   font-size: 2rem;
 }
 
@@ -1658,6 +1799,105 @@ main {
   min-height: 100vh;
 }
 
+.sales-report-page {
+  padding: 118px clamp(18px, 4vw, 56px) clamp(64px, 8vw, 118px);
+  background: var(--black);
+}
+
+.sales-summary,
+.monthly-report-list,
+.sales-order-list {
+  width: min(100%, var(--page-max));
+  margin-inline: auto;
+}
+
+.sales-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.monthly-report-list,
+.sales-order-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.monthly-report-heading,
+.sales-order-header,
+.sales-order-footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.monthly-report-heading h2,
+.sales-order-header h2,
+.sales-item-row h3,
+.sales-item-row p {
+  margin: 0;
+}
+
+.monthly-report-heading h2,
+.sales-order-header h2 {
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  line-height: 1.05;
+}
+
+.monthly-report-heading > div > span,
+.sales-order-header > div > span {
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.monthly-report-metrics,
+.sales-customer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.monthly-report-metrics span,
+.sales-customer-grid span,
+.sales-order-footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.sales-items-table {
+  display: grid;
+  gap: 8px;
+}
+
+.sales-item-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto auto auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sales-item-row img {
+  width: 64px;
+  height: 64px;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.sales-item-row p {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
 .site-footer {
   padding: clamp(46px, 6vw, 72px) clamp(18px, 4vw, 56px) 26px;
   border-top: 1px solid var(--line);
@@ -1771,18 +2011,22 @@ main {
     width: min(520px, calc(100% - 36px));
   }
 
-  .trust-band,
   .detail-grid,
   .brand-catalog-layout,
   .cart-grid,
   .advanced-filters,
   .form-grid,
+  .sales-summary,
   .footer-grid,
   .checkout-form {
     grid-template-columns: 1fr;
   }
 
   .detail-panel {
+    position: static;
+  }
+
+  .gallery-shell {
     position: static;
   }
 
@@ -1878,8 +2122,7 @@ main {
 
   .launches,
   .category-band,
-  .trust-band,
-  .cart-shell,
+    .cart-shell,
     .admin-page,
     .catalog-section,
     .product-detail {
@@ -1917,16 +2160,16 @@ main {
     justify-self: start;
   }
 
-  .trust-item {
-    min-height: 112px;
-  }
-
   .shipping-simulator > div {
     grid-template-columns: 1fr;
   }
 
   .admin-table article {
     grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .sales-item-row {
+    grid-template-columns: 58px minmax(0, 1fr);
   }
 
   .admin-table img {

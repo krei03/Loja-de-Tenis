@@ -8,6 +8,7 @@ import { ProductDetail } from './pages/ProductDetail'
 import { BrandProfile } from './pages/BrandProfile'
 import { Admin } from './pages/Admin'
 import { Checkout } from './pages/Checkout'
+import { SalesReport } from './pages/SalesReport'
 import { api } from './services/api'
 
 function App() {
@@ -94,6 +95,7 @@ function App() {
           path="/admin"
           element={<Admin products={products} onProductsChanged={refreshProducts} />}
         />
+        <Route path="/admin/sales" element={<SalesReport />} />
       </Routes>
       <Footer />
     </BrowserRouter>

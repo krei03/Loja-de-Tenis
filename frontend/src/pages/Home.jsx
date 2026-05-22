@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import { Flame, ShieldCheck, Truck } from 'lucide-react'
 import { Hero } from '../components/Hero'
 import { CategoryCarousel } from '../components/CategoryCarousel'
 import { ProductCard } from '../components/ProductCard'
@@ -58,19 +56,6 @@ export function Home({ onAdd }) {
               <ProductCard product={product} key={product.id} onAdd={onAdd} />
             ))}
           </div>
-        </section>
-
-        <section className="trust-band">
-          {[
-            ['Drops verificados', Flame],
-            ['Entrega rastreada', Truck],
-            ['Compra protegida', ShieldCheck],
-          ].map(([label, Icon]) => (
-            <motion.div className="trust-item" key={label} whileHover={{ y: -4 }}>
-              <Icon size={24} />
-              <span>{label}</span>
-            </motion.div>
-          ))}
         </section>
       </main>
     </>

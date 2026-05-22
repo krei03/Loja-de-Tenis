@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   ChevronDown,
   ChevronUp,
@@ -6,6 +7,7 @@ import {
   LockKeyhole,
   PackagePlus,
   Pencil,
+  ReceiptText,
   Save,
   Tags,
   Trash2,
@@ -52,6 +54,7 @@ const emptyProduct = {
 const emptyCarouselItem = {
   name: '',
   logo: '',
+  models: '',
   display_order: 1,
   is_active: true,
 }
@@ -83,13 +86,15 @@ export function Admin({ products, onProductsChanged }) {
   const [carouselForm, setCarouselForm] = useState(emptyCarouselItem)
   const [editingCarouselId, setEditingCarouselId] = useState(null)
   const [carouselEditorOpen, setCarouselEditorOpen] = useState(false)
-  const [carouselListOpen, setCarouselListOpen] = useState(true)
+  const [carouselListOpen, setCarouselListOpen] = useState(false)
   const [brandSearchOpen, setBrandSearchOpen] = useState(false)
+  const [orders, setOrders] = useState([])
   const [message, setMessage] = useState('')
   const carouselEditorRef = useRef(null)
 
   const totalInventory = products.length
   const totalValue = products.reduce((sum, product) => sum + product.price, 0)
+  const totalSales = orders.reduce((sum, order) => sum + Number(order.total || 0), 0)
   const brands = useMemo(() => [...new Set(products.map((product) => product.brand))], [products])
   const productBrandOptions = useMemo(
     () =>
@@ -105,6 +110,7 @@ export function Admin({ products, onProductsChanged }) {
   useEffect(() => {
     if (session?.token) {
       api.getAdminCategoryCarousel(session.token).then(setCarouselItems)
+      api.getOrders().then(setOrders)
     }
   }, [session?.token])
 
@@ -272,6 +278,7 @@ export function Admin({ products, onProductsChanged }) {
     setCarouselForm({
       name: item.name,
       logo: item.logo || '',
+      models: item.models?.join('\n') || '',
       display_order: item.display_order,
       is_active: item.is_active,
     })
@@ -286,6 +293,7 @@ export function Admin({ products, onProductsChanged }) {
 
     const payload = {
       ...carouselForm,
+      models: carouselForm.models,
       display_order: Number(carouselForm.display_order),
       is_active: Boolean(carouselForm.is_active),
     }
@@ -361,7 +369,7 @@ export function Admin({ products, onProductsChanged }) {
               onClick={() => setCarouselListOpen((current) => !current)}
             >
               {carouselListOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              {carouselListOpen ? 'Diminuir lista' : 'Mostrar lista'}
+              {carouselListOpen ? 'Ocultar lista' : 'Mostrar lista'}
             </button>
           </div>
         </div>
@@ -396,6 +404,13 @@ export function Admin({ products, onProductsChanged }) {
                 Ativa
               </label>
             </div>
+
+            <textarea
+              name="models"
+              placeholder="Modelos da marca, um por linha"
+              value={carouselForm.models}
+              onChange={updateCarousel}
+            />
 
             <div className="upload-row">
               <label>
@@ -437,7 +452,9 @@ export function Admin({ products, onProductsChanged }) {
                 </div>
                 <div>
                   <h3>{item.name}</h3>
-                  <p>Ordem {item.display_order} / {item.is_active ? 'ativa' : 'inativa'}</p>
+                  <p>
+                    Ordem {item.display_order} / {item.is_active ? 'ativa' : 'inativa'} / {(item.models || []).length} modelo(s)
+                  </p>
                 </div>
                 <span>{item.is_active ? 'Ativa' : 'Off'}</span>
                 <div className="admin-actions">
@@ -649,6 +666,11 @@ export function Admin({ products, onProductsChanged }) {
           <span>Marcas</span>
           <strong>{brands.length}</strong>
         </article>
+        <Link className="admin-metric-link" to="/admin/sales">
+          <ReceiptText size={24} />
+          <span>Total de vendas</span>
+          <strong>{money.format(totalSales)}</strong>
+        </Link>
       </section>
 
       {!editingProductId && renderProductForm('Cadastrar produto')}

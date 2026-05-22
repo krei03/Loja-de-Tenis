@@ -1,12 +1,31 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
-import { ArrowRight, Menu, Moon, Search, ShoppingBag, Sun, UserRound, X } from 'lucide-react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
+import { ArrowRight, Menu, Moon, Search, ShoppingBag, Sun, X } from 'lucide-react'
 
 export function Navbar({ cartCount, onToggleTheme, theme }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const location = useLocation()
 
   const closeMenu = () => setMenuOpen(false)
+
+  const scrollHome = (event) => {
+    closeMenu()
+
+    if (location.pathname === '/') {
+      event.preventDefault()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  const scrollToBrands = (event) => {
+    closeMenu()
+
+    if (location.pathname === '/') {
+      event.preventDefault()
+      document.getElementById('brand-carousel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
 
   useEffect(() => {
     const updateScrollState = () => {
@@ -27,11 +46,8 @@ export function Navbar({ cartCount, onToggleTheme, theme }) {
       </Link>
 
       <nav className="nav-links" aria-label="Principal">
-        <NavLink to="/">Marcas</NavLink>
-        <a href="/#categories">Categorias</a>
-        <a href="/#launches">Calendario</a>
-        <a href="/#launches">Feed</a>
-        <NavLink to="/admin">Vender</NavLink>
+        <a href="/#brand-carousel" onClick={scrollToBrands}>Marcas</a>
+        <Link to="/" onClick={scrollHome}>Feed</Link>
       </nav>
 
       <label className="nav-search">
@@ -42,9 +58,6 @@ export function Navbar({ cartCount, onToggleTheme, theme }) {
       <div className="nav-actions">
         <button className="icon-button" type="button" onClick={onToggleTheme} aria-label="Alternar tema">
           {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
-        <button className="icon-button desktop-account" type="button" aria-label="Conta">
-          <UserRound size={20} />
         </button>
         <Link className="icon-button cart-link" to="/cart" aria-label="Carrinho" onClick={closeMenu}>
           <ShoppingBag size={20} />
@@ -67,10 +80,8 @@ export function Navbar({ cartCount, onToggleTheme, theme }) {
 
       {menuOpen && (
         <nav className="mobile-menu" aria-label="Menu mobile">
-          <NavLink to="/" onClick={closeMenu}>Drops</NavLink>
-          <a href="/#launches" onClick={closeMenu}>Lancamentos</a>
-          <a href="/#categories" onClick={closeMenu}>Categorias</a>
-          <NavLink to="/admin" onClick={closeMenu}>Admin</NavLink>
+          <a href="/#brand-carousel" onClick={scrollToBrands}>Marcas</a>
+          <Link to="/" onClick={scrollHome}>Feed</Link>
         </nav>
       )}
     </header>

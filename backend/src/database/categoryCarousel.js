@@ -30,9 +30,9 @@ export async function createCategoryCarouselItem(input) {
 
   if (isDatabaseReady()) {
     await query(
-      `INSERT INTO category_carousel (id, name, logo, display_order, is_active)
-       VALUES (?, ?, ?, ?, ?)`,
-      [item.id, item.name, item.logo, item.display_order, item.is_active],
+      `INSERT INTO category_carousel (id, name, logo, models, display_order, is_active)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [item.id, item.name, item.logo, JSON.stringify(item.models), item.display_order, item.is_active],
     )
   } else {
     setCategoryCarousel([...categoryCarousel, item].sort(sortCategoryCarousel))
@@ -53,9 +53,9 @@ export async function updateCategoryCarouselItem(id, input) {
   if (isDatabaseReady()) {
     await query(
       `UPDATE category_carousel
-       SET name = ?, logo = ?, display_order = ?, is_active = ?
+       SET name = ?, logo = ?, models = ?, display_order = ?, is_active = ?
        WHERE id = ?`,
-      [item.name, item.logo, item.display_order, item.is_active, id],
+      [item.name, item.logo, JSON.stringify(item.models), item.display_order, item.is_active, id],
     )
   } else {
     setCategoryCarousel(
@@ -89,9 +89,25 @@ function normalizeCategoryCarouselItem(input) {
     id: input.id || slugify(name || randomUUID()),
     name,
     logo: String(input.logo || '').trim(),
+    models: normalizeModels(input.models),
     display_order: Number(input.display_order ?? input.displayOrder ?? 0),
     is_active: normalizeBoolean(input.is_active ?? input.isActive ?? true),
   }
+}
+
+function normalizeModels(value) {
+  if (Array.isArray(value)) {
+    return value.map((model) => String(model).trim()).filter(Boolean)
+  }
+
+  if (typeof value === 'string') {
+    return value
+      .split(/\r?\n|,/)
+      .map((model) => model.trim())
+      .filter(Boolean)
+  }
+
+  return []
 }
 
 function normalizeBoolean(value) {

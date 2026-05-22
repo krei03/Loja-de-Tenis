@@ -4,11 +4,25 @@ import { ChevronDown, ChevronLeft, SlidersHorizontal } from 'lucide-react'
 import { ProductCard } from '../components/ProductCard'
 import { api } from '../services/api'
 
-const fallbackFilters = ['Genero', 'Tipo de produto', 'Tamanho', 'Preco', 'Modelos', 'Cores', 'Esportes', 'Marca']
+const fallbackFilters = ['Genero', 'Tamanho', 'Preco', 'Modelos', 'Marca']
+const genderOptions = ['Feminino', 'Masculino', 'Unissex']
+const priceOptions = [
+  { label: 'R$ 100 - R$ 200', min: 100, max: 200 },
+  { label: 'R$ 200 - R$ 300', min: 200, max: 300 },
+  { label: 'R$ 300 - R$ 400', min: 300, max: 400 },
+  { label: 'R$ 400 - R$ 500', min: 400, max: 500 },
+  { label: 'Acima de R$ 500', min: 500, max: Infinity },
+]
+const sizeOptions = ['32,5', '33', '33,5', '34', '34,5', '34.5', '35', '35,5', '36', '36,5', '37', '37,5', '38', '39', '39,5', '40', '40,5', '41', '41,5', '42', '42,5', '43', '43,5', '44']
 
 export function BrandProfile({ onAdd, products }) {
   const { brandId } = useParams()
   const [carouselItems, setCarouselItems] = useState([])
+  const [expandedFilter, setExpandedFilter] = useState('Genero')
+  const [selectedGender, setSelectedGender] = useState('Masculino')
+  const [selectedModel, setSelectedModel] = useState('')
+  const [selectedPrice, setSelectedPrice] = useState('')
+  const [selectedSize, setSelectedSize] = useState('')
 
   useEffect(() => {
     api.getCategoryCarousel().then(setCarouselItems)
@@ -18,6 +32,8 @@ export function BrandProfile({ onAdd, products }) {
     () => carouselItems.find((item) => item.id === brandId) || createFallbackBrand(brandId),
     [brandId, carouselItems],
   )
+  const modelOptions = brand.models || []
+  const activeSelectedModel = modelOptions.includes(selectedModel) ? selectedModel : ''
 
   const brandProducts = useMemo(() => {
     const normalizedName = brand.name.toLowerCase()
@@ -31,7 +47,22 @@ export function BrandProfile({ onAdd, products }) {
     })
   }, [brand, products])
 
-  const visibleProducts = brandProducts.length ? brandProducts : products
+  const visibleProducts = useMemo(() => {
+    const sourceProducts = brandProducts.length ? brandProducts : products
+
+    return sourceProducts.filter((product) => {
+      const matchesSize = selectedSize ? product.sizes?.includes(selectedSize) : true
+      const productGender = product.gender || product.genero
+      const matchesGender = selectedGender && productGender ? productGender === selectedGender : true
+      const matchesModel = activeSelectedModel
+        ? product.name.toLowerCase().includes(activeSelectedModel.toLowerCase())
+        : true
+      const priceRange = priceOptions.find((option) => option.label === selectedPrice)
+      const matchesPrice = priceRange ? product.price >= priceRange.min && product.price < priceRange.max : true
+
+      return matchesSize && matchesGender && matchesModel && matchesPrice
+    })
+  }, [activeSelectedModel, brandProducts, products, selectedGender, selectedPrice, selectedSize])
 
   return (
     <main className="brand-profile-page">
@@ -40,20 +71,6 @@ export function BrandProfile({ onAdd, products }) {
         Voltar
       </Link>
 
-      <section className="brand-hero">
-        <div className="brand-hero-logo">
-          {brand.logo ? <img src={brand.logo} alt={brand.name} /> : <span>{brand.name.slice(0, 2).toUpperCase()}</span>}
-        </div>
-        <div>
-          <p>Perfil da marca</p>
-          <h1>{brand.name}</h1>
-          <span>
-            Curadoria premium de sneakers e streetwear com produtos cadastrados em tempo real.
-          </span>
-        </div>
-        <strong>{brandProducts.length} produto(s)</strong>
-      </section>
-
       <section className="brand-catalog-layout">
         <aside className="brand-filter-panel" aria-label="Filtros da marca">
           <div className="brand-filter-title">
@@ -61,17 +78,86 @@ export function BrandProfile({ onAdd, products }) {
             Filtros
           </div>
           {fallbackFilters.map((filter) => (
-            <button type="button" key={filter}>
-              {filter}
-              <ChevronDown size={18} />
-            </button>
+            <div className="brand-filter-group" key={filter}>
+              <button
+                type="button"
+                aria-expanded={expandedFilter === filter}
+                onClick={() => setExpandedFilter((current) => (current === filter ? '' : filter))}
+              >
+                {getFilterLabel(filter, { selectedGender, selectedModel: activeSelectedModel, selectedPrice })}
+                <ChevronDown size={18} />
+              </button>
+
+              {filter === 'Genero' && expandedFilter === 'Genero' && (
+                <div className="brand-option-list">
+                  {genderOptions.map((gender) => (
+                    <label key={gender}>
+                      <input
+                        type="checkbox"
+                        checked={selectedGender === gender}
+                        onChange={() => setSelectedGender((current) => (current === gender ? '' : gender))}
+                      />
+                      <span>{gender}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              {filter === 'Tamanho' && expandedFilter === 'Tamanho' && (
+                <div className="brand-size-grid">
+                  {sizeOptions.map((size) => (
+                    <button
+                      type="button"
+                      className={selectedSize === size ? 'active' : ''}
+                      key={size}
+                      onClick={() => setSelectedSize((current) => (current === size ? '' : size))}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {filter === 'Preco' && expandedFilter === 'Preco' && (
+                <div className="brand-option-list">
+                  {priceOptions.map((option) => (
+                    <label key={option.label}>
+                      <input
+                        type="checkbox"
+                        checked={selectedPrice === option.label}
+                        onChange={() => setSelectedPrice((current) => (current === option.label ? '' : option.label))}
+                      />
+                      <span>{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              {filter === 'Modelos' && expandedFilter === 'Modelos' && (
+                <div className="brand-option-list">
+                  {modelOptions.length > 0 ? (
+                    modelOptions.map((model) => (
+                      <label key={model}>
+                        <input
+                          type="checkbox"
+                          checked={activeSelectedModel === model}
+                          onChange={() => setSelectedModel((current) => (current === model ? '' : model))}
+                        />
+                        <span>{model}</span>
+                      </label>
+                    ))
+                  ) : (
+                    <p className="brand-filter-empty">Nenhum modelo cadastrado.</p>
+                  )}
+                </div>
+              )}
+            </div>
           ))}
         </aside>
 
         <div className="brand-product-area">
           <div className="brand-results-heading">
-            <p>{brand.name}</p>
-            <h2>Modelos cadastrados</h2>
+            <h2>{brand.name}</h2>
           </div>
 
           <div className="product-grid brand-product-grid">
@@ -85,6 +171,22 @@ export function BrandProfile({ onAdd, products }) {
   )
 }
 
+function getFilterLabel(filter, { selectedGender, selectedModel, selectedPrice }) {
+  if (filter === 'Genero' && selectedGender) {
+    return `${filter} (1)`
+  }
+
+  if (filter === 'Preco' && selectedPrice) {
+    return `${filter} (1)`
+  }
+
+  if (filter === 'Modelos' && selectedModel) {
+    return `${filter} (1)`
+  }
+
+  return filter
+}
+
 function createFallbackBrand(id = '') {
   const name = id
     .split('-')
@@ -95,6 +197,7 @@ function createFallbackBrand(id = '') {
   return {
     id,
     logo: '',
+    models: [],
     name: name || 'Marca',
   }
 }

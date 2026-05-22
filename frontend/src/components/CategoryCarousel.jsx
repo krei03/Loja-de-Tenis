@@ -62,7 +62,7 @@ export function CategoryCarousel({ activeItemId, items: controlledItems, onSelec
   }
 
   return (
-    <section className="premium-category-section" aria-label="Categorias premium">
+    <section className="premium-category-section" id="brand-carousel" aria-label="Categorias premium">
       <div
         ref={trackRef}
         className="premium-category-track"

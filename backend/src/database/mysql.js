@@ -82,11 +82,14 @@ export async function initializeDatabase() {
           id VARCHAR(120) PRIMARY KEY,
           name VARCHAR(140) NOT NULL,
           logo TEXT NOT NULL,
+          models JSON NOT NULL,
           display_order INT NOT NULL DEFAULT 0,
           is_active BOOLEAN NOT NULL DEFAULT TRUE,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `)
+      await ensureCategoryCarouselModelsColumn(database)
+      await ensureDefaultCategoryCarouselModels(database)
 
       await seedIfEmpty()
       ready = true
@@ -103,6 +106,30 @@ export async function initializeDatabase() {
       await wait(2500)
     }
   }
+}
+
+async function ensureCategoryCarouselModelsColumn(database) {
+  const [columns] = await database.query("SHOW COLUMNS FROM category_carousel LIKE 'models'")
+
+  if (columns.length === 0) {
+    await database.query("ALTER TABLE category_carousel ADD COLUMN models JSON NULL AFTER logo")
+    await database.query("UPDATE category_carousel SET models = JSON_ARRAY() WHERE models IS NULL")
+  }
+}
+
+async function ensureDefaultCategoryCarouselModels(database) {
+  await Promise.all(
+    seedCategoryCarousel
+      .filter((item) => item.models?.length)
+      .map((item) =>
+        database.execute(
+          `UPDATE category_carousel
+           SET models = ?
+           WHERE id = ? AND (models IS NULL OR JSON_LENGTH(models) = 0)`,
+          [JSON.stringify(item.models), item.id],
+        ),
+      ),
+  )
 }
 
 function wait(ms) {
@@ -158,9 +185,9 @@ async function seedIfEmpty() {
     await Promise.all(
       seedCategoryCarousel.map((item) =>
         database.execute(
-          `INSERT INTO category_carousel (id, name, logo, display_order, is_active)
-           VALUES (?, ?, ?, ?, ?)`,
-          [item.id, item.name, item.logo, item.display_order, item.is_active],
+          `INSERT INTO category_carousel (id, name, logo, models, display_order, is_active)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [item.id, item.name, item.logo, JSON.stringify(item.models || []), item.display_order, item.is_active],
         ),
       ),
     )
@@ -172,6 +199,7 @@ export function mapCategoryCarouselItem(row) {
     id: row.id,
     name: row.name,
     logo: row.logo,
+    models: parseJson(row.models, []),
     display_order: Number(row.display_order),
     is_active: Boolean(row.is_active),
   }
