@@ -64,13 +64,11 @@
   scroll-snap-align: start;
 }
 
-.premium-category-item button {
+.premium-category-item a {
   display: grid;
   justify-items: center;
   gap: 12px;
-  border: 0;
   padding: 0;
-  background: transparent;
   color: inherit;
   cursor: pointer;
 }

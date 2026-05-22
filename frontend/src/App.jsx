@@ -5,6 +5,7 @@ import { Cart } from './components/Cart'
 import { Footer } from './components/Footer'
 import { Home } from './pages/Home'
 import { ProductDetail } from './pages/ProductDetail'
+import { BrandProfile } from './pages/BrandProfile'
 import { Admin } from './pages/Admin'
 import { Checkout } from './pages/Checkout'
 import { api } from './services/api'
@@ -12,10 +13,16 @@ import { api } from './services/api'
 function App() {
   const [products, setProducts] = useState([])
   const [cart, setCart] = useState([])
+  const [theme, setTheme] = useState(() => localStorage.getItem('vertex-theme') || 'dark')
 
   useEffect(() => {
     api.getProducts().then(setProducts)
   }, [])
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem('vertex-theme', theme)
+  }, [theme])
 
   const cartCount = useMemo(
     () => cart.reduce((total, item) => total + item.quantity, 0),
@@ -60,11 +67,16 @@ function App() {
     api.getProducts().then(setProducts)
   }
 
+  const toggleTheme = () => {
+    setTheme((current) => (current === 'dark' ? 'light' : 'dark'))
+  }
+
   return (
     <BrowserRouter>
-      <Navbar cartCount={cartCount} />
+      <Navbar cartCount={cartCount} theme={theme} onToggleTheme={toggleTheme} />
       <Routes>
         <Route path="/" element={<Home onAdd={addToCart} />} />
+        <Route path="/brand/:brandId" element={<BrandProfile products={products} onAdd={addToCart} />} />
         <Route path="/product/:id" element={<ProductDetail products={products} onAdd={addToCart} />} />
         <Route
           path="/cart"

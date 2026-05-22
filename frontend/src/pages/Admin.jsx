@@ -594,7 +594,7 @@ export function Admin({ products, onProductsChanged }) {
 
   if (!session) {
     return (
-      <main className="admin-page">
+      <main className="admin-page admin-login-page">
         <div className="section-heading">
           <p>Painel admin</p>
           <h1>Login do admin</h1>

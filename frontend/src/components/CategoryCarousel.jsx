@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { api } from '../services/api'
 import '../styles/categoryCarousel.css'
@@ -82,7 +83,7 @@ export function CategoryCarousel({ activeItemId, items: controlledItems, onSelec
             viewport={{ once: true, margin: '-40px' }}
             transition={{ delay: Math.min(index * 0.035, 0.28), duration: 0.32 }}
           >
-            <button type="button" onClick={() => onSelect?.(item)}>
+            <Link to={`/brand/${item.id}`} onClick={() => onSelect?.(item)}>
               <span className="premium-category-logo">
                 {item.logo ? (
                   <span className={`premium-category-mark ${logoShapes[item.id] || 'square'}`}>
@@ -98,7 +99,7 @@ export function CategoryCarousel({ activeItemId, items: controlledItems, onSelec
                 )}
               </span>
               <strong>{item.name}</strong>
-            </button>
+            </Link>
           </motion.article>
         ))}
       </div>

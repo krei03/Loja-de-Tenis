@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ChevronLeft, Ruler, ShieldCheck, ShoppingBag } from 'lucide-react'
+import { ChevronLeft, Ruler, ShieldCheck, ShoppingBag, Truck } from 'lucide-react'
 
 const money = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -13,11 +13,32 @@ export function ProductDetail({ products, onAdd }) {
   const [selectedSizeByProduct, setSelectedSizeByProduct] = useState({})
   const [activeImageByProduct, setActiveImageByProduct] = useState({})
   const [descriptionOpenByProduct, setDescriptionOpenByProduct] = useState({})
+  const [shippingZip, setShippingZip] = useState('')
+  const [shippingQuote, setShippingQuote] = useState(null)
   const selectedSize = product ? selectedSizeByProduct[product.id] ?? product.sizes?.[0] ?? null : null
   const galleryImages = product ? [...new Set([product.image, ...(product.gallery || [])].filter(Boolean))] : []
   const hasLongDescription = (product?.description || '').length > 220
   const activeImage = product ? activeImageByProduct[product.id] ?? 0 : 0
   const descriptionOpen = product ? Boolean(descriptionOpenByProduct[product.id]) : false
+
+  const simulateShipping = (event) => {
+    event.preventDefault()
+    const cleanZip = shippingZip.replace(/\D/g, '')
+
+    if (cleanZip.length < 8) {
+      setShippingQuote({ type: 'error', message: 'Digite um CEP valido com 8 numeros.' })
+      return
+    }
+
+    const lastDigit = Number(cleanZip.at(-1))
+    const price = lastDigit % 2 === 0 ? 'Gratis' : 'R$ 19,90'
+    const days = 2 + (lastDigit % 4)
+
+    setShippingQuote({
+      type: 'success',
+      message: `${price} / entrega estimada em ${days} dias uteis.`,
+    })
+  }
 
   if (!product) {
     return (
@@ -102,6 +123,24 @@ export function ProductDetail({ products, onAdd }) {
             <ShoppingBag size={19} />
             Adicionar ao carrinho
           </button>
+
+          <form className="shipping-simulator" onSubmit={simulateShipping}>
+            <label>
+              <Truck size={18} />
+              Simular frete
+            </label>
+            <div>
+              <input
+                inputMode="numeric"
+                maxLength={9}
+                placeholder="Digite seu CEP"
+                value={shippingZip}
+                onChange={(event) => setShippingZip(event.target.value)}
+              />
+              <button type="submit">Calcular</button>
+            </div>
+            {shippingQuote && <p className={shippingQuote.type}>{shippingQuote.message}</p>}
+          </form>
 
           <div className="premium-note">
             <ShieldCheck size={20} />

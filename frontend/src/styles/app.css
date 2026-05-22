@@ -18,6 +18,17 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+:root[data-theme='light'] {
+  --black: #f7f7f5;
+  --graphite: #ffffff;
+  --panel: #eeeeea;
+  --line: rgba(5, 5, 5, 0.12);
+  --ice: #090909;
+  --muted: #676767;
+  --accent: #8ac900;
+  --accent-soft: rgba(138, 201, 0, 0.14);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -30,6 +41,40 @@ body {
   margin: 0;
   min-width: 320px;
   background: var(--black);
+}
+
+:root[data-theme='light'] .navbar {
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme='light'] .navbar.scrolled,
+:root[data-theme='light'] .mobile-menu {
+  background: rgba(255, 255, 255, 0.94);
+}
+
+:root[data-theme='light'] .nav-search {
+  background: #eeeeea;
+  color: #111;
+}
+
+:root[data-theme='light'] .hero::after {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.08) 52%, rgba(0, 0, 0, 0.44)),
+    linear-gradient(0deg, #f7f7f5 0%, rgba(247, 247, 245, 0.2) 20%, transparent 64%, rgba(5, 5, 5, 0.58));
+}
+
+:root[data-theme='light'] .launches,
+:root[data-theme='light'] .catalog-section {
+  background: linear-gradient(180deg, #f7f7f5 0%, #ffffff 100%);
+}
+
+:root[data-theme='light'] .product-card,
+:root[data-theme='light'] .detail-panel,
+:root[data-theme='light'] .form-panel,
+:root[data-theme='light'] .cart-item,
+:root[data-theme='light'] .admin-table article {
+  background: rgba(255, 255, 255, 0.76);
 }
 
 button,
@@ -742,6 +787,65 @@ main {
   gap: 8px;
 }
 
+.shipping-simulator {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.shipping-simulator label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ice);
+  font-weight: 900;
+}
+
+.shipping-simulator > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.shipping-simulator input {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ice);
+  outline: 0;
+}
+
+.shipping-simulator button {
+  min-height: 44px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding-inline: 14px;
+  background: var(--accent);
+  color: var(--black);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.shipping-simulator p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-transform: none;
+}
+
+.shipping-simulator p.success {
+  color: var(--accent);
+}
+
+.shipping-simulator p.error {
+  color: #ff6b6b;
+}
+
 .size-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -786,6 +890,137 @@ main {
 .admin-page {
   padding-top: 118px;
   min-height: 100vh;
+}
+
+.admin-login-page {
+  display: grid;
+  place-items: center;
+  align-content: center;
+}
+
+.admin-login-page .section-heading,
+.admin-login-page .admin-login {
+  width: min(100%, 480px);
+}
+
+.brand-profile-page {
+  min-height: 100vh;
+  padding: 118px clamp(18px, 4vw, 56px) clamp(64px, 8vw, 118px);
+  background: var(--black);
+}
+
+.brand-hero,
+.brand-catalog-layout {
+  width: min(100%, var(--page-max));
+  margin-inline: auto;
+}
+
+.brand-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: clamp(18px, 4vw, 44px);
+  align-items: center;
+  margin-bottom: clamp(32px, 5vw, 64px);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: clamp(24px, 4vw, 42px);
+}
+
+.brand-hero-logo {
+  width: clamp(92px, 10vw, 150px);
+  height: clamp(92px, 10vw, 150px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--ice);
+  color: var(--black);
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  font-weight: 950;
+}
+
+.brand-hero-logo img {
+  width: 66%;
+  height: 66%;
+  object-fit: contain;
+}
+
+.brand-hero p,
+.brand-results-heading p {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.brand-hero h1,
+.brand-results-heading h2 {
+  margin: 0;
+  font-size: clamp(2.4rem, 7vw, 6rem);
+  line-height: 0.92;
+}
+
+.brand-hero span {
+  display: block;
+  max-width: 620px;
+  margin-top: 14px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.brand-hero strong {
+  align-self: end;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.brand-catalog-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: clamp(20px, 4vw, 44px);
+  align-items: start;
+}
+
+.brand-filter-panel {
+  position: sticky;
+  top: 104px;
+  display: grid;
+  border-top: 1px solid var(--line);
+}
+
+.brand-filter-title,
+.brand-filter-panel button {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 0;
+  background: transparent;
+  color: var(--ice);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.brand-filter-title {
+  justify-content: flex-start;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.brand-product-area {
+  display: grid;
+  gap: 24px;
+}
+
+.brand-product-grid {
+  justify-content: start;
 }
 
 .empty-cart {
@@ -1538,6 +1773,7 @@ main {
 
   .trust-band,
   .detail-grid,
+  .brand-catalog-layout,
   .cart-grid,
   .advanced-filters,
   .form-grid,
@@ -1547,6 +1783,10 @@ main {
   }
 
   .detail-panel {
+    position: static;
+  }
+
+  .brand-filter-panel {
     position: static;
   }
 
@@ -1566,6 +1806,14 @@ main {
 
   .carousel-admin-controls {
     justify-content: flex-start;
+  }
+
+  .brand-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-hero strong {
+    justify-self: start;
   }
 }
 
@@ -1621,6 +1869,7 @@ main {
 
   .gallery-thumbs,
   .admin-metrics,
+  .brand-hero,
   .upload-row,
   .image-url-field,
   .image-preview-grid {
@@ -1670,6 +1919,10 @@ main {
 
   .trust-item {
     min-height: 112px;
+  }
+
+  .shipping-simulator > div {
+    grid-template-columns: 1fr;
   }
 
   .admin-table article {

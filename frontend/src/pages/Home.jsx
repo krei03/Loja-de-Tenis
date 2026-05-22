@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Flame, ShieldCheck, Truck } from 'lucide-react'
 import { Hero } from '../components/Hero'
@@ -10,7 +10,6 @@ export function Home({ onAdd }) {
   const [allProducts, setAllProducts] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
   const [activeCarouselItem, setActiveCarouselItem] = useState(null)
-  const catalogRef = useRef(null)
 
   useEffect(() => {
     api.getProducts().then((productData) => {
@@ -25,20 +24,7 @@ export function Home({ onAdd }) {
   }, [allProducts])
 
   const selectCarouselItem = (item) => {
-    const normalizedName = item.name.toLowerCase()
-    const normalizedId = item.id.toLowerCase()
-    const nextProducts = allProducts.filter((product) => {
-      const brand = product.brand.toLowerCase()
-      const category = product.category.toLowerCase()
-
-      return brand === normalizedName || brand.includes(normalizedName) || category === normalizedId
-    })
-
     setActiveCarouselItem(item.id)
-    setFilteredProducts(nextProducts.length ? nextProducts : allProducts)
-    window.setTimeout(() => {
-      catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 80)
   }
 
   return (
@@ -61,7 +47,7 @@ export function Home({ onAdd }) {
 
         <CategoryCarousel activeItemId={activeCarouselItem} onSelect={selectCarouselItem} />
 
-        <section className="catalog-section" ref={catalogRef}>
+        <section className="catalog-section">
           <div className="section-heading">
             <p>{activeCarouselItem ? 'Categoria selecionada' : 'Vitrine'}</p>
             <h2>Selecao premium em tempo real</h2>

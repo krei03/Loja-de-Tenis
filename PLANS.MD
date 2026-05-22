@@ -131,6 +131,21 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 - [x] Ao clicar em uma categoria, levar o usuário para a página/listagem dos produtos cadastrados naquela categoria.
 - [x] Garantir que o filtro da categoria funcione com os produtos reais do banco.
 - [x] Manter aparência premium do carrossel após adicionar navegação por clique.
+- [x] Criar página/perfil individual para cada marca/categoria.
+- [x] Utilizar referência visual `assets/perfil_marca` para a página de marca.
+- [x] Ao entrar em uma categoria como Nike, exibir uma página premium da marca.
+- [x] Mostrar banner/header da marca na página de categoria.
+- [x] Mostrar logo, nome, descrição e quantidade de produtos da marca.
+- [x] Listar todos os modelos cadastrados daquela marca.
+- [x] Manter layout premium semelhante à referência enviada.
+- [x] Adicionar opção de modo claro e modo escuro na navbar.
+- [x] Salvar preferência de tema do usuário.
+- [x] Ajustar tela de acesso/login admin para ficar centralizada.
+- [x] Melhorar responsividade da tela de login admin.
+- [x] Adicionar simulador de frete em cada perfil de tênis.
+- [x] Criar campo de CEP no perfil do produto.
+- [x] Exibir retorno visual do frete simulado.
+- [x] Preparar estrutura para futura integração real com API de frete.
 ---
 
 
@@ -225,6 +240,18 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 
 - Observação: O campo de preço do admin gerava confusão por aceitar número cru.
   Evidência: `frontend/src/pages/Admin.jsx` agora formata durante digitação em `R$ 0,00` e converte de volta para número antes de chamar a API.
+
+- Observação: A referência `assets/perfil_marca.png` indica uma página de marca/listagem com filtro lateral e vitrine de produtos.
+  Evidência: A nova página `frontend/src/pages/BrandProfile.jsx` usa hero de marca, contagem de produtos, logo circular e layout com painel lateral de filtros.
+
+- Observação: O carrossel de categorias precisava navegar para perfis próprios, não apenas aplicar filtro na home.
+  Evidência: `frontend/src/components/CategoryCarousel.jsx` agora usa links para `/brand/:brandId`, e `frontend/src/App.jsx` registra a rota de marca.
+
+- Observação: O tema claro/escuro precisa sobreviver ao recarregamento da página.
+  Evidência: `frontend/src/App.jsx` salva `vertex-theme` no `localStorage` e aplica `data-theme` no elemento raiz.
+
+- Observação: O simulador de frete foi preparado como retorno local determinístico enquanto não há API externa de frete.
+  Evidência: `frontend/src/pages/ProductDetail.jsx` valida CEP com 8 dígitos e exibe prazo/preço simulados em componente próprio.
 
 ---
 
@@ -342,6 +369,18 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
   Justificativa: Corrige imagem gigante sem cortar fotos de tênis e preserva a galeria premium em desktop/mobile.
   Data/Autor: 2026-05-22 / Codex
 
+- Decisão: Criar rota `/brand/:brandId` para perfis de marca/categoria consumindo o carrossel de categorias e os produtos já carregados.
+  Justificativa: Atende a navegação premium por marca sem criar uma API nova desnecessária nesta etapa.
+  Data/Autor: 2026-05-22 / Codex
+
+- Decisão: Aplicar tema claro/escuro via atributo `data-theme` no `documentElement` e persistir em `localStorage`.
+  Justificativa: Permite alternância global simples, compatível com CSS existente e sem dependência extra.
+  Data/Autor: 2026-05-22 / Codex
+
+- Decisão: Implementar o simulador de frete como camada visual local com validação de CEP.
+  Justificativa: Entrega a experiência esperada no perfil do tênis e deixa a estrutura pronta para trocar por API real depois.
+  Data/Autor: 2026-05-22 / Codex
+
 ---
 
 # Outcomes & Retrospective
@@ -374,6 +413,10 @@ Sétima etapa funcional concluída em 2026-05-22.
 
 O admin recebeu modal premium de edição, upload/URL de até 5 imagens por produto, previews com remoção/reordenação, tabela refinada e responsividade melhor. A página do produto passou a ter galeria com miniaturas, os cards usam imagem secundária no hover, a home passou a exibir exatamente 4 lançamentos, carrossel horizontal de categorias, vitrine filtrada separada, navbar inspirada na referência com busca/menu mobile/animação no scroll e footer baseado na referência visual adicionada.
 
+Oitava etapa funcional concluída em 2026-05-22.
+
+O carrossel de categorias agora leva para perfis premium de marca/categoria com header, logo, descrição, contagem e listagem de modelos; a navbar ganhou alternância de tema claro/escuro persistida; o login admin foi centralizado e reforçado no mobile; a página do produto recebeu simulador visual de frete com campo de CEP e estrutura pronta para futura integração real.
+
 Pendência recomendada para evolução: autenticação robusta com hash/JWT, histórico de pedidos no admin, persistência do tamanho selecionado no pedido e integração de pagamento real.
 
 ---
@@ -382,6 +425,15 @@ Pendência recomendada para evolução: autenticação robusta com hash/JWT, his
 
 ```md id="m6v1qc"
 # Plan of Work
+
+Criar uma página específica para perfil de marca/categoria.
+
+Essa página deverá ser acionada ao clicar em qualquer item do carrossel de categorias.
+
+O fluxo esperado será:
+
+```txt
+Carrossel de categorias -> clique na marca -> página da marca -> produtos daquela marca
 
 
 ```md
@@ -1174,6 +1226,8 @@ frontend/src/components/CategoryCarousel.jsx
 frontend/src/data/products.js
 frontend/src/services/api.js
 frontend/src/styles/categoryCarousel.css
+assets/perfil_marca.png
+frontend/src/pages/BrandProfile.jsx
 ```
 
 Comandos executados nesta execução:
@@ -1288,6 +1342,18 @@ Invoke-WebRequest -UseBasicParsing http://localhost:5173
 Invoke-RestMethod http://localhost:8080/api/category-carousel
 git add .
 git commit -m "feat: finalizar galeria preco e carrossel clicavel"
+Get-Content PLANS.MD
+npm run lint
+npm run build
+npm run test:responsive
+npm run test:hero
+git diff --check
+docker compose up --build -d
+Invoke-WebRequest -UseBasicParsing http://localhost:5173
+Invoke-RestMethod http://localhost:8080/health
+Invoke-RestMethod http://localhost:8080/api/category-carousel
+git add .
+git commit -m "feat: adicionar perfil de marca tema e frete"
 ```
 
 Validação realizada:
@@ -1341,6 +1407,15 @@ frontend npm run lint apos galeria/preco/carrossel clicavel: OK
 frontend npm run test:responsive apos galeria/preco/carrossel clicavel: OK, 5 testes aprovados em 390px, 768px, 1024px, 1366px e 1920px
 frontend npm run test:hero apos galeria/preco/carrossel clicavel: OK, 2 testes aprovados em desktop e mobile
 git diff --check apos galeria/preco/carrossel clicavel: OK, apenas avisos de CRLF do Git no Windows
+frontend npm run lint apos perfil de marca/tema/frete: OK
+frontend npm run build apos perfil de marca/tema/frete: OK
+frontend npm run test:responsive apos perfil de marca/tema/frete: OK, 5 testes aprovados em 390px, 768px, 1024px, 1366px e 1920px
+frontend npm run test:hero apos perfil de marca/tema/frete: OK, 2 testes aprovados em desktop e mobile
+git diff --check apos perfil de marca/tema/frete: OK, apenas avisos de CRLF do Git no Windows
+docker compose up --build -d apos perfil de marca/tema/frete: OK
+frontend Docker em http://localhost:5173 apos perfil de marca/tema/frete: HTTP 200
+backend Docker em http://localhost:8080/health apos perfil de marca/tema/frete: OK com database mysql
+backend Docker em http://localhost:8080/api/category-carousel apos perfil de marca/tema/frete: OK
 ```
 
 Commit criado:
@@ -1358,6 +1433,7 @@ fix: restaurar velocidade normal do hero
 feat: aprimorar admin e selecao de tamanhos
 feat: refinar admin galeria homepage navbar e footer
 feat: finalizar galeria preco e carrossel clicavel
+feat: adicionar perfil de marca tema e frete
 ```
 
 ---

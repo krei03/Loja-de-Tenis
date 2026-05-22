@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { ArrowRight, Menu, Search, ShoppingBag, UserRound, X } from 'lucide-react'
+import { ArrowRight, Menu, Moon, Search, ShoppingBag, Sun, UserRound, X } from 'lucide-react'
 
-export function Navbar({ cartCount }) {
+export function Navbar({ cartCount, onToggleTheme, theme }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -40,6 +40,9 @@ export function Navbar({ cartCount }) {
       </label>
 
       <div className="nav-actions">
+        <button className="icon-button" type="button" onClick={onToggleTheme} aria-label="Alternar tema">
+          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
         <button className="icon-button desktop-account" type="button" aria-label="Conta">
           <UserRound size={20} />
         </button>
