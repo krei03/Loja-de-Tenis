@@ -1,58 +1,44 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { CircleDot, Flame, ShieldCheck, Truck } from 'lucide-react'
+import { Flame, ShieldCheck, Truck } from 'lucide-react'
 import { Hero } from '../components/Hero'
+import { CategoryCarousel } from '../components/CategoryCarousel'
 import { ProductCard } from '../components/ProductCard'
 import { api } from '../services/api'
-
-const categoryIcons = {
-  all: 'VX',
-  launch: '01',
-  running: 'RUN',
-  streetwear: 'ST',
-  limited: 'LTD',
-}
 
 export function Home({ onAdd }) {
   const [allProducts, setAllProducts] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
-  const [categories, setCategories] = useState([])
-  const [filters, setFilters] = useState({
-    category: 'all',
-    brand: 'all',
-    size: '',
-    minPrice: '',
-    maxPrice: '',
-  })
+  const [activeCarouselItem, setActiveCarouselItem] = useState(null)
+  const catalogRef = useRef(null)
 
   useEffect(() => {
-    Promise.all([api.getProducts(), api.getCategories()]).then(([productData, categoryData]) => {
+    api.getProducts().then((productData) => {
       setAllProducts(productData)
-      setCategories(categoryData)
+      setFilteredProducts(productData)
     })
   }, [])
-
-  useEffect(() => {
-    api.getProducts(filters).then(setFilteredProducts)
-  }, [filters])
 
   const launches = useMemo(() => {
     const launchProducts = allProducts.filter((product) => product.category === 'launch')
     return [...launchProducts, ...allProducts.filter((product) => product.category !== 'launch')].slice(0, 4)
   }, [allProducts])
 
-  const brands = useMemo(() => [...new Set(allProducts.map((product) => product.brand))], [allProducts])
-  const sizes = useMemo(
-    () => [...new Set(allProducts.flatMap((product) => product.sizes || []))].sort((a, b) => a - b),
-    [allProducts],
-  )
+  const selectCarouselItem = (item) => {
+    const normalizedName = item.name.toLowerCase()
+    const normalizedId = item.id.toLowerCase()
+    const nextProducts = allProducts.filter((product) => {
+      const brand = product.brand.toLowerCase()
+      const category = product.category.toLowerCase()
 
-  const updateFilter = (event) => {
-    setFilters((current) => ({ ...current, [event.target.name]: event.target.value }))
-  }
+      return brand === normalizedName || brand.includes(normalizedName) || category === normalizedId
+    })
 
-  const setCategory = (category) => {
-    setFilters((current) => ({ ...current, category }))
+    setActiveCarouselItem(item.id)
+    setFilteredProducts(nextProducts.length ? nextProducts : allProducts)
+    window.setTimeout(() => {
+      catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 80)
   }
 
   return (
@@ -63,7 +49,7 @@ export function Home({ onAdd }) {
         <section className="launches" id="launches">
           <div className="section-heading">
             <p>Lancamentos</p>
-            <h2>4 tenis premium para entrar no radar agora</h2>
+            <h2>Melhores drops premium para entrar no radar</h2>
           </div>
 
           <div className="product-grid launches-grid">
@@ -73,51 +59,11 @@ export function Home({ onAdd }) {
           </div>
         </section>
 
-        <section className="category-band" id="categories">
+        <CategoryCarousel activeItemId={activeCarouselItem} onSelect={selectCarouselItem} />
+
+        <section className="catalog-section" ref={catalogRef}>
           <div className="section-heading">
-            <p>Categorias</p>
-            <h2>Escolha pelo momento do fit</h2>
-          </div>
-
-          <div className="category-carousel" aria-label="Categorias de produto">
-            {categories.map((category) => (
-              <button
-                type="button"
-                key={category.id}
-                className={filters.category === category.id ? 'active' : ''}
-                onClick={() => setCategory(category.id)}
-              >
-                <span>{categoryIcons[category.id] || <CircleDot size={22} />}</span>
-                {category.name}
-              </button>
-            ))}
-          </div>
-
-          <div className="advanced-filters">
-            <select name="brand" value={filters.brand} onChange={updateFilter}>
-              <option value="all">Todas as marcas</option>
-              {brands.map((brand) => (
-                <option value={brand} key={brand}>
-                  {brand}
-                </option>
-              ))}
-            </select>
-            <select name="size" value={filters.size} onChange={updateFilter}>
-              <option value="">Todos os tamanhos</option>
-              {sizes.map((size) => (
-                <option value={size} key={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
-            <input name="minPrice" type="number" placeholder="Preco min." value={filters.minPrice} onChange={updateFilter} />
-            <input name="maxPrice" type="number" placeholder="Preco max." value={filters.maxPrice} onChange={updateFilter} />
-          </div>
-        </section>
-
-        <section className="catalog-section">
-          <div className="section-heading">
-            <p>Vitrine</p>
+            <p>{activeCarouselItem ? 'Categoria selecionada' : 'Vitrine'}</p>
             <h2>Selecao premium em tempo real</h2>
           </div>
 

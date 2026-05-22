@@ -1,4 +1,8 @@
-import { categories as localCategories, products as localProducts } from '../data/products'
+import {
+  categories as localCategories,
+  categoryCarousel as localCategoryCarousel,
+  products as localProducts,
+} from '../data/products'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const API_ORIGIN = API_URL.replace(/\/api$/, '')
@@ -37,6 +41,10 @@ async function request(path, options) {
       return localCategories
     }
 
+    if (path.startsWith('/category-carousel')) {
+      return localCategoryCarousel
+    }
+
     throw error
   }
 }
@@ -44,6 +52,13 @@ async function request(path, options) {
 export const api = {
   getProducts: (params) => request(`/products${buildQuery(params)}`),
   getCategories: () => request('/categories'),
+  getCategoryCarousel: () => request('/category-carousel'),
+  getAdminCategoryCarousel: (token) =>
+    request('/category-carousel/admin', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
   loginAdmin: (payload) =>
     request('/auth/admin/login', {
       method: 'POST',
@@ -70,6 +85,31 @@ export const api = {
     }),
   deleteProduct: (id, token) =>
     request(`/products/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+  createCategoryCarouselItem: (payload, token) =>
+    request('/category-carousel', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    }),
+  updateCategoryCarouselItem: (id, payload, token) =>
+    request(`/category-carousel/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    }),
+  deleteCategoryCarouselItem: (id, token) =>
+    request(`/category-carousel/${id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,

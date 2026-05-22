@@ -1,5 +1,5 @@
 import mysql from 'mysql2/promise'
-import { seedCategories, seedProducts } from './seed.js'
+import { seedCategories, seedCategoryCarousel, seedProducts } from './seed.js'
 
 let pool
 let ready = false
@@ -77,6 +77,16 @@ export async function initializeDatabase() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `)
+      await database.query(`
+        CREATE TABLE IF NOT EXISTS category_carousel (
+          id VARCHAR(120) PRIMARY KEY,
+          name VARCHAR(140) NOT NULL,
+          logo TEXT NOT NULL,
+          display_order INT NOT NULL DEFAULT 0,
+          is_active BOOLEAN NOT NULL DEFAULT TRUE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `)
 
       await seedIfEmpty()
       ready = true
@@ -105,6 +115,7 @@ async function seedIfEmpty() {
   const database = getPool()
   const [[categoryCount]] = await database.query('SELECT COUNT(*) AS total FROM categories')
   const [[productCount]] = await database.query('SELECT COUNT(*) AS total FROM products')
+  const [[categoryCarouselCount]] = await database.query('SELECT COUNT(*) AS total FROM category_carousel')
 
   if (categoryCount.total === 0) {
     await Promise.all(
@@ -141,6 +152,28 @@ async function seedIfEmpty() {
         ),
       ),
     )
+  }
+
+  if (categoryCarouselCount.total === 0) {
+    await Promise.all(
+      seedCategoryCarousel.map((item) =>
+        database.execute(
+          `INSERT INTO category_carousel (id, name, logo, display_order, is_active)
+           VALUES (?, ?, ?, ?, ?)`,
+          [item.id, item.name, item.logo, item.display_order, item.is_active],
+        ),
+      ),
+    )
+  }
+}
+
+export function mapCategoryCarouselItem(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    logo: row.logo,
+    display_order: Number(row.display_order),
+    is_active: Boolean(row.is_active),
   }
 }
 

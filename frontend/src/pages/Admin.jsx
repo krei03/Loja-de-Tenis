@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ChevronDown,
   ChevronUp,
@@ -12,12 +12,28 @@ import {
   X,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { CategoryCarousel } from '../components/CategoryCarousel'
 import { api } from '../services/api'
 
 const money = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
 })
+
+function formatPriceInput(value) {
+  const digits = String(value ?? '').replace(/\D/g, '')
+
+  if (!digits) {
+    return ''
+  }
+
+  return money.format(Number(digits) / 100)
+}
+
+function parsePriceInput(value) {
+  const digits = String(value ?? '').replace(/\D/g, '')
+  return digits ? Number(digits) / 100 : 0
+}
 
 const emptyProduct = {
   name: '',
@@ -33,6 +49,13 @@ const emptyProduct = {
   stock: 1,
 }
 
+const emptyCarouselItem = {
+  name: '',
+  logo: '',
+  display_order: 1,
+  is_active: true,
+}
+
 function productToForm(product) {
   const images = [...new Set([product.image, ...(product.gallery || [])].filter(Boolean))].slice(0, 5)
 
@@ -40,7 +63,7 @@ function productToForm(product) {
     name: product.name || '',
     brand: product.brand || '',
     category: product.category || 'launch',
-    price: product.price ?? '',
+    price: formatPriceInput(Math.round((product.price ?? 0) * 100)),
     badge: product.badge || '',
     color: product.color || '',
     sizes: product.sizes?.join(',') || '',
@@ -56,19 +79,55 @@ export function Admin({ products, onProductsChanged }) {
   const [session, setSession] = useState(null)
   const [productForm, setProductForm] = useState(emptyProduct)
   const [editingProductId, setEditingProductId] = useState(null)
+  const [carouselItems, setCarouselItems] = useState([])
+  const [carouselForm, setCarouselForm] = useState(emptyCarouselItem)
+  const [editingCarouselId, setEditingCarouselId] = useState(null)
+  const [carouselEditorOpen, setCarouselEditorOpen] = useState(false)
+  const [carouselListOpen, setCarouselListOpen] = useState(true)
+  const [brandSearchOpen, setBrandSearchOpen] = useState(false)
   const [message, setMessage] = useState('')
+  const carouselEditorRef = useRef(null)
 
   const totalInventory = products.length
   const totalValue = products.reduce((sum, product) => sum + product.price, 0)
   const brands = useMemo(() => [...new Set(products.map((product) => product.brand))], [products])
+  const productBrandOptions = useMemo(
+    () =>
+      [...new Set([...carouselItems.map((item) => item.name), ...brands].filter(Boolean))]
+        .sort((first, second) => first.localeCompare(second)),
+    [brands, carouselItems],
+  )
+  const filteredBrandOptions = productBrandOptions.filter((brand) =>
+    brand.toLowerCase().includes(productForm.brand.toLowerCase()),
+  )
   const editingProduct = products.find((product) => product.id === editingProductId)
+
+  useEffect(() => {
+    if (session?.token) {
+      api.getAdminCategoryCarousel(session.token).then(setCarouselItems)
+    }
+  }, [session?.token])
 
   const updateCredentials = (event) => {
     setCredentials((current) => ({ ...current, [event.target.name]: event.target.value }))
   }
 
   const updateProduct = (event) => {
-    setProductForm((current) => ({ ...current, [event.target.name]: event.target.value }))
+    const { name, value } = event.target
+    setProductForm((current) => ({
+      ...current,
+      [name]: name === 'price' ? formatPriceInput(value) : value,
+    }))
+  }
+
+  const selectProductBrand = (brand) => {
+    setProductForm((current) => ({ ...current, brand }))
+    setBrandSearchOpen(false)
+  }
+
+  const updateCarousel = (event) => {
+    const { checked, name, type, value } = event.target
+    setCarouselForm((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }))
   }
 
   const login = async (event) => {
@@ -76,6 +135,15 @@ export function Admin({ products, onProductsChanged }) {
     const result = await api.loginAdmin(credentials)
     setSession(result)
     setMessage('Admin autenticado.')
+  }
+
+  const refreshCarousel = async () => {
+    if (!session?.token) {
+      return
+    }
+
+    const items = await api.getAdminCategoryCarousel(session.token)
+    setCarouselItems(items)
   }
 
   const addImages = (urls) => {
@@ -96,6 +164,19 @@ export function Admin({ products, onProductsChanged }) {
     const uploaded = await Promise.all(files.map((file) => api.uploadImage(file, session.token)))
     addImages(uploaded.map((item) => item.url))
     setMessage(`${uploaded.length} imagem(ns) enviada(s).`)
+    event.target.value = ''
+  }
+
+  const uploadCarouselLogo = async (event) => {
+    const file = event.target.files?.[0]
+
+    if (!file || !session) {
+      return
+    }
+
+    const uploaded = await api.uploadImage(file, session.token)
+    setCarouselForm((current) => ({ ...current, logo: uploaded.url }))
+    setMessage('Logo do carrossel enviada.')
     event.target.value = ''
   }
 
@@ -133,7 +214,7 @@ export function Admin({ products, onProductsChanged }) {
 
   const buildProductPayload = () => ({
     ...productForm,
-    price: Number(productForm.price),
+    price: parsePriceInput(productForm.price),
     stock: Number(productForm.stock),
     sizes: productForm.sizes,
     image: productForm.images[0] || '',
@@ -177,6 +258,213 @@ export function Admin({ products, onProductsChanged }) {
     onProductsChanged()
   }
 
+  const resetCarouselForm = () => {
+    setEditingCarouselId(null)
+    setCarouselForm({
+      ...emptyCarouselItem,
+      display_order: carouselItems.length + 1,
+    })
+  }
+
+  const editCarouselItem = (item) => {
+    setCarouselEditorOpen(true)
+    setEditingCarouselId(item.id)
+    setCarouselForm({
+      name: item.name,
+      logo: item.logo || '',
+      display_order: item.display_order,
+      is_active: item.is_active,
+    })
+    setMessage(`Editando ${item.name}.`)
+    window.setTimeout(() => {
+      carouselEditorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 80)
+  }
+
+  const saveCarouselItem = async (event) => {
+    event.preventDefault()
+
+    const payload = {
+      ...carouselForm,
+      display_order: Number(carouselForm.display_order),
+      is_active: Boolean(carouselForm.is_active),
+    }
+
+    if (editingCarouselId) {
+      await api.updateCategoryCarouselItem(editingCarouselId, payload, session.token)
+      setMessage('Categoria do carrossel atualizada.')
+    } else {
+      await api.createCategoryCarouselItem(payload, session.token)
+      setMessage('Categoria adicionada ao carrossel.')
+    }
+
+    resetCarouselForm()
+    setCarouselEditorOpen(false)
+    await refreshCarousel()
+  }
+
+  const deleteCarouselItem = async (id) => {
+    await api.deleteCategoryCarouselItem(id, session.token)
+    setMessage('Categoria removida do carrossel.')
+    await refreshCarousel()
+  }
+
+  const toggleCarouselItem = async (item) => {
+    await api.updateCategoryCarouselItem(item.id, { is_active: !item.is_active }, session.token)
+    await refreshCarousel()
+  }
+
+  const moveCarouselItem = async (item, direction) => {
+    const orderedItems = [...carouselItems].sort((first, second) => first.display_order - second.display_order)
+    const index = orderedItems.findIndex((current) => current.id === item.id)
+    const swap = orderedItems[index + direction]
+
+    if (!swap) {
+      return
+    }
+
+    await Promise.all([
+      api.updateCategoryCarouselItem(item.id, { display_order: swap.display_order }, session.token),
+      api.updateCategoryCarouselItem(swap.id, { display_order: item.display_order }, session.token),
+    ])
+    await refreshCarousel()
+  }
+
+  const renderCarouselManager = () => {
+    const activePreviewItems = carouselItems.filter((item) => item.is_active)
+
+    return (
+      <section className="carousel-admin-shell">
+        <div className="form-title-row carousel-admin-header">
+          <div>
+            <span>Carrossel premium</span>
+            <h2>Gerenciar Carrossel de Categorias</h2>
+          </div>
+          <div className="carousel-admin-controls">
+            <button
+              type="button"
+              className="carousel-admin-toggle"
+              onClick={() => {
+                setCarouselEditorOpen((current) => !current)
+
+                if (carouselEditorOpen) {
+                  resetCarouselForm()
+                }
+              }}
+            >
+              {carouselEditorOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+              Criar categoria
+            </button>
+            <button
+              type="button"
+              className="carousel-admin-toggle secondary-toggle"
+              onClick={() => setCarouselListOpen((current) => !current)}
+            >
+              {carouselListOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+              {carouselListOpen ? 'Diminuir lista' : 'Mostrar lista'}
+            </button>
+          </div>
+        </div>
+
+        {carouselEditorOpen && (
+          <motion.form
+            ref={carouselEditorRef}
+            className="form-panel carousel-admin-form"
+            onSubmit={saveCarouselItem}
+            initial={{ opacity: 0, height: 0, y: -8 }}
+            animate={{ opacity: 1, height: 'auto', y: 0 }}
+            transition={{ duration: 0.22 }}
+          >
+            <div className="form-grid">
+              <input required name="name" placeholder="Nome da marca" value={carouselForm.name} onChange={updateCarousel} />
+              <input
+                required
+                name="display_order"
+                type="number"
+                placeholder="Lugar / ordem"
+                value={carouselForm.display_order}
+                onChange={updateCarousel}
+              />
+              <input name="logo" placeholder="URL da foto/logo" value={carouselForm.logo} onChange={updateCarousel} />
+              <label className="toggle-field">
+                <input
+                  name="is_active"
+                  type="checkbox"
+                  checked={carouselForm.is_active}
+                  onChange={updateCarousel}
+                />
+                Ativa
+              </label>
+            </div>
+
+            <div className="upload-row">
+              <label>
+                <ImagePlus size={18} />
+                Upload foto/logo
+                <input type="file" accept="image/*" onChange={uploadCarouselLogo} />
+              </label>
+              <div className="carousel-logo-preview">
+                {carouselForm.logo ? <img src={carouselForm.logo} alt="Preview do logo" /> : <span>Preview</span>}
+              </div>
+            </div>
+
+            <div className="form-actions">
+              <button type="submit">
+                <Save size={18} />
+                {editingCarouselId ? 'Atualizar categoria' : 'Adicionar categoria'}
+              </button>
+              <button type="button" className="secondary-action" onClick={resetCarouselForm}>
+                <X size={18} />
+                {editingCarouselId ? 'Cancelar edicao' : 'Limpar'}
+              </button>
+            </div>
+          </motion.form>
+        )}
+
+        <CategoryCarousel items={activePreviewItems} />
+
+        {carouselListOpen && (
+          <motion.div
+            className="admin-table carousel-admin-list"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            transition={{ duration: 0.2 }}
+          >
+            {carouselItems.map((item) => (
+              <article key={item.id}>
+                <div className="carousel-admin-logo">
+                  {item.logo ? <img src={item.logo} alt={item.name} /> : <span>{item.name.slice(0, 2).toUpperCase()}</span>}
+                </div>
+                <div>
+                  <h3>{item.name}</h3>
+                  <p>Ordem {item.display_order} / {item.is_active ? 'ativa' : 'inativa'}</p>
+                </div>
+                <span>{item.is_active ? 'Ativa' : 'Off'}</span>
+                <div className="admin-actions">
+                  <button type="button" onClick={() => moveCarouselItem(item, -1)} aria-label={`Subir ${item.name}`}>
+                    <ChevronUp size={18} />
+                  </button>
+                  <button type="button" onClick={() => moveCarouselItem(item, 1)} aria-label={`Descer ${item.name}`}>
+                    <ChevronDown size={18} />
+                  </button>
+                  <button type="button" onClick={() => toggleCarouselItem(item)} aria-label={`Alternar ${item.name}`}>
+                    <Tags size={18} />
+                  </button>
+                  <button type="button" onClick={() => editCarouselItem(item)} aria-label={`Editar ${item.name}`}>
+                    <Pencil size={18} />
+                  </button>
+                  <button type="button" onClick={() => deleteCarouselItem(item.id)} aria-label={`Remover ${item.name}`}>
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </article>
+            ))}
+          </motion.div>
+        )}
+      </section>
+    )
+  }
+
   const renderProductForm = (title) => (
     <form className="admin-product-form form-panel" onSubmit={saveProduct}>
       <div className="form-title-row">
@@ -193,14 +481,42 @@ export function Admin({ products, onProductsChanged }) {
 
       <div className="form-grid">
         <input required name="name" placeholder="Nome" value={productForm.name} onChange={updateProduct} />
-        <input required name="brand" placeholder="Marca" value={productForm.brand} onChange={updateProduct} />
+        <div className="product-brand-search">
+          <input
+            required
+            name="brand"
+            placeholder="Buscar marca"
+            value={productForm.brand}
+            autoComplete="off"
+            onChange={updateProduct}
+            onFocus={() => setBrandSearchOpen(true)}
+            onBlur={() => window.setTimeout(() => setBrandSearchOpen(false), 120)}
+          />
+          {brandSearchOpen && filteredBrandOptions.length > 0 && (
+            <div className="brand-search-list">
+              {filteredBrandOptions.map((brand) => (
+                <button type="button" key={brand} onMouseDown={() => selectProductBrand(brand)}>
+                  {brand}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <select name="category" value={productForm.category} onChange={updateProduct}>
           <option value="launch">Lancamentos</option>
           <option value="running">Performance</option>
           <option value="streetwear">Streetwear</option>
           <option value="limited">Limitados</option>
         </select>
-        <input required name="price" type="number" placeholder="Preco" value={productForm.price} onChange={updateProduct} />
+        <input
+          required
+          name="price"
+          type="text"
+          inputMode="numeric"
+          placeholder="R$ 0,00"
+          value={productForm.price}
+          onChange={updateProduct}
+        />
         <input name="badge" placeholder="Selo" value={productForm.badge} onChange={updateProduct} />
         <input name="color" placeholder="Cor" value={productForm.color} onChange={updateProduct} />
         <input name="sizes" placeholder="Tamanhos" value={productForm.sizes} onChange={updateProduct} />
@@ -337,6 +653,7 @@ export function Admin({ products, onProductsChanged }) {
 
       {!editingProductId && renderProductForm('Cadastrar produto')}
       {message && <p className="admin-message">{message}</p>}
+      {renderCarouselManager()}
 
       <section className="admin-table">
         {products.map((product) => (

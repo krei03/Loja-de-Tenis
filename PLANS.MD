@@ -104,14 +104,12 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 - [x] Criar animações suaves no admin.
 - [x] Melhorar aparência premium das tabelas do admin.
 - [x] Melhorar responsividade do painel administrativo.
-
 - [x] Exibir exatamente 4 tênis premium na seção “Lançamentos”.
 - [x] Criar carrossel horizontal de categorias abaixo da seção de lançamentos.
 - [x] Utilizar referência visual `assets/carrosel_categoria`.
 - [x] Melhorar visual premium da seção de lançamentos.
 - [x] Melhorar espaçamento e hierarquia visual da homepage.
 - [x] Criar transição suave entre hero e seção de produtos.
-
 - [x] Refazer footer baseado na referência `assets/foter`.
 - [x] Refinar navbar premium baseada na referência `assets/navbar`.
 - [x] Melhorar navegação desktop/mobile.
@@ -119,7 +117,22 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 - [x] Melhorar menu mobile premium.
 - [x] Melhorar animações da navbar durante scroll.
 - [x] Melhorar experiência visual geral do ecommerce.
+- [x] Corrigir página/perfil do produto para não exibir imagem gigante.
+- [x] Exibir todas as fotos enviadas no upload do produto.
+- [x] Criar galeria premium no perfil do produto usando todas as imagens cadastradas.
+- [x] Criar miniaturas clicáveis abaixo/ao lado da imagem principal do produto.
+- [x] Melhorar responsividade da galeria do produto no mobile.
+- [x] Adicionar botão “Ler mais” na descrição do produto.
+- [x] Limitar descrição grande inicialmente e expandir ao clicar em “Ler mais”.
+- [x] Melhorar campo de valor/preço no admin.
+- [x] Deixar preço no formato brasileiro `R$ 0,00` durante cadastro e edição.
+- [x] Corrigir confusão visual ao digitar preço do produto.
+- [x] Fazer cada item do carrossel de categorias ser clicável.
+- [x] Ao clicar em uma categoria, levar o usuário para a página/listagem dos produtos cadastrados naquela categoria.
+- [x] Garantir que o filtro da categoria funcione com os produtos reais do banco.
+- [x] Manter aparência premium do carrossel após adicionar navegação por clique.
 ---
+
 
 # Surprises & Discoveries
 
@@ -203,6 +216,15 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 
 - Observação: A home precisava separar lançamentos de vitrine filtrada para cumprir “exatamente 4 tênis” sem quebrar os filtros.
   Evidência: `frontend/src/pages/Home.jsx` agora busca `allProducts` para lançamentos/categorias e `filteredProducts` para a vitrine.
+
+- Observação: O carrossel de marcas precisava funcionar como navegação real, não apenas vitrine visual.
+  Evidência: `frontend/src/components/CategoryCarousel.jsx` aceita `onSelect` e `activeItemId`; `frontend/src/pages/Home.jsx` filtra a vitrine com produtos reais já carregados da API e rola até a listagem.
+
+- Observação: A galeria do produto já guardava múltiplas imagens no backend, mas a experiência precisava limitar o tamanho da imagem principal e resumir descrições longas.
+  Evidência: `frontend/src/pages/ProductDetail.jsx` usa todas as imagens de `gallery`, miniaturas clicáveis e botão `Ler mais`; `frontend/src/styles/app.css` limita a imagem principal com `max-height` e `object-fit: contain`.
+
+- Observação: O campo de preço do admin gerava confusão por aceitar número cru.
+  Evidência: `frontend/src/pages/Admin.jsx` agora formata durante digitação em `R$ 0,00` e converte de volta para número antes de chamar a API.
 
 ---
 
@@ -308,6 +330,18 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
   Justificativa: Mantém a identidade Vertex e usa as referências apenas como direção visual de estrutura, contraste e densidade.
   Data/Autor: 2026-05-22 / Codex
 
+- Decisão: Filtrar o carrossel de categorias pelo nome da marca e, como fallback, pelo id da categoria.
+  Justificativa: Os itens do carrossel representam marcas de sneakers/streetwear, mas o catálogo ainda mantém categorias técnicas como `launch`, `running`, `streetwear` e `limited`.
+  Data/Autor: 2026-05-22 / Codex
+
+- Decisão: Manter a máscara de preço apenas no frontend/admin e enviar valor numérico para a API.
+  Justificativa: Evita migração de banco e mantém compatibilidade com `price DECIMAL(10,2)` no MySQL.
+  Data/Autor: 2026-05-22 / Codex
+
+- Decisão: Usar `object-fit: contain` e limite de altura na imagem principal do produto.
+  Justificativa: Corrige imagem gigante sem cortar fotos de tênis e preserva a galeria premium em desktop/mobile.
+  Data/Autor: 2026-05-22 / Codex
+
 ---
 
 # Outcomes & Retrospective
@@ -348,6 +382,154 @@ Pendência recomendada para evolução: autenticação robusta com hash/JWT, his
 
 ```md id="m6v1qc"
 # Plan of Work
+
+
+```md
+
+Refinar a página individual do produto para corrigir o tamanho exagerado da imagem principal.
+
+A galeria do produto deverá passar a usar todas as imagens enviadas no cadastro/upload.
+
+A implementação deverá verificar o campo de imagens/galeria do produto e montar uma interface com:
+
+- imagem principal;
+- miniaturas clicáveis;
+- troca de imagem sem recarregar;
+- proporção visual controlada;
+- responsividade mobile;
+- aparência premium.
+
+A imagem principal não poderá ultrapassar um tamanho visual confortável.
+
+Ela deverá manter proporção consistente usando `object-fit`, largura máxima e altura controlada.
+
+A descrição do produto deverá receber comportamento de “Ler mais”.
+
+Inicialmente, a descrição deverá aparecer limitada.
+
+Quando o usuário clicar em “Ler mais”, o texto completo deverá abrir com transição suave.
+
+O botão também poderá alternar para:
+
+```txt
+Mostrar menos
+
+Inicialmente será criada toda estrutura principal do projeto separando frontend e backend.
+
+O frontend será desenvolvido utilizando React + Vite.
+
+O backend será desenvolvido utilizando Node.js + Express.
+
+Após criação da estrutura inicial será configurado Docker para execução completa do ambiente.
+
+Será criado um `docker-compose.yml` responsável por subir frontend e backend simultaneamente.
+
+Na home page será desenvolvido um hero cinematográfico fullscreen utilizando o vídeo:
+
+```txt
+frontend/assets/video_hero.mp4
+```
+Adicionar ação de editar produto dentro do painel admin, posicionando o botão ao lado do botão de deletar.
+
+O botão deverá abrir modo de edição do produto ou preencher novamente o formulário admin com os dados atuais do item selecionado.
+
+Revisar os componentes de select/dropdown do admin, pois atualmente os textos e fundos estão brancos, dificultando visualizar as opções.
+
+Os selects precisam possuir contraste correto com dark mode premium.
+
+O seletor de tamanhos da página de produto deverá ser transformado em um componente realmente interativo.
+
+Os tamanhos precisam responder ao clique, destacar o tamanho selecionado e atualizar visualmente o estado ativo.
+
+Também deverá existir hover premium nos tamanhos.
+
+Os cards filtrados precisam manter proporção consistente após aplicação de filtros.
+
+Atualmente as imagens estão crescendo excessivamente, quebrando o layout premium.
+
+A grid de produtos deverá manter:
+
+- altura consistente;
+- imagens proporcionais;
+- cards alinhados;
+- tamanho premium;
+- comportamento responsivo.
+
+O hero deverá:
+
+- ocupar 100% da tela;
+- possuir vídeo fullscreen;
+- manter o vídeo fixo durante scroll;
+- sincronizar o tempo do vídeo com a rolagem da página.
+
+A lógica do scroll funcionará alterando:
+
+```js
+video.currentTime
+```
+
+conforme a posição do scroll.
+
+Será criada uma seção de produtos premium logo após o hero.
+
+Os cards dos produtos deverão possuir:
+
+- imagem grande;
+- hover moderno;
+- sombra suave;
+- animação;
+- nome;
+- preço;
+- botão de detalhes.
+
+Será criada página individual do produto contendo:
+
+- galeria de imagens;
+- descrição;
+- tamanhos;
+- botão adicionar ao carrinho;
+- informações premium.
+
+O backend possuirá:
+
+- CRUD de produtos;
+- CRUD de categorias;
+- gerenciamento de pedidos;
+- painel admin simples.
+
+- O projeto deverá funcionar completamente dentro do Docker.
+- Transformar o ecommerce de uma versão visual/demonstrativa para uma loja mais real, com produtos salvos no banco, admin funcional e fluxo de compra mais completo.
+
+
+- Corrigir o comportamento do vídeo cinematográfico do hero, pois atualmente existe um atraso entre o movimento do scroll e a atualização do tempo do vídeo.
+
+- A lógica atual de sincronização deverá ser revisada para garantir que o `currentTime` do vídeo acompanhe o progresso real do scroll de forma mais precisa.
+
+- A correção deve evitar que o vídeo pareça estar “atrasado” em relação à rolagem, principalmente quando o usuário desce a página rapidamente.
+
+- O componente responsável pelo hero, provavelmente em:
+
+```txt
+frontend/src/components/Hero.jsx
+```
+- Melhorar o componente do hero para transformar o vídeo principal em uma experiência cinematográfica premium.
+
+- Revisar a lógica atual de sincronização do vídeo com o scroll, pois o vídeo está apresentando sensação de atraso quando o usuário rola a página para baixo.
+
+- A lógica deverá ser ajustada para que o progresso do scroll controle o `video.currentTime` de forma mais precisa e fluida.
+
+- O evento de scroll não deve executar cálculos pesados o tempo inteiro.
+
+- A implementação deverá usar `requestAnimationFrame` para controlar a atualização do vídeo com mais performance.
+
+- Também deverá ser feito cache dos valores de posição e altura do hero, evitando uso excessivo de `getBoundingClientRect()` durante a rolagem.
+
+- A geometria do hero deverá ser recalculada apenas quando necessário, como em:
+
+```txt
+resize
+orientationchange
+loadedmetadata
 
 Refinar completamente o painel admin para melhorar usabilidade e aparência premium.
 
@@ -518,130 +700,27 @@ assets/carrosel_categoria
 assets/foter
 assets/navbar
 
----
-
-# Plan of Work
-
-Inicialmente será criada toda estrutura principal do projeto separando frontend e backend.
-
-O frontend será desenvolvido utilizando React + Vite.
-
-O backend será desenvolvido utilizando Node.js + Express.
-
-Após criação da estrutura inicial será configurado Docker para execução completa do ambiente.
-
-Será criado um `docker-compose.yml` responsável por subir frontend e backend simultaneamente.
-
-Na home page será desenvolvido um hero cinematográfico fullscreen utilizando o vídeo:
-
-```txt
-frontend/assets/video_hero.mp4
-```
-Adicionar ação de editar produto dentro do painel admin, posicionando o botão ao lado do botão de deletar.
-
-O botão deverá abrir modo de edição do produto ou preencher novamente o formulário admin com os dados atuais do item selecionado.
-
-Revisar os componentes de select/dropdown do admin, pois atualmente os textos e fundos estão brancos, dificultando visualizar as opções.
-
-Os selects precisam possuir contraste correto com dark mode premium.
-
-O seletor de tamanhos da página de produto deverá ser transformado em um componente realmente interativo.
-
-Os tamanhos precisam responder ao clique, destacar o tamanho selecionado e atualizar visualmente o estado ativo.
-
-Também deverá existir hover premium nos tamanhos.
-
-Os cards filtrados precisam manter proporção consistente após aplicação de filtros.
-
-Atualmente as imagens estão crescendo excessivamente, quebrando o layout premium.
-
-A grid de produtos deverá manter:
-
-- altura consistente;
-- imagens proporcionais;
-- cards alinhados;
-- tamanho premium;
-- comportamento responsivo.
-
-O hero deverá:
-
-- ocupar 100% da tela;
-- possuir vídeo fullscreen;
-- manter o vídeo fixo durante scroll;
-- sincronizar o tempo do vídeo com a rolagem da página.
-
-A lógica do scroll funcionará alterando:
-
-```js
-video.currentTime
-```
-
-conforme a posição do scroll.
-
-Será criada uma seção de produtos premium logo após o hero.
-
-Os cards dos produtos deverão possuir:
-
-- imagem grande;
-- hover moderno;
-- sombra suave;
-- animação;
-- nome;
-- preço;
-- botão de detalhes.
-
-Será criada página individual do produto contendo:
-
-- galeria de imagens;
-- descrição;
-- tamanhos;
-- botão adicionar ao carrinho;
-- informações premium.
-
-O backend possuirá:
-
-- CRUD de produtos;
-- CRUD de categorias;
-- gerenciamento de pedidos;
-- painel admin simples.
-
-- O projeto deverá funcionar completamente dentro do Docker.
-- Transformar o ecommerce de uma versão visual/demonstrativa para uma loja mais real, com produtos salvos no banco, admin funcional e fluxo de compra mais completo.
-
-
-- Corrigir o comportamento do vídeo cinematográfico do hero, pois atualmente existe um atraso entre o movimento do scroll e a atualização do tempo do vídeo.
-
-- A lógica atual de sincronização deverá ser revisada para garantir que o `currentTime` do vídeo acompanhe o progresso real do scroll de forma mais precisa.
-
-- A correção deve evitar que o vídeo pareça estar “atrasado” em relação à rolagem, principalmente quando o usuário desce a página rapidamente.
-
-- O componente responsável pelo hero, provavelmente em:
-
-```txt
-frontend/src/components/Hero.jsx
-```
-- Melhorar o componente do hero para transformar o vídeo principal em uma experiência cinematográfica premium.
-
-- Revisar a lógica atual de sincronização do vídeo com o scroll, pois o vídeo está apresentando sensação de atraso quando o usuário rola a página para baixo.
-
-- A lógica deverá ser ajustada para que o progresso do scroll controle o `video.currentTime` de forma mais precisa e fluida.
-
-- O evento de scroll não deve executar cálculos pesados o tempo inteiro.
-
-- A implementação deverá usar `requestAnimationFrame` para controlar a atualização do vídeo com mais performance.
-
-- Também deverá ser feito cache dos valores de posição e altura do hero, evitando uso excessivo de `getBoundingClientRect()` durante a rolagem.
-
-- A geometria do hero deverá ser recalculada apenas quando necessário, como em:
-
-```txt
-resize
-orientationchange
-loadedmetadata
-
----
 
 # Concrete Steps
+
+A página/perfil individual do produto precisa ser refinada.
+
+Atualmente a imagem do produto está aparecendo muito grande e apenas uma imagem é exibida, mesmo quando o produto possui várias fotos enviadas pelo upload.
+
+O perfil do produto deverá exibir todas as imagens cadastradas no produto em formato de galeria premium.
+
+A primeira imagem deverá aparecer como imagem principal e as demais deverão aparecer como miniaturas clicáveis.
+
+Ao clicar em uma miniatura, a imagem principal deverá trocar sem recarregar a página.
+
+A descrição do produto também precisa ser melhorada.
+
+Descrições longas não devem ocupar espaço exagerado na tela.
+
+A descrição deverá aparecer resumida inicialmente e possuir um botão:
+
+```txt
+Ler mais
 
 ## Criar estrutura principal
 
@@ -1084,6 +1163,17 @@ frontend/src/styles/app.css
 assets/carrosel_categoria .png
 assets/foter.png
 assets/navbar.png
+backend/src/controllers/categoryCarouselController.js
+backend/src/database/categoryCarousel.js
+backend/src/database/mysql.js
+backend/src/database/seed.js
+backend/src/database/store.js
+backend/src/routes/categoryCarouselRoutes.js
+backend/src/server.js
+frontend/src/components/CategoryCarousel.jsx
+frontend/src/data/products.js
+frontend/src/services/api.js
+frontend/src/styles/categoryCarousel.css
 ```
 
 Comandos executados nesta execução:
@@ -1188,6 +1278,16 @@ git diff --check
 git diff --stat
 rg -n "Transformar edição|Permitir upload|Criar sistema|Melhorar experiência visual do formulário|Melhorar preview|Permitir remover|Melhorar UX/UI|Criar animações suaves no admin|Melhorar aparência premium|Melhorar responsividade do painel|Exibir exatamente|Criar carrossel|Refazer footer|Refinar navbar" PLANS.MD
 git diff -- PLANS.MD
+npm run build
+npm run lint
+npm run test:responsive
+npm run test:hero
+git diff --check
+docker compose up --build -d
+Invoke-WebRequest -UseBasicParsing http://localhost:5173
+Invoke-RestMethod http://localhost:8080/api/category-carousel
+git add .
+git commit -m "feat: finalizar galeria preco e carrossel clicavel"
 ```
 
 Validação realizada:
@@ -1236,6 +1336,11 @@ frontend local em http://localhost:5173: HTTP 200
 frontend npm run test:responsive apos refinamentos admin/home/navbar/footer: OK, 5 testes aprovados em 390px, 768px, 1024px, 1366px e 1920px
 frontend npm run test:hero apos refinamentos admin/home/navbar/footer: OK, 2 testes aprovados em desktop e mobile
 git diff --check apos refinamentos admin/home/navbar/footer: OK, apenas avisos de CRLF do Git no Windows
+frontend npm run build apos galeria/preco/carrossel clicavel: OK
+frontend npm run lint apos galeria/preco/carrossel clicavel: OK
+frontend npm run test:responsive apos galeria/preco/carrossel clicavel: OK, 5 testes aprovados em 390px, 768px, 1024px, 1366px e 1920px
+frontend npm run test:hero apos galeria/preco/carrossel clicavel: OK, 2 testes aprovados em desktop e mobile
+git diff --check apos galeria/preco/carrossel clicavel: OK, apenas avisos de CRLF do Git no Windows
 ```
 
 Commit criado:
@@ -1252,6 +1357,7 @@ fix: deixar hero em autoplay lento
 fix: restaurar velocidade normal do hero
 feat: aprimorar admin e selecao de tamanhos
 feat: refinar admin galeria homepage navbar e footer
+feat: finalizar galeria preco e carrossel clicavel
 ```
 
 ---

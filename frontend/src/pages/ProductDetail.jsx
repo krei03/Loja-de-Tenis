@@ -11,9 +11,13 @@ export function ProductDetail({ products, onAdd }) {
   const { id } = useParams()
   const product = products.find((item) => item.id === id)
   const [selectedSizeByProduct, setSelectedSizeByProduct] = useState({})
-  const [activeImage, setActiveImage] = useState(0)
+  const [activeImageByProduct, setActiveImageByProduct] = useState({})
+  const [descriptionOpenByProduct, setDescriptionOpenByProduct] = useState({})
   const selectedSize = product ? selectedSizeByProduct[product.id] ?? product.sizes?.[0] ?? null : null
-  const galleryImages = product ? [...new Set([...(product.gallery || []), product.image].filter(Boolean))] : []
+  const galleryImages = product ? [...new Set([product.image, ...(product.gallery || [])].filter(Boolean))] : []
+  const hasLongDescription = (product?.description || '').length > 220
+  const activeImage = product ? activeImageByProduct[product.id] ?? 0 : 0
+  const descriptionOpen = product ? Boolean(descriptionOpenByProduct[product.id]) : false
 
   if (!product) {
     return (
@@ -42,7 +46,7 @@ export function ProductDetail({ products, onAdd }) {
                 type="button"
                 key={image}
                 className={activeImage === index ? 'active' : undefined}
-                onClick={() => setActiveImage(index)}
+                onClick={() => setActiveImageByProduct((current) => ({ ...current, [product.id]: index }))}
                 aria-label={`Ver imagem ${index + 1}`}
               >
                 <img src={image} alt="" aria-hidden="true" />
@@ -56,7 +60,19 @@ export function ProductDetail({ products, onAdd }) {
           <h1>{product.name}</h1>
           <strong>{money.format(product.price)}</strong>
           <small>{product.brand} / estoque {product.stock ?? 0}</small>
-          <span>{product.description}</span>
+          <div className={`product-description ${descriptionOpen ? 'expanded' : ''}`}>
+            <span>{product.description}</span>
+            {hasLongDescription && (
+              <button
+                type="button"
+                onClick={() =>
+                  setDescriptionOpenByProduct((current) => ({ ...current, [product.id]: !descriptionOpen }))
+                }
+              >
+                {descriptionOpen ? 'Ler menos' : 'Ler mais'}
+              </button>
+            )}
+          </div>
 
           <div className="sizes">
             <div>

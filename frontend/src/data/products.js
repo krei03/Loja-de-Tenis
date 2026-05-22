@@ -6,6 +6,21 @@ export const categories = [
   { id: 'limited', name: 'Limitados' },
 ]
 
+export const categoryCarousel = [
+  { id: 'nike', name: 'Nike', logo: '', display_order: 1, is_active: true },
+  { id: 'adidas', name: 'Adidas', logo: '', display_order: 2, is_active: true },
+  { id: 'air-jordan', name: 'Air Jordan', logo: '', display_order: 3, is_active: true },
+  { id: 'yeezy', name: 'Yeezy', logo: '', display_order: 4, is_active: true },
+  { id: 'new-balance', name: 'New Balance', logo: '', display_order: 5, is_active: true },
+  { id: 'supreme', name: 'Supreme', logo: '', display_order: 6, is_active: true },
+  { id: 'stussy', name: 'Stussy', logo: '', display_order: 7, is_active: true },
+  { id: 'corteiz', name: 'Corteiz', logo: '', display_order: 8, is_active: true },
+  { id: 'off-white', name: 'Off-White', logo: '', display_order: 9, is_active: true },
+  { id: 'bape', name: 'Bape', logo: '', display_order: 10, is_active: true },
+  { id: 'essentials', name: 'Essentials', logo: '', display_order: 11, is_active: true },
+  { id: 'chrome-hearts', name: 'Chrome Hearts', logo: '', display_order: 12, is_active: true },
+]
+
 export const products = [
   {
     id: 'aero-volt-01',

@@ -5,6 +5,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { authRoutes } from './routes/authRoutes.js'
 import { categoryRoutes } from './routes/categoryRoutes.js'
+import { categoryCarouselRoutes } from './routes/categoryCarouselRoutes.js'
 import { orderRoutes } from './routes/orderRoutes.js'
 import { productRoutes } from './routes/productRoutes.js'
 import { uploadRoutes } from './routes/uploadRoutes.js'
@@ -26,6 +27,7 @@ app.get('/health', (_req, res) => {
 app.use('/api/auth', authRoutes)
 app.use('/api/products', productRoutes)
 app.use('/api/categories', categoryRoutes)
+app.use('/api/category-carousel', categoryCarouselRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/uploads', uploadRoutes)
 app.use(notFound)
