@@ -8,6 +8,8 @@ const money = new Intl.NumberFormat('pt-BR', {
 })
 
 export function ProductCard({ product, onAdd }) {
+  const hoverImage = product.gallery?.find((image) => image !== product.image)
+
   return (
     <motion.article
       className="product-card"
@@ -16,6 +18,7 @@ export function ProductCard({ product, onAdd }) {
     >
       <Link to={`/product/${product.id}`} className="product-media">
         <img src={product.image} alt={product.name} />
+        {hoverImage && <img className="hover-image" src={hoverImage} alt="" aria-hidden="true" />}
         <span>{product.badge}</span>
       </Link>
 

@@ -11,7 +11,9 @@ export function ProductDetail({ products, onAdd }) {
   const { id } = useParams()
   const product = products.find((item) => item.id === id)
   const [selectedSizeByProduct, setSelectedSizeByProduct] = useState({})
+  const [activeImage, setActiveImage] = useState(0)
   const selectedSize = product ? selectedSizeByProduct[product.id] ?? product.sizes?.[0] ?? null : null
+  const galleryImages = product ? [...new Set([...(product.gallery || []), product.image].filter(Boolean))] : []
 
   if (!product) {
     return (
@@ -30,10 +32,23 @@ export function ProductDetail({ products, onAdd }) {
       </Link>
 
       <section className="detail-grid">
-        <div className="gallery">
-          {product.gallery.map((image) => (
-            <img src={image} alt={product.name} key={image} />
-          ))}
+        <div className="gallery-shell">
+          <div className="gallery-main">
+            <img src={galleryImages[activeImage] || product.image} alt={product.name} />
+          </div>
+          <div className="gallery-thumbs" aria-label="Galeria do produto">
+            {galleryImages.map((image, index) => (
+              <button
+                type="button"
+                key={image}
+                className={activeImage === index ? 'active' : undefined}
+                onClick={() => setActiveImage(index)}
+                aria-label={`Ver imagem ${index + 1}`}
+              >
+                <img src={image} alt="" aria-hidden="true" />
+              </button>
+            ))}
+          </div>
         </div>
 
         <aside className="detail-panel">

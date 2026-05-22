@@ -1,35 +1,75 @@
+import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { Menu, Search, ShoppingBag, UserRound } from 'lucide-react'
+import { ArrowRight, Menu, Search, ShoppingBag, UserRound, X } from 'lucide-react'
 
 export function Navbar({ cartCount }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  const closeMenu = () => setMenuOpen(false)
+
+  useEffect(() => {
+    const updateScrollState = () => {
+      setScrolled(window.scrollY > 24)
+    }
+
+    updateScrollState()
+    window.addEventListener('scroll', updateScrollState, { passive: true })
+
+    return () => window.removeEventListener('scroll', updateScrollState)
+  }, [])
+
   return (
-    <header className="navbar">
-      <Link className="brand" to="/">
+    <header className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+      <Link className="brand" to="/" onClick={closeMenu} aria-label="Vertex home">
+        <span>V</span>
         VERTEX
       </Link>
 
       <nav className="nav-links" aria-label="Principal">
-        <NavLink to="/">Drops</NavLink>
-        <a href="/#launches">Lancamentos</a>
+        <NavLink to="/">Marcas</NavLink>
         <a href="/#categories">Categorias</a>
-        <NavLink to="/admin">Admin</NavLink>
+        <a href="/#launches">Calendario</a>
+        <a href="/#launches">Feed</a>
+        <NavLink to="/admin">Vender</NavLink>
       </nav>
 
+      <label className="nav-search">
+        <Search size={20} />
+        <input placeholder="Drops, produtos ou marcas" aria-label="Buscar drops, produtos ou marcas" />
+      </label>
+
       <div className="nav-actions">
-        <button className="icon-button" type="button" aria-label="Buscar">
-          <Search size={20} />
-        </button>
-        <button className="icon-button" type="button" aria-label="Conta">
+        <button className="icon-button desktop-account" type="button" aria-label="Conta">
           <UserRound size={20} />
         </button>
-        <Link className="icon-button cart-link" to="/cart" aria-label="Carrinho">
+        <Link className="icon-button cart-link" to="/cart" aria-label="Carrinho" onClick={closeMenu}>
           <ShoppingBag size={20} />
           {cartCount > 0 && <span>{cartCount}</span>}
         </Link>
-        <button className="icon-button mobile-only" type="button" aria-label="Menu">
-          <Menu size={20} />
+        <button
+          className="icon-button mobile-only"
+          type="button"
+          aria-label={menuOpen ? 'Fechar menu' : 'Menu'}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((current) => !current)}
+        >
+          {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
+        <NavLink className="sell-link" to="/admin" onClick={closeMenu}>
+          Entrar
+          <ArrowRight size={22} />
+        </NavLink>
       </div>
+
+      {menuOpen && (
+        <nav className="mobile-menu" aria-label="Menu mobile">
+          <NavLink to="/" onClick={closeMenu}>Drops</NavLink>
+          <a href="/#launches" onClick={closeMenu}>Lancamentos</a>
+          <a href="/#categories" onClick={closeMenu}>Categorias</a>
+          <NavLink to="/admin" onClick={closeMenu}>Admin</NavLink>
+        </nav>
+      )}
     </header>
   )
 }

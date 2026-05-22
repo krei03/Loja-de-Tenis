@@ -94,6 +94,31 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 - [x] Melhorar comportamento visual do seletor de tamanhos.
 - [x] Corrigir imagem dos produtos ficando exageradamente grande após aplicar filtros.
 - [x] Ajustar proporção dos cards filtrados para manter visual premium.
+- [x] Transformar edição de produto em dropdown/modal premium dentro do admin.
+- [x] Permitir upload de até 5 imagens por produto.
+- [x] Criar sistema de galeria/carrossel de imagens do produto.
+- [x] Melhorar experiência visual do formulário de cadastro de produtos.
+- [x] Melhorar preview de imagens antes do upload.
+- [x] Permitir remover/reordenar imagens no cadastro.
+- [x] Melhorar UX/UI do painel admin.
+- [x] Criar animações suaves no admin.
+- [x] Melhorar aparência premium das tabelas do admin.
+- [x] Melhorar responsividade do painel administrativo.
+
+- [x] Exibir exatamente 4 tênis premium na seção “Lançamentos”.
+- [x] Criar carrossel horizontal de categorias abaixo da seção de lançamentos.
+- [x] Utilizar referência visual `assets/carrosel_categoria`.
+- [x] Melhorar visual premium da seção de lançamentos.
+- [x] Melhorar espaçamento e hierarquia visual da homepage.
+- [x] Criar transição suave entre hero e seção de produtos.
+
+- [x] Refazer footer baseado na referência `assets/foter`.
+- [x] Refinar navbar premium baseada na referência `assets/navbar`.
+- [x] Melhorar navegação desktop/mobile.
+- [x] Melhorar responsividade da navbar.
+- [x] Melhorar menu mobile premium.
+- [x] Melhorar animações da navbar durante scroll.
+- [x] Melhorar experiência visual geral do ecommerce.
 ---
 
 # Surprises & Discoveries
@@ -166,6 +191,18 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
 
 - Observação: O plano ainda descreve o hero como vídeo sincronizado com scroll, mas a direção mais recente do usuário pediu vídeo em autoplay normal sem interação de scroll.
   Evidência: `frontend/src/components/Hero.jsx` e `frontend/tests/hero-scroll.spec.js` validam autoplay com `playbackRate = 1`.
+
+- Observação: As novas referências visuais estavam na pasta `assets/` como arquivos de imagem soltos.
+  Evidência: Foram lidos `assets/navbar.png`, `assets/foter.png` e `assets/carrosel_categoria .png` antes dos refinamentos de UI.
+
+- Observação: O backend já aceitava `gallery` como JSON e normalizava listas de imagens.
+  Evidência: `backend/src/controllers/productController.js` persiste `gallery` em create/update, então a implementação de até 5 imagens pôde ficar no frontend/admin sem migração de banco.
+
+- Observação: O build falhou uma vez porque a versão instalada de `lucide-react` não exporta `Instagram`.
+  Evidência: `npm run build` retornou `MISSING_EXPORT` em `frontend/src/components/Footer.jsx`; o ícone foi substituído por `Camera` e o build passou em seguida.
+
+- Observação: A home precisava separar lançamentos de vitrine filtrada para cumprir “exatamente 4 tênis” sem quebrar os filtros.
+  Evidência: `frontend/src/pages/Home.jsx` agora busca `allProducts` para lançamentos/categorias e `filteredProducts` para a vitrine.
 
 ---
 
@@ -255,6 +292,22 @@ O resultado esperado é um ecommerce com aparência de marca cara e experiência
   Justificativa: O pedido mais recente do usuário sobre o hero foi remover o controle por scroll e manter velocidade normal.
   Data/Autor: 2026-05-21 / Codex
 
+- Decisão: Usar modal animado para edição de produto e manter cadastro de novo produto no fluxo principal do admin.
+  Justificativa: Evita recarregar a página, preserva contexto da tabela e atende a intenção de edição premium sem misturar criação e edição.
+  Data/Autor: 2026-05-22 / Codex
+
+- Decisão: Limitar a galeria no frontend a 5 imagens, usando a primeira imagem como capa e enviando todas em `gallery`.
+  Justificativa: Aproveita a API existente e mantém compatibilidade com cards, página de produto e admin.
+  Data/Autor: 2026-05-22 / Codex
+
+- Decisão: Separar a homepage em seção de 4 lançamentos, carrossel horizontal de categorias e vitrine filtrada.
+  Justificativa: Garante o requisito de lançamentos fixos e mantém filtros por marca, tamanho e preço funcionando em área própria.
+  Data/Autor: 2026-05-22 / Codex
+
+- Decisão: Criar footer e navbar próprios inspirados nas referências, sem copiar marcas ou identidade da Droper.
+  Justificativa: Mantém a identidade Vertex e usa as referências apenas como direção visual de estrutura, contraste e densidade.
+  Data/Autor: 2026-05-22 / Codex
+
 ---
 
 # Outcomes & Retrospective
@@ -283,9 +336,51 @@ Sexta etapa funcional concluída em 2026-05-21.
 
 O painel admin agora permite editar produtos existentes ao lado da ação de deletar, os selects do admin/filtros mantêm contraste em dark mode, o seletor de tamanhos da página de produto possui estado ativo e envia o tamanho para o carrinho, e os cards filtrados mantêm proporção premium sem imagem gigante.
 
+Sétima etapa funcional concluída em 2026-05-22.
+
+O admin recebeu modal premium de edição, upload/URL de até 5 imagens por produto, previews com remoção/reordenação, tabela refinada e responsividade melhor. A página do produto passou a ter galeria com miniaturas, os cards usam imagem secundária no hover, a home passou a exibir exatamente 4 lançamentos, carrossel horizontal de categorias, vitrine filtrada separada, navbar inspirada na referência com busca/menu mobile/animação no scroll e footer baseado na referência visual adicionada.
+
 Pendência recomendada para evolução: autenticação robusta com hash/JWT, histórico de pedidos no admin, persistência do tamanho selecionado no pedido e integração de pagamento real.
 
 ---
+
+---
+
+```md id="m6v1qc"
+# Plan of Work
+
+Refinar completamente o painel admin para melhorar usabilidade e aparência premium.
+
+Transformar a edição de produtos em um dropdown/modal moderno semelhante a plataformas reais de ecommerce.
+
+O modal de edição deverá:
+
+- abrir sem recarregar a página;
+- preencher automaticamente os dados do produto;
+- permitir editar imagens;
+- possuir preview visual;
+- possuir animações suaves;
+- manter identidade visual premium.
+
+Reestruturar o sistema de upload de imagens do backend/frontend.
+
+O cadastro de produtos deverá aceitar até 5 imagens por produto.
+
+As imagens deverão ser utilizadas em:
+
+- página do produto;
+- galeria premium;
+- hover dos cards;
+- previews no admin;
+- carrossel interno do produto.
+
+A homepage deverá ser refinada visualmente.
+
+A seção:
+
+```txt
+Lançamentos
+Seleção premium em tempo real
 
 # Context and Orientation
 
@@ -411,6 +506,17 @@ Backend:
 - Quando o usuário filtra um tênis, a imagem do produto fica exageradamente grande, quebrando o layout premium dos cards.
 
 - Os ajustes devem manter a identidade visual premium do ecommerce.
+
+- O ecommerce deverá manter aparência extremamente premium inspirada em plataformas modernas de sneakers/streetwear como Droper.
+
+As novas referências visuais adicionadas na pasta `assets/` deverão ser utilizadas como base principal para os próximos refinamentos de UI/UX.
+
+Referências adicionadas:
+
+```txt
+assets/carrosel_categoria
+assets/foter
+assets/navbar
 
 ---
 
@@ -938,6 +1044,7 @@ frontend/package-lock.json
 frontend/src/App.jsx
 frontend/src/components/Cart.jsx
 frontend/src/components/Hero.jsx
+frontend/src/components/Footer.jsx
 frontend/src/components/Navbar.jsx
 frontend/src/components/ProductCard.jsx
 frontend/src/data/products.js
@@ -967,11 +1074,16 @@ Arquivos alterados nesta execução:
 ```txt
 PLANS.MD
 frontend/src/App.jsx
-frontend/src/components/Cart.jsx
+frontend/src/components/Footer.jsx
+frontend/src/components/Navbar.jsx
+frontend/src/components/ProductCard.jsx
 frontend/src/pages/Admin.jsx
+frontend/src/pages/Home.jsx
 frontend/src/pages/ProductDetail.jsx
-frontend/src/services/api.js
 frontend/src/styles/app.css
+assets/carrosel_categoria .png
+assets/foter.png
+assets/navbar.png
 ```
 
 Comandos executados nesta execução:
@@ -1046,6 +1158,36 @@ git add PLANS.MD
 git commit --amend --no-edit
 git log --oneline -1
 git show --stat --oneline --name-only HEAD
+Get-Content -Raw -LiteralPath PLANS.md
+git status --short
+rg --files
+Get-Content -Raw -LiteralPath frontend/src/pages/Admin.jsx
+Get-Content -Raw -LiteralPath frontend/src/pages/Home.jsx
+Get-Content -Raw -LiteralPath frontend/src/components/ProductCard.jsx
+Get-Content -Raw -LiteralPath frontend/src/components/Navbar.jsx
+Get-Content -Raw -LiteralPath frontend/src/styles/app.css
+Get-Content -Raw -LiteralPath backend/src/controllers/productController.js
+Get-Content -Raw -LiteralPath backend/src/database/mysql.js
+Get-Content -Raw -LiteralPath backend/src/database/seed.js
+Get-Content -Raw -LiteralPath frontend/src/pages/ProductDetail.jsx
+Get-Content -Raw -LiteralPath frontend/src/services/api.js
+Get-Content -Raw -LiteralPath frontend/src/App.jsx
+Get-Content -Raw -LiteralPath frontend/package.json
+Get-Content -Raw -LiteralPath frontend/src/main.jsx
+Get-Content -Raw -LiteralPath frontend/tests/responsive-layout.spec.js
+Get-Content -Raw -LiteralPath frontend/tests/hero-scroll.spec.js
+View image: assets/navbar.png
+View image: assets/foter.png
+View image: assets/carrosel_categoria .png
+npm run lint
+npm run build
+Invoke-WebRequest -Uri http://localhost:5173
+npm run test:responsive
+npm run test:hero
+git diff --check
+git diff --stat
+rg -n "Transformar edição|Permitir upload|Criar sistema|Melhorar experiência visual do formulário|Melhorar preview|Permitir remover|Melhorar UX/UI|Criar animações suaves no admin|Melhorar aparência premium|Melhorar responsividade do painel|Exibir exatamente|Criar carrossel|Refazer footer|Refinar navbar" PLANS.MD
+git diff -- PLANS.MD
 ```
 
 Validação realizada:
@@ -1088,6 +1230,12 @@ frontend npm run build apos ajustes de admin/tamanho/cards filtrados: OK
 frontend npm run lint apos ajustes de admin/tamanho/cards filtrados: OK
 frontend npm run test:hero apos ajustes de admin/tamanho/cards filtrados: OK, 2 testes aprovados em desktop e mobile
 frontend npm run test:responsive apos ajustes de admin/tamanho/cards filtrados: OK, 5 testes aprovados em 390px, 768px, 1024px, 1366px e 1920px
+frontend npm run lint apos refinamentos admin/home/navbar/footer: OK
+frontend npm run build apos refinamentos admin/home/navbar/footer: OK
+frontend local em http://localhost:5173: HTTP 200
+frontend npm run test:responsive apos refinamentos admin/home/navbar/footer: OK, 5 testes aprovados em 390px, 768px, 1024px, 1366px e 1920px
+frontend npm run test:hero apos refinamentos admin/home/navbar/footer: OK, 2 testes aprovados em desktop e mobile
+git diff --check apos refinamentos admin/home/navbar/footer: OK, apenas avisos de CRLF do Git no Windows
 ```
 
 Commit criado:
@@ -1103,6 +1251,7 @@ fix: remover tom verde do hero
 fix: deixar hero em autoplay lento
 fix: restaurar velocidade normal do hero
 feat: aprimorar admin e selecao de tamanhos
+feat: refinar admin galeria homepage navbar e footer
 ```
 
 ---

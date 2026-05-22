@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Navbar } from './components/Navbar'
 import { Cart } from './components/Cart'
+import { Footer } from './components/Footer'
 import { Home } from './pages/Home'
 import { ProductDetail } from './pages/ProductDetail'
 import { Admin } from './pages/Admin'
@@ -82,6 +83,7 @@ function App() {
           element={<Admin products={products} onProductsChanged={refreshProducts} />}
         />
       </Routes>
+      <Footer />
     </BrowserRouter>
   )
 }
