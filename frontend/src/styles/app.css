@@ -2154,8 +2154,9 @@ main {
 .danger-account-action {
   justify-self: start;
   min-width: min(100%, 280px);
-  background: #ee1616;
-  color: #fff;
+  border-color: rgba(198, 255, 0, 0.34);
+  background: rgba(198, 255, 0, 0.18);
+  color: var(--accent);
 }
 
 .address-manager {
