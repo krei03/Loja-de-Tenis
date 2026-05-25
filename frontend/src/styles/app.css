@@ -2140,7 +2140,7 @@ main {
   border: 0;
   padding: 0;
   background: transparent;
-  color: #ff3b30;
+  color: var(--accent);
   cursor: pointer;
   font-weight: 900;
 }
