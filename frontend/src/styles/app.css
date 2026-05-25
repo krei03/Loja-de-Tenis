@@ -1896,6 +1896,37 @@ main {
   align-items: start;
 }
 
+.customer-auth-main {
+  display: grid;
+  gap: 12px;
+}
+
+.auth-mode-switch {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  width: min(100%, 360px);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px;
+  background: var(--graphite);
+}
+
+.auth-mode-switch button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.auth-mode-switch button[aria-selected='true'] {
+  background: var(--accent);
+  color: var(--black);
+}
+
 .customer-auth-form button,
 .social-login-panel button,
 .account-sidebar button,
@@ -1941,6 +1972,24 @@ main {
   background: var(--graphite);
 }
 
+.social-login-panel > div {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.social-login-panel > div span {
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.social-login-panel > div strong {
+  color: var(--ice);
+  font-size: 1.15rem;
+}
+
 .social-login-panel button {
   justify-content: flex-start;
   padding-inline: 16px;
@@ -1957,6 +2006,19 @@ main {
   background: var(--ice);
   color: var(--black);
   font-weight: 950;
+}
+
+.social-login-panel .secondary-create-account {
+  justify-content: center;
+  border-style: dashed;
+  background: rgba(198, 255, 0, 0.12);
+  color: var(--accent);
+}
+
+.customer-auth-form .create-account-button {
+  background: rgba(198, 255, 0, 0.18);
+  color: var(--accent);
+  border-color: rgba(198, 255, 0, 0.36);
 }
 
 .customer-account-shell {

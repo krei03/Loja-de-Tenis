@@ -18,7 +18,7 @@ O projeto deve continuar priorizando:
 
 # Current Progress
 
-O projeto já possui base funcional com frontend React/Vite, backend Node/Express, MySQL no Docker, painel admin, autenticação admin com hash/token assinado, cadastro de produtos, upload de imagens, checkout com camada preparada para pagamento, carrinho, carrossel de categorias, página de produto com galeria, perfis de marca/categoria com banner/descrição/metadados, modo claro/escuro, reset global de scroll em navegação, portal do cliente com Minha Conta, login/registro local e botões sociais preparados, simulador visual de frete e relatório/gestão administrativa de vendas com filtros e status.
+O projeto já possui base funcional com frontend React/Vite, backend Node/Express, MySQL no Docker, painel admin, autenticação admin com hash/token assinado, cadastro de produtos, upload de imagens, checkout com camada preparada para pagamento, carrinho, carrossel de categorias, página de produto com galeria, perfis de marca/categoria com banner/descrição/metadados, modo claro/escuro, reset global de scroll em navegação, portal do cliente com Minha Conta, login/registro local separados e botões sociais preparados, simulador visual de frete e relatório/gestão administrativa de vendas com filtros e status.
 
 O foco atual deixa de ser reconstrução da base e passa a ser evolução de produto: integrações reais, refinamento administrativo, melhoria de dados e validação visual contínua.
 
@@ -61,6 +61,9 @@ O foco atual deixa de ser reconstrução da base e passa a ser evolução de pro
 - [x] Refinar visual da aba “Meu Cadastro” usando a referência visual que esta na pasta assets nomo da imagem meu_cadastro enviada pelo usuário.
 - [x] Reestruturar layout da área “Meus endereços”.
 - [x] Adicionar botão “Cadastrar endereço”.
+- [x] Separar fluxo de login e registro da conta do cliente.
+- [x] Criar botão exclusivo para “Criar conta”.
+- [x] Melhorar UX da tela de autenticação do cliente.
 
 ---
 
@@ -190,6 +193,14 @@ npm run test:hero
 
 # Plan of Work
 
+A tela atual de autenticação do cliente está utilizando apenas um único botão
+
+A autenticação do cliente deverá separar claramente:
+
+- fluxo de entrada para cliente existente;
+- fluxo de criação de conta;
+- botão dedicado “Criar conta”;
+- login social preservado como acesso rápido preparado.
 
 A área “Meu Cadastro” deverá ser refinada visualmente utilizando como base a referência enviada pelo usuário.
 
@@ -318,6 +329,14 @@ Validação de acessibilidade básica:
 - [x] adicionar `aria-label` no CEP do simulador de frete;
 - [x] manter navegação lateral da conta como `nav` com links de teclado;
 - [x] manter ações essenciais com texto acessível.
+
+Validação da autenticação do cliente:
+
+- [x] separar formulário de entrada do formulário de criação;
+- [x] criar botão exclusivo “Criar conta”;
+- [x] manter botões sociais como acesso rápido;
+- [x] usar controle segmentado com `role="tablist"` e `aria-selected`;
+- [x] direcionar novo cadastro para `/account/edit`.
 
 Para autenticação admin:
 
@@ -487,6 +506,19 @@ screenshots Playwright:
 - /account/addresses desktop: OK
 ```
 
+Validação executada na etapa de autenticação do cliente:
+
+```txt
+frontend npm run lint: OK
+frontend npm run build: OK
+frontend npm run test:responsive: OK, 5 testes aprovados
+frontend npm run test:hero: OK, 2 testes aprovados
+git diff --check: OK, apenas avisos CRLF do Windows
+docker compose up --build -d: OK
+frontend http://localhost:5173/login: HTTP 200
+backend http://localhost:8080/health: OK com database mysql
+```
+
 # Decision Log
 
 - 2026-05-25: Autenticação admin passou a usar hash PBKDF2 (`ADMIN_PASSWORD_HASH` quando definido, ou hash em runtime de `ADMIN_PASSWORD` para desenvolvimento local) e token admin assinado com HMAC e expiração.
@@ -503,6 +535,7 @@ screenshots Playwright:
 - 2026-05-25: Simulador de frete usa ViaCEP para validar destino e calcular uma cotação interna `Vertex Express`; integração comercial com transportadora fica como etapa futura.
 - 2026-05-25: “Meu Cadastro” passa a usar cards de “Dados de acesso” e “Dados pessoais” inspirados na referência enviada, sem copiar a paleta clara/vermelha literalmente para preservar a identidade escura da Vertex.
 - 2026-05-25: A revisão de acessibilidade desta rodada é básica e focada em formulários/conta/produto; auditoria formal com axe/leitores de tela fica para etapa futura.
+- 2026-05-25: Login e registro do cliente foram separados no frontend com controle segmentado; a criação de conta continua usando sessão local até existir backend real de clientes.
 
 # Surprises & Discoveries
 
@@ -518,6 +551,7 @@ screenshots Playwright:
 - ViaCEP entrega endereço/UF, mas não preço de transportadora; por isso preço e prazo continuam calculados internamente até um provedor logístico ser escolhido.
 - A referência `assets/meu_cadastro.png` tem layout claro com ações vermelhas; a implementação manteve a estrutura e hierarquia, mas adaptou o visual ao tema escuro premium.
 - A primeira tentativa de gerar screenshots fora do projeto não resolveu o módulo Playwright; foi necessário apontar para o `node_modules` do frontend.
+- A tela de autenticação anterior misturava entrada e cadastro em um único submit, o que deixava ambíguo se o cliente estava entrando ou registrando.
 
 # Artifacts and Notes
 
@@ -536,6 +570,9 @@ screenshots Playwright:
 - Arquivos alterados na etapa de cadastro/acessibilidade: `frontend/src/pages/CustomerPortal.jsx`, `frontend/src/pages/Checkout.jsx`, `frontend/src/pages/ProductDetail.jsx`, `frontend/src/styles/app.css`, `PLANS.MD`; referência usada: `assets/meu_cadastro.png`.
 - Comandos usados na etapa de cadastro/acessibilidade: `npm run lint` em `frontend`, `npm run build` em `frontend`, `docker compose up --build -d`, script Playwright temporário para screenshots em `%TEMP%\\vertex-visual-review`.
 - Observação operacional: screenshots de revisão foram gerados fora do repo em `%TEMP%\\vertex-visual-review` para evitar poluir o versionamento.
+- Arquivos alterados na etapa de autenticação do cliente: `frontend/src/pages/CustomerPortal.jsx`, `frontend/src/styles/app.css`, `PLANS.MD`.
+- Comandos usados na etapa de autenticação do cliente: `npm run lint` em `frontend`, `npm run build` em `frontend`, `npm run test:responsive` em `frontend`, `npm run test:hero` em `frontend`, `git diff --check`, `docker compose up --build -d`, checagens HTTP com `Invoke-WebRequest`.
+- Observação operacional: Docker foi atualizado nesta etapa conforme rotina atual do projeto.
 
 # Validation Pending
 

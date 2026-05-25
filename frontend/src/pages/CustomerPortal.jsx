@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import {
   Apple,
@@ -15,12 +16,28 @@ import { AccountSidebar } from '../components/AccountSidebar'
 
 export function CustomerLogin({ onLogin, customer }) {
   const navigate = useNavigate()
+  const [mode, setMode] = useState('login')
 
   if (customer) {
     return <Navigate to="/account" replace />
   }
 
-  const submit = (event) => {
+  const login = (event) => {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    const session = {
+      name: data.get('email')?.split('@')[0] || 'Cliente Vertex',
+      email: data.get('email'),
+      phone: '',
+      provider: 'email',
+      createdAt: new Date().toISOString(),
+    }
+
+    onLogin(session)
+    navigate('/account')
+  }
+
+  const register = (event) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
     const session = {
@@ -32,7 +49,7 @@ export function CustomerLogin({ onLogin, customer }) {
     }
 
     onLogin(session)
-    navigate('/account')
+    navigate('/account/edit')
   }
 
   const socialLogin = (provider) => {
@@ -55,27 +72,74 @@ export function CustomerLogin({ onLogin, customer }) {
         </div>
 
         <div className="customer-auth-grid">
-          <form className="form-panel customer-auth-form" onSubmit={submit}>
-            <h2>Entrar ou criar cadastro</h2>
-            <label>
-              <span>Nome completo</span>
-              <input required name="name" placeholder="Nome completo" autoComplete="name" />
-            </label>
-            <label>
-              <span>Email</span>
-              <input required name="email" type="email" placeholder="Email" autoComplete="email" />
-            </label>
-            <label>
-              <span>Telefone</span>
-              <input name="phone" placeholder="Telefone" autoComplete="tel" />
-            </label>
-            <button type="submit">
-              <User size={18} />
-              Entrar / Registrar
-            </button>
-          </form>
+          <section className="customer-auth-main">
+            <div className="auth-mode-switch" role="tablist" aria-label="Tipo de acesso">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mode === 'login'}
+                onClick={() => setMode('login')}
+              >
+                Entrar
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mode === 'register'}
+                onClick={() => setMode('register')}
+              >
+                Criar conta
+              </button>
+            </div>
+
+            {mode === 'login' ? (
+              <form className="form-panel customer-auth-form" onSubmit={login}>
+                <h2>Entrar na minha conta</h2>
+                <label>
+                  <span>Email</span>
+                  <input required name="email" type="email" placeholder="Email" autoComplete="email" />
+                </label>
+                <label>
+                  <span>Senha</span>
+                  <input required name="password" type="password" placeholder="Senha" autoComplete="current-password" />
+                </label>
+                <button type="submit">
+                  <User size={18} />
+                  Entrar
+                </button>
+              </form>
+            ) : (
+              <form className="form-panel customer-auth-form" onSubmit={register}>
+                <h2>Criar conta</h2>
+                <label>
+                  <span>Nome completo</span>
+                  <input required name="name" placeholder="Nome completo" autoComplete="name" />
+                </label>
+                <label>
+                  <span>Email</span>
+                  <input required name="email" type="email" placeholder="Email" autoComplete="email" />
+                </label>
+                <label>
+                  <span>Telefone</span>
+                  <input name="phone" placeholder="Telefone" autoComplete="tel" />
+                </label>
+                <label>
+                  <span>Senha</span>
+                  <input required name="password" type="password" placeholder="Senha" autoComplete="new-password" />
+                </label>
+                <button type="submit" className="create-account-button">
+                  <User size={18} />
+                  Criar conta
+                </button>
+              </form>
+            )}
+          </section>
 
           <section className="social-login-panel" aria-label="Login social">
+            <div>
+              <span>Acesso rapido</span>
+              <strong>Use sua conta preferida</strong>
+            </div>
             <button type="button" onClick={() => socialLogin('google')}>
               <span>G</span>
               Entrar com Google
@@ -83,6 +147,9 @@ export function CustomerLogin({ onLogin, customer }) {
             <button type="button" onClick={() => socialLogin('apple')}>
               <Apple size={19} />
               Entrar com Apple
+            </button>
+            <button type="button" className="secondary-create-account" onClick={() => setMode('register')}>
+              Criar conta com email
             </button>
           </section>
         </div>
