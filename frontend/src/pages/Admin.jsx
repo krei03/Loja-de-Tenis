@@ -5,6 +5,7 @@ import {
   ChevronUp,
   ImagePlus,
   LockKeyhole,
+  LogOut,
   PackagePlus,
   Pencil,
   ReceiptText,
@@ -59,6 +60,15 @@ const emptyCarouselItem = {
   is_active: true,
 }
 
+function getStoredAdminSession() {
+  try {
+    const stored = localStorage.getItem('vertex-admin-session')
+    return stored ? JSON.parse(stored) : null
+  } catch {
+    return null
+  }
+}
+
 function productToForm(product) {
   const images = [...new Set([product.image, ...(product.gallery || [])].filter(Boolean))].slice(0, 5)
 
@@ -79,7 +89,7 @@ function productToForm(product) {
 
 export function Admin({ products, onProductsChanged }) {
   const [credentials, setCredentials] = useState({ username: 'admin', password: 'vertex123' })
-  const [session, setSession] = useState(null)
+  const [session, setSession] = useState(getStoredAdminSession)
   const [productForm, setProductForm] = useState(emptyProduct)
   const [editingProductId, setEditingProductId] = useState(null)
   const [carouselItems, setCarouselItems] = useState([])
@@ -109,8 +119,14 @@ export function Admin({ products, onProductsChanged }) {
 
   useEffect(() => {
     if (session?.token) {
-      api.getAdminCategoryCarousel(session.token).then(setCarouselItems)
-      api.getOrders().then(setOrders)
+      Promise.all([
+        api.getAdminCategoryCarousel(session.token).then(setCarouselItems),
+        api.getOrders(session.token).then(setOrders),
+      ]).catch(() => {
+        localStorage.removeItem('vertex-admin-session')
+        setSession(null)
+        setMessage('Sessao expirada. Entre novamente.')
+      })
     }
   }, [session?.token])
 
@@ -138,9 +154,21 @@ export function Admin({ products, onProductsChanged }) {
 
   const login = async (event) => {
     event.preventDefault()
-    const result = await api.loginAdmin(credentials)
-    setSession(result)
-    setMessage('Admin autenticado.')
+    try {
+      const result = await api.loginAdmin(credentials)
+      localStorage.setItem('vertex-admin-session', JSON.stringify(result))
+      setSession(result)
+      setMessage('Admin autenticado.')
+    } catch {
+      setMessage('Credenciais invalidas ou sessao indisponivel.')
+    }
+  }
+
+  const logout = () => {
+    localStorage.removeItem('vertex-admin-session')
+    setSession(null)
+    setOrders([])
+    setMessage('')
   }
 
   const refreshCarousel = async () => {
@@ -648,6 +676,10 @@ export function Admin({ products, onProductsChanged }) {
       <div className="section-heading">
         <p>Painel admin</p>
         <h1>Controle real dos drops</h1>
+        <button type="button" className="admin-logout" onClick={logout}>
+          <LogOut size={18} />
+          Sair
+        </button>
       </div>
 
       <section className="admin-metrics">

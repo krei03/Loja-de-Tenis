@@ -1750,6 +1750,21 @@ main {
   font-weight: 800;
 }
 
+.admin-logout {
+  width: max-content;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ice);
+  font-weight: 800;
+  cursor: pointer;
+}
+
 .admin-login {
   max-width: 440px;
 }
@@ -1816,6 +1831,41 @@ main {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 20px;
+}
+
+.sales-filters {
+  width: min(100%, var(--page-max));
+  margin: 0 auto 20px;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 170px 170px;
+  gap: 12px;
+}
+
+.sales-filters label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sales-filters select,
+.sales-filters input,
+.sales-status-select select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ice);
+  color-scheme: dark;
+}
+
+.sales-status-select {
+  display: grid;
+  gap: 6px;
+  min-width: 180px;
+  color: var(--muted);
+  font-weight: 800;
 }
 
 .monthly-report-list,
@@ -2015,6 +2065,7 @@ main {
   .brand-catalog-layout,
   .cart-grid,
   .advanced-filters,
+  .sales-filters,
   .form-grid,
   .sales-summary,
   .footer-grid,
@@ -2058,6 +2109,15 @@ main {
 
   .brand-hero strong {
     justify-self: start;
+  }
+
+  .sales-order-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sales-status-select {
+    width: 100%;
   }
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronLeft, Mail, MapPin, PackageCheck, Phone, ReceiptText } from 'lucide-react'
+import { ChevronLeft, Filter, Mail, MapPin, PackageCheck, Phone, ReceiptText } from 'lucide-react'
 import { api } from '../services/api'
 
 const money = new Intl.NumberFormat('pt-BR', {
@@ -18,12 +18,43 @@ const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
   timeStyle: 'short',
 })
 
+const orderStatuses = [
+  { value: 'created', label: 'Criado' },
+  { value: 'paid', label: 'Pago' },
+  { value: 'separating', label: 'Em separacao' },
+  { value: 'shipped', label: 'Enviado' },
+  { value: 'delivered', label: 'Entregue' },
+  { value: 'canceled', label: 'Cancelado' },
+]
+
+function getStoredAdminSession() {
+  try {
+    const stored = localStorage.getItem('vertex-admin-session')
+    return stored ? JSON.parse(stored) : null
+  } catch {
+    return null
+  }
+}
+
 export function SalesReport() {
   const [orders, setOrders] = useState([])
+  const [filters, setFilters] = useState({ status: 'all', q: '', from: '', to: '' })
+  const [session] = useState(getStoredAdminSession)
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
-    api.getOrders().then(setOrders)
-  }, [])
+    if (!session?.token) {
+      return
+    }
+
+    api
+      .getOrders(session.token, filters)
+      .then((result) => {
+        setOrders(result)
+        setMessage('')
+      })
+      .catch(() => setMessage('Entre novamente no admin para ver os pedidos.'))
+  }, [filters, session?.token])
 
   const monthlyReports = useMemo(() => {
     const grouped = orders.reduce((reports, order) => {
@@ -69,6 +100,36 @@ export function SalesReport() {
     [orders],
   )
 
+  const updateFilter = (event) => {
+    const { name, value } = event.target
+    setFilters((current) => ({ ...current, [name]: value }))
+  }
+
+  const updateStatus = async (orderId, status) => {
+    if (!session?.token) {
+      return
+    }
+
+    const updatedOrder = await api.updateOrderStatus(orderId, status, session.token)
+    setOrders((current) => current.map((order) => (order.id === orderId ? updatedOrder : order)))
+    setMessage('Status do pedido atualizado.')
+  }
+
+  if (!session?.token) {
+    return (
+      <main className="sales-report-page">
+        <Link className="back-link" to="/admin">
+          <ChevronLeft size={18} />
+          Voltar ao admin
+        </Link>
+        <div className="empty-cart">
+          <ReceiptText size={40} />
+          <p>Faca login no painel admin para acessar o historico de pedidos.</p>
+        </div>
+      </main>
+    )
+  }
+
   return (
     <main className="sales-report-page">
       <Link className="back-link" to="/admin">
@@ -98,6 +159,23 @@ export function SalesReport() {
           <strong>{money.format(totals.sales)}</strong>
         </article>
       </section>
+
+      <section className="sales-filters" aria-label="Filtros de pedidos">
+        <label>
+          <Filter size={16} />
+          <select name="status" value={filters.status} onChange={updateFilter}>
+            <option value="all">Todos os status</option>
+            {orderStatuses.map((status) => (
+              <option key={status.value} value={status.value}>{status.label}</option>
+            ))}
+          </select>
+        </label>
+        <input name="q" placeholder="Buscar cliente, email, telefone ou pedido" value={filters.q} onChange={updateFilter} />
+        <input name="from" type="date" value={filters.from} onChange={updateFilter} />
+        <input name="to" type="date" value={filters.to} onChange={updateFilter} />
+      </section>
+
+      {message && <p className="admin-message">{message}</p>}
 
       <section className="monthly-report-list">
         {monthlyReports.map((report) => (
@@ -156,7 +234,17 @@ export function SalesReport() {
             </div>
 
             <div className="sales-order-footer">
-              <span>Status: {order.status || 'created'}</span>
+              <label className="sales-status-select">
+                Status
+                <select
+                  value={order.status || 'created'}
+                  onChange={(event) => updateStatus(order.id, event.target.value)}
+                >
+                  {orderStatuses.map((status) => (
+                    <option key={status.value} value={status.value}>{status.label}</option>
+                  ))}
+                </select>
+              </label>
               <span>Data: {formatOrderDate(order.created_at || order.createdAt)}</span>
             </div>
           </article>

@@ -138,5 +138,19 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }),
-  getOrders: () => request('/orders'),
+  getOrders: (token, params) =>
+    request(`/orders${buildQuery(params)}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+  updateOrderStatus: (id, status, token) =>
+    request(`/orders/${id}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status }),
+    }),
 }
