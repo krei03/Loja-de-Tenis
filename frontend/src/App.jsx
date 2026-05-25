@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { Navbar } from './components/Navbar'
 import { Cart } from './components/Cart'
 import { Footer } from './components/Footer'
@@ -74,6 +74,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Navbar cartCount={cartCount} theme={theme} onToggleTheme={toggleTheme} />
       <Routes>
         <Route path="/" element={<Home onAdd={addToCart} />} />
@@ -100,6 +101,16 @@ function App() {
       <Footer />
     </BrowserRouter>
   )
+}
+
+function ScrollToTop() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [pathname])
+
+  return null
 }
 
 export default App

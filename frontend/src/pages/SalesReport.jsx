@@ -245,6 +245,7 @@ export function SalesReport() {
                   ))}
                 </select>
               </label>
+              <span>Pagamento: {formatPayment(order.payment)}</span>
               <span>Data: {formatOrderDate(order.created_at || order.createdAt)}</span>
             </div>
           </article>
@@ -259,6 +260,17 @@ export function SalesReport() {
       </section>
     </main>
   )
+}
+
+function formatPayment(payment) {
+  if (!payment) {
+    return 'Nao informado'
+  }
+
+  const method = payment.method === 'pix' ? 'Pix' : 'Cartao'
+  const status = payment.status === 'manual_review' ? 'analise manual' : payment.status || 'pendente'
+
+  return `${method} / ${status}`
 }
 
 function formatOrderDate(value) {

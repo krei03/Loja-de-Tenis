@@ -26,19 +26,34 @@ const nikeModels = [
 ]
 
 export const seedCategoryCarousel = [
-  { id: 'nike', name: 'Nike', logo: '', models: nikeModels, display_order: 1, is_active: true },
-  { id: 'adidas', name: 'Adidas', logo: '', models: [], display_order: 2, is_active: true },
-  { id: 'air-jordan', name: 'Air Jordan', logo: '', models: [], display_order: 3, is_active: true },
-  { id: 'yeezy', name: 'Yeezy', logo: '', models: [], display_order: 4, is_active: true },
-  { id: 'new-balance', name: 'New Balance', logo: '', models: [], display_order: 5, is_active: true },
-  { id: 'supreme', name: 'Supreme', logo: '', models: [], display_order: 6, is_active: true },
-  { id: 'stussy', name: 'Stussy', logo: '', models: [], display_order: 7, is_active: true },
-  { id: 'corteiz', name: 'Corteiz', logo: '', models: [], display_order: 8, is_active: true },
-  { id: 'off-white', name: 'Off-White', logo: '', models: [], display_order: 9, is_active: true },
-  { id: 'bape', name: 'Bape', logo: '', models: [], display_order: 10, is_active: true },
-  { id: 'essentials', name: 'Essentials', logo: '', models: [], display_order: 11, is_active: true },
-  { id: 'chrome-hearts', name: 'Chrome Hearts', logo: '', models: [], display_order: 12, is_active: true },
+  createSeedBrand('nike', 'Nike', nikeModels, 1, 'Drops esportivos, retros e colabs que atravessam performance e cultura sneaker.'),
+  createSeedBrand('adidas', 'Adidas', [], 2, 'Classicos de arquivo, runners modernos e silhuetas urbanas para rotinas premium.'),
+  createSeedBrand('air-jordan', 'Air Jordan', [], 3, 'Basquete, legado e pares de colecionador com presenca forte no streetwear.'),
+  createSeedBrand('yeezy', 'Yeezy', [], 4, 'Design escultural, conforto e edicoes desejadas por quem busca visual de impacto.'),
+  createSeedBrand('new-balance', 'New Balance', [], 5, 'Runners premium, materiais nobres e proporcoes equilibradas para uso diario.'),
+  createSeedBrand('supreme', 'Supreme', [], 6, 'Streetwear de alto desejo com drops pontuais, collabs e pecas de arquivo.'),
+  createSeedBrand('stussy', 'Stussy', [], 7, 'Essenciais relaxed, heranca surf-street e pecas versateis para camadas urbanas.'),
+  createSeedBrand('corteiz', 'Corteiz', [], 8, 'Energia underground, lancamentos disputados e identidade visual direta.'),
+  createSeedBrand('off-white', 'Off-White', [], 9, 'Design conceitual, referencias industriais e sneakers com assinatura de passarela.'),
+  createSeedBrand('bape', 'Bape', [], 10, 'Camo, graficos marcantes e classicos japoneses de streetwear colecionavel.'),
+  createSeedBrand('essentials', 'Essentials', [], 11, 'Basics premium, tons neutros e modelagens amplas para compor qualquer fit.'),
+  createSeedBrand('chrome-hearts', 'Chrome Hearts', [], 12, 'Luxo artesanal, detalhes goticos e pecas raras para colecionadores.'),
 ]
+
+function createSeedBrand(id, name, models, displayOrder, description) {
+  return {
+    id,
+    name,
+    logo: '',
+    banner: '',
+    description,
+    meta_title: `${name} na Vertex`,
+    meta_description: description,
+    models,
+    display_order: displayOrder,
+    is_active: true,
+  }
+}
 
 export const seedProducts = [
   {

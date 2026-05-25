@@ -30,9 +30,21 @@ export async function createCategoryCarouselItem(input) {
 
   if (isDatabaseReady()) {
     await query(
-      `INSERT INTO category_carousel (id, name, logo, models, display_order, is_active)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [item.id, item.name, item.logo, JSON.stringify(item.models), item.display_order, item.is_active],
+      `INSERT INTO category_carousel
+        (id, name, logo, banner, description, meta_title, meta_description, models, display_order, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        item.id,
+        item.name,
+        item.logo,
+        item.banner,
+        item.description,
+        item.meta_title,
+        item.meta_description,
+        JSON.stringify(item.models),
+        item.display_order,
+        item.is_active,
+      ],
     )
   } else {
     setCategoryCarousel([...categoryCarousel, item].sort(sortCategoryCarousel))
@@ -53,9 +65,21 @@ export async function updateCategoryCarouselItem(id, input) {
   if (isDatabaseReady()) {
     await query(
       `UPDATE category_carousel
-       SET name = ?, logo = ?, models = ?, display_order = ?, is_active = ?
+       SET name = ?, logo = ?, banner = ?, description = ?, meta_title = ?, meta_description = ?,
+           models = ?, display_order = ?, is_active = ?
        WHERE id = ?`,
-      [item.name, item.logo, JSON.stringify(item.models), item.display_order, item.is_active, id],
+      [
+        item.name,
+        item.logo,
+        item.banner,
+        item.description,
+        item.meta_title,
+        item.meta_description,
+        JSON.stringify(item.models),
+        item.display_order,
+        item.is_active,
+        id,
+      ],
     )
   } else {
     setCategoryCarousel(
@@ -89,6 +113,10 @@ function normalizeCategoryCarouselItem(input) {
     id: input.id || slugify(name || randomUUID()),
     name,
     logo: String(input.logo || '').trim(),
+    banner: String(input.banner || '').trim(),
+    description: String(input.description || '').trim(),
+    meta_title: String(input.meta_title ?? input.metaTitle ?? '').trim(),
+    meta_description: String(input.meta_description ?? input.metaDescription ?? '').trim(),
     models: normalizeModels(input.models),
     display_order: Number(input.display_order ?? input.displayOrder ?? 0),
     is_active: normalizeBoolean(input.is_active ?? input.isActive ?? true),

@@ -35,6 +35,23 @@ export function BrandProfile({ onAdd, products }) {
   const modelOptions = brand.models || []
   const activeSelectedModel = modelOptions.includes(selectedModel) ? selectedModel : ''
 
+  useEffect(() => {
+    const previousTitle = document.title
+    const metaDescription = document.querySelector('meta[name="description"]')
+    const previousDescription = metaDescription?.getAttribute('content') || ''
+
+    document.title = brand.meta_title || `${brand.name} | Vertex`
+    metaDescription?.setAttribute(
+      'content',
+      brand.meta_description || brand.description || `Explore produtos ${brand.name} na Vertex.`,
+    )
+
+    return () => {
+      document.title = previousTitle
+      metaDescription?.setAttribute('content', previousDescription)
+    }
+  }, [brand])
+
   const brandProducts = useMemo(() => {
     const normalizedName = brand.name.toLowerCase()
     const normalizedId = brand.id.toLowerCase()
@@ -70,6 +87,21 @@ export function BrandProfile({ onAdd, products }) {
         <ChevronLeft size={18} />
         Voltar
       </Link>
+
+      <section
+        className={`brand-hero ${brand.banner ? 'has-banner' : ''}`}
+        style={brand.banner ? { backgroundImage: `url(${brand.banner})` } : undefined}
+      >
+        <div className="brand-hero-logo">
+          {brand.logo ? <img src={brand.logo} alt={brand.name} /> : getLogoFallback(brand.name)}
+        </div>
+        <div className="brand-results-heading">
+          <p>Perfil da marca</p>
+          <h1>{brand.name}</h1>
+          <span>{brand.description || 'Selecao premium com curadoria de sneakers, roupas e drops especiais.'}</span>
+        </div>
+        <strong>{visibleProducts.length} produto(s)</strong>
+      </section>
 
       <section className="brand-catalog-layout">
         <aside className="brand-filter-panel" aria-label="Filtros da marca">
@@ -157,7 +189,8 @@ export function BrandProfile({ onAdd, products }) {
 
         <div className="brand-product-area">
           <div className="brand-results-heading">
-            <h2>{brand.name}</h2>
+            <p>Catalogo</p>
+            <h2>{activeSelectedModel || brand.name}</h2>
           </div>
 
           <div className="product-grid brand-product-grid">
@@ -199,5 +232,19 @@ function createFallbackBrand(id = '') {
     logo: '',
     models: [],
     name: name || 'Marca',
+    banner: '',
+    description: '',
+    meta_title: '',
+    meta_description: '',
   }
+}
+
+function getLogoFallback(name = '') {
+  return name
+    .split(/\s|-/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 3)
+    .toUpperCase()
 }

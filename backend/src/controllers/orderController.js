@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { isDatabaseReady, parseJson, query } from '../database/mysql.js'
 import { orders } from '../database/store.js'
+import { createPaymentIntent } from '../services/paymentGateway.js'
 
 const validStatuses = new Set(['created', 'paid', 'separating', 'shipped', 'delivered', 'canceled'])
 
@@ -10,6 +11,7 @@ function mapOrder(order) {
     subtotal: Number(order.subtotal),
     shipping: Number(order.shipping),
     total: Number(order.total),
+    payment: parseJson(order.payment, null),
     customer: parseJson(order.customer, {}),
     items: parseJson(order.items, []),
   }
@@ -82,27 +84,36 @@ export async function getOrders(req, res) {
 
 export async function createOrder(req, res) {
   const items = req.body.items || []
-  const subtotal = items.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0)
-  const shipping = subtotal > 1200 ? 0 : 29.9
-  const order = {
-    id: randomUUID(),
-    items,
-    customer: req.body.customer || {},
-    subtotal,
-    shipping,
-    total: subtotal + shipping,
-    status: 'created',
-    createdAt: new Date().toISOString(),
-  }
 
   if (items.length === 0) {
     return res.status(400).json({ message: 'Pedido sem produtos.' })
   }
 
+  const subtotal = items.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0)
+  const shipping = subtotal > 1200 ? 0 : 29.9
+  const total = subtotal + shipping
+  const orderId = randomUUID()
+  const payment = await createPaymentIntent({
+    amount: total,
+    method: req.body.payment?.method || req.body.customer?.payment,
+    orderId,
+  })
+  const order = {
+    id: orderId,
+    items,
+    customer: req.body.customer || {},
+    subtotal,
+    shipping,
+    total,
+    payment,
+    status: 'created',
+    createdAt: new Date().toISOString(),
+  }
+
   if (isDatabaseReady()) {
     await query(
-      `INSERT INTO orders (id, customer, items, subtotal, shipping, total, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO orders (id, customer, items, subtotal, shipping, total, payment, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         order.id,
         JSON.stringify(order.customer),
@@ -110,6 +121,7 @@ export async function createOrder(req, res) {
         order.subtotal,
         order.shipping,
         order.total,
+        JSON.stringify(order.payment),
         order.status,
       ],
     )

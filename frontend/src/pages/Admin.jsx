@@ -55,6 +55,10 @@ const emptyProduct = {
 const emptyCarouselItem = {
   name: '',
   logo: '',
+  banner: '',
+  description: '',
+  meta_title: '',
+  meta_description: '',
   models: '',
   display_order: 1,
   is_active: true,
@@ -214,6 +218,19 @@ export function Admin({ products, onProductsChanged }) {
     event.target.value = ''
   }
 
+  const uploadCarouselBanner = async (event) => {
+    const file = event.target.files?.[0]
+
+    if (!file || !session) {
+      return
+    }
+
+    const uploaded = await api.uploadImage(file, session.token)
+    setCarouselForm((current) => ({ ...current, banner: uploaded.url }))
+    setMessage('Banner da marca enviado.')
+    event.target.value = ''
+  }
+
   const addImageUrl = () => {
     if (!productForm.imageUrl.trim()) {
       return
@@ -306,6 +323,10 @@ export function Admin({ products, onProductsChanged }) {
     setCarouselForm({
       name: item.name,
       logo: item.logo || '',
+      banner: item.banner || '',
+      description: item.description || '',
+      meta_title: item.meta_title || '',
+      meta_description: item.meta_description || '',
       models: item.models?.join('\n') || '',
       display_order: item.display_order,
       is_active: item.is_active,
@@ -422,6 +443,13 @@ export function Admin({ products, onProductsChanged }) {
                 onChange={updateCarousel}
               />
               <input name="logo" placeholder="URL da foto/logo" value={carouselForm.logo} onChange={updateCarousel} />
+              <input name="banner" placeholder="URL do banner da marca" value={carouselForm.banner} onChange={updateCarousel} />
+              <input
+                name="meta_title"
+                placeholder="Meta titulo"
+                value={carouselForm.meta_title}
+                onChange={updateCarousel}
+              />
               <label className="toggle-field">
                 <input
                   name="is_active"
@@ -432,6 +460,21 @@ export function Admin({ products, onProductsChanged }) {
                 Ativa
               </label>
             </div>
+
+            <textarea
+              required
+              name="description"
+              placeholder="Descricao da marca para o perfil"
+              value={carouselForm.description}
+              onChange={updateCarousel}
+            />
+
+            <textarea
+              name="meta_description"
+              placeholder="Meta descricao para buscadores"
+              value={carouselForm.meta_description}
+              onChange={updateCarousel}
+            />
 
             <textarea
               name="models"
@@ -448,6 +491,14 @@ export function Admin({ products, onProductsChanged }) {
               </label>
               <div className="carousel-logo-preview">
                 {carouselForm.logo ? <img src={carouselForm.logo} alt="Preview do logo" /> : <span>Preview</span>}
+              </div>
+              <label>
+                <ImagePlus size={18} />
+                Upload banner
+                <input type="file" accept="image/*" onChange={uploadCarouselBanner} />
+              </label>
+              <div className="carousel-banner-preview">
+                {carouselForm.banner ? <img src={carouselForm.banner} alt="Preview do banner" /> : <span>Banner</span>}
               </div>
             </div>
 
@@ -482,6 +533,7 @@ export function Admin({ products, onProductsChanged }) {
                   <h3>{item.name}</h3>
                   <p>
                     Ordem {item.display_order} / {item.is_active ? 'ativa' : 'inativa'} / {(item.models || []).length} modelo(s)
+                    {item.description ? ' / perfil completo' : ' / sem descricao'}
                   </p>
                 </div>
                 <span>{item.is_active ? 'Ativa' : 'Off'}</span>

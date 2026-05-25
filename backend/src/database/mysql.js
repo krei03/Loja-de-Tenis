@@ -73,6 +73,7 @@ export async function initializeDatabase() {
           subtotal DECIMAL(10,2) NOT NULL,
           shipping DECIMAL(10,2) NOT NULL,
           total DECIMAL(10,2) NOT NULL,
+          payment JSON NULL,
           status VARCHAR(40) NOT NULL,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -82,14 +83,20 @@ export async function initializeDatabase() {
           id VARCHAR(120) PRIMARY KEY,
           name VARCHAR(140) NOT NULL,
           logo TEXT NOT NULL,
+          banner TEXT NULL,
+          description TEXT NULL,
+          meta_title VARCHAR(180) NULL,
+          meta_description TEXT NULL,
           models JSON NOT NULL,
           display_order INT NOT NULL DEFAULT 0,
           is_active BOOLEAN NOT NULL DEFAULT TRUE,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `)
-      await ensureCategoryCarouselModelsColumn(database)
+      await ensureCategoryCarouselColumns(database)
+      await ensureOrdersColumns(database)
       await ensureDefaultCategoryCarouselModels(database)
+      await ensureDefaultCategoryCarouselMetadata(database)
 
       await seedIfEmpty()
       ready = true
@@ -108,10 +115,36 @@ export async function initializeDatabase() {
   }
 }
 
-async function ensureCategoryCarouselModelsColumn(database) {
-  const [columns] = await database.query("SHOW COLUMNS FROM category_carousel LIKE 'models'")
+async function ensureOrdersColumns(database) {
+  const [columns] = await database.query('SHOW COLUMNS FROM orders')
+  const columnNames = new Set(columns.map((column) => column.Field))
 
-  if (columns.length === 0) {
+  if (!columnNames.has('payment')) {
+    await database.query('ALTER TABLE orders ADD COLUMN payment JSON NULL AFTER total')
+  }
+}
+
+async function ensureCategoryCarouselColumns(database) {
+  const [columns] = await database.query('SHOW COLUMNS FROM category_carousel')
+  const columnNames = new Set(columns.map((column) => column.Field))
+
+  if (!columnNames.has('banner')) {
+    await database.query('ALTER TABLE category_carousel ADD COLUMN banner TEXT NULL AFTER logo')
+  }
+
+  if (!columnNames.has('description')) {
+    await database.query('ALTER TABLE category_carousel ADD COLUMN description TEXT NULL AFTER banner')
+  }
+
+  if (!columnNames.has('meta_title')) {
+    await database.query('ALTER TABLE category_carousel ADD COLUMN meta_title VARCHAR(180) NULL AFTER description')
+  }
+
+  if (!columnNames.has('meta_description')) {
+    await database.query('ALTER TABLE category_carousel ADD COLUMN meta_description TEXT NULL AFTER meta_title')
+  }
+
+  if (!columnNames.has('models')) {
     await database.query("ALTER TABLE category_carousel ADD COLUMN models JSON NULL AFTER logo")
     await database.query("UPDATE category_carousel SET models = JSON_ARRAY() WHERE models IS NULL")
   }
@@ -129,6 +162,26 @@ async function ensureDefaultCategoryCarouselModels(database) {
           [JSON.stringify(item.models), item.id],
         ),
       ),
+  )
+}
+
+async function ensureDefaultCategoryCarouselMetadata(database) {
+  await Promise.all(
+    seedCategoryCarousel.map((item) =>
+      database.execute(
+        `UPDATE category_carousel
+         SET description = COALESCE(NULLIF(description, ''), ?),
+             meta_title = COALESCE(NULLIF(meta_title, ''), ?),
+             meta_description = COALESCE(NULLIF(meta_description, ''), ?)
+         WHERE id = ?`,
+        [
+          item.description || '',
+          item.meta_title || item.metaTitle || '',
+          item.meta_description || item.metaDescription || item.description || '',
+          item.id,
+        ],
+      ),
+    ),
   )
 }
 
@@ -185,9 +238,21 @@ async function seedIfEmpty() {
     await Promise.all(
       seedCategoryCarousel.map((item) =>
         database.execute(
-          `INSERT INTO category_carousel (id, name, logo, models, display_order, is_active)
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          [item.id, item.name, item.logo, JSON.stringify(item.models || []), item.display_order, item.is_active],
+          `INSERT INTO category_carousel
+            (id, name, logo, banner, description, meta_title, meta_description, models, display_order, is_active)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            item.id,
+            item.name,
+            item.logo,
+            item.banner || '',
+            item.description || '',
+            item.meta_title || item.metaTitle || '',
+            item.meta_description || item.metaDescription || '',
+            JSON.stringify(item.models || []),
+            item.display_order,
+            item.is_active,
+          ],
         ),
       ),
     )
@@ -199,6 +264,10 @@ export function mapCategoryCarouselItem(row) {
     id: row.id,
     name: row.name,
     logo: row.logo,
+    banner: row.banner || '',
+    description: row.description || '',
+    meta_title: row.meta_title || '',
+    meta_description: row.meta_description || '',
     models: parseJson(row.models, []),
     display_order: Number(row.display_order),
     is_active: Boolean(row.is_active),
