@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { authRoutes } from './routes/authRoutes.js'
 import { categoryRoutes } from './routes/categoryRoutes.js'
 import { categoryCarouselRoutes } from './routes/categoryCarouselRoutes.js'
+import { customerRoutes } from './routes/customerRoutes.js'
 import { orderRoutes } from './routes/orderRoutes.js'
 import { productRoutes } from './routes/productRoutes.js'
 import { shippingRoutes } from './routes/shippingRoutes.js'
@@ -29,6 +30,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/products', productRoutes)
 app.use('/api/categories', categoryRoutes)
 app.use('/api/category-carousel', categoryCarouselRoutes)
+app.use('/api/customers', customerRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/shipping', shippingRoutes)
 app.use('/api/uploads', uploadRoutes)

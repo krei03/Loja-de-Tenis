@@ -79,6 +79,17 @@ export async function initializeDatabase() {
         )
       `)
       await database.query(`
+        CREATE TABLE IF NOT EXISTS customers (
+          id VARCHAR(120) PRIMARY KEY,
+          name VARCHAR(160) NOT NULL,
+          email VARCHAR(180) NOT NULL UNIQUE,
+          phone VARCHAR(40) NULL,
+          password_hash VARCHAR(255) NOT NULL,
+          provider VARCHAR(40) NOT NULL DEFAULT 'email',
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `)
+      await database.query(`
         CREATE TABLE IF NOT EXISTS category_carousel (
           id VARCHAR(120) PRIMARY KEY,
           name VARCHAR(140) NOT NULL,

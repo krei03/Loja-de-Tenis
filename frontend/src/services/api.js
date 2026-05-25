@@ -65,6 +65,18 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }),
+  registerCustomer: (payload) =>
+    request('/customers/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+  loginCustomer: (payload) =>
+    request('/customers/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
   createProduct: (payload, token) =>
     request('/products', {
       method: 'POST',

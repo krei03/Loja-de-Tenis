@@ -18,7 +18,7 @@ O projeto deve continuar priorizando:
 
 # Current Progress
 
-O projeto já possui base funcional com frontend React/Vite, backend Node/Express, MySQL no Docker, painel admin, autenticação admin com hash/token assinado, cadastro de produtos, upload de imagens, checkout com camada preparada para pagamento, carrinho, carrossel de categorias, página de produto com galeria, perfis de marca/categoria com banner/descrição/metadados, modo claro/escuro, reset global de scroll em navegação, portal do cliente com Minha Conta, login/registro local separados e botões sociais preparados, simulador visual de frete e relatório/gestão administrativa de vendas com filtros e status.
+O projeto já possui base funcional com frontend React/Vite, backend Node/Express, MySQL no Docker, painel admin, autenticação admin com hash/token assinado, cadastro de produtos, upload de imagens, checkout com camada preparada para pagamento, carrinho, carrossel de categorias, página de produto com galeria, perfis de marca/categoria com banner/descrição/metadados, modo claro/escuro, reset global de scroll em navegação, portal do cliente com Minha Conta, login/registro por email com backend e senha validada, botões sociais preparados, simulador visual de frete e relatório/gestão administrativa de vendas com filtros e status.
 
 O foco atual deixa de ser reconstrução da base e passa a ser evolução de produto: integrações reais, refinamento administrativo, melhoria de dados e validação visual contínua.
 
@@ -64,6 +64,9 @@ O foco atual deixa de ser reconstrução da base e passa a ser evolução de pro
 - [x] Separar fluxo de login e registro da conta do cliente.
 - [x] Criar botão exclusivo para “Criar conta”.
 - [x] Melhorar UX da tela de autenticação do cliente.
+- [x] Corrigir validação de senha no login do cliente.
+- [x] Impedir login com qualquer senha.
+- [x] Exibir mensagem de erro quando email ou senha estiverem incorretos.
 
 ---
 
@@ -106,7 +109,7 @@ Possíveis pontos para observar nas próximas alterações:
 - Usar `category_carousel` como fonte de dados de perfil de marca, incluindo banner, descrição e metadados.
 - Preparar checkout com uma camada de pagamento interna (`paymentGateway`) em modo manual até escolha de provedor real.
 - Usar um componente global de scroll no topo em mudanças de rota para evitar páginas abrindo na posição anterior.
-- Implementar Portal do Cliente inicialmente no frontend com sessão em `localStorage`, para entregar navegação e telas de conta antes de criar autenticação real de cliente no backend.
+- Implementar Portal do Cliente com sessão persistida no `localStorage`, usando backend para login/cadastro por email e mantendo telas de conta no frontend.
 - Tratar Google/Apple como botões sociais funcionais em modo local/preparado; OAuth real dependerá de credenciais e configuração de provedores.
 - Reduzir a escala visual geral com `--page-max` menor, navbar mais compacta, grids mais estreitos e paddings menores.
 - Usar ViaCEP como serviço real de validação/consulta de CEP no simulador de frete, mantendo cálculo interno de preço/prazo até escolha de transportadora.
@@ -192,6 +195,10 @@ npm run test:hero
 ---
 
 # Plan of Work
+Atualmente o login do cliente está aceitando qualquer senha.
+
+Esse comportamento precisa ser corrigido, pois o sistema deve validar corretamente a senha cadastrada pelo usuário.
+
 
 A tela atual de autenticação do cliente está utilizando apenas um único botão
 
@@ -519,6 +526,26 @@ frontend http://localhost:5173/login: HTTP 200
 backend http://localhost:8080/health: OK com database mysql
 ```
 
+Validação executada na etapa de validação real de senha do cliente:
+
+```txt
+backend node --check src/server.js: OK
+backend node --check src/controllers/customerController.js: OK
+backend node --check src/services/customerSecurity.js: OK
+frontend npm run lint: OK
+frontend npm run build: OK
+frontend npm run test:responsive: OK, 5 testes aprovados
+frontend npm run test:hero: OK, 2 testes aprovados
+git diff --check: OK, apenas avisos CRLF do Windows
+docker compose up --build -d: OK
+frontend http://localhost:5173/login: HTTP 200
+backend http://localhost:8080/health: OK com database mysql
+backend POST http://localhost:8080/api/customers/register: OK, conta de teste criada
+backend POST http://localhost:8080/api/customers/login com senha errada: HTTP 401 esperado
+backend POST http://localhost:8080/api/customers/login com senha correta: HTTP 200
+cleanup MySQL da conta de teste criada na validação: OK
+```
+
 # Decision Log
 
 - 2026-05-25: Autenticação admin passou a usar hash PBKDF2 (`ADMIN_PASSWORD_HASH` quando definido, ou hash em runtime de `ADMIN_PASSWORD` para desenvolvimento local) e token admin assinado com HMAC e expiração.
@@ -536,6 +563,7 @@ backend http://localhost:8080/health: OK com database mysql
 - 2026-05-25: “Meu Cadastro” passa a usar cards de “Dados de acesso” e “Dados pessoais” inspirados na referência enviada, sem copiar a paleta clara/vermelha literalmente para preservar a identidade escura da Vertex.
 - 2026-05-25: A revisão de acessibilidade desta rodada é básica e focada em formulários/conta/produto; auditoria formal com axe/leitores de tela fica para etapa futura.
 - 2026-05-25: Login e registro do cliente foram separados no frontend com controle segmentado; a criação de conta continua usando sessão local até existir backend real de clientes.
+- 2026-05-25: Login/cadastro por email do cliente passam a usar backend com senha PBKDF2 e sessão assinada; Google/Apple continuam como acesso social preparado/local até haver credenciais OAuth.
 
 # Surprises & Discoveries
 
@@ -552,6 +580,7 @@ backend http://localhost:8080/health: OK com database mysql
 - A referência `assets/meu_cadastro.png` tem layout claro com ações vermelhas; a implementação manteve a estrutura e hierarquia, mas adaptou o visual ao tema escuro premium.
 - A primeira tentativa de gerar screenshots fora do projeto não resolveu o módulo Playwright; foi necessário apontar para o `node_modules` do frontend.
 - A tela de autenticação anterior misturava entrada e cadastro em um único submit, o que deixava ambíguo se o cliente estava entrando ou registrando.
+- O bug de senha aceitava qualquer valor porque o login montava a sessão diretamente no frontend, sem consultar um cadastro real.
 
 # Artifacts and Notes
 
@@ -573,6 +602,9 @@ backend http://localhost:8080/health: OK com database mysql
 - Arquivos alterados na etapa de autenticação do cliente: `frontend/src/pages/CustomerPortal.jsx`, `frontend/src/styles/app.css`, `PLANS.MD`.
 - Comandos usados na etapa de autenticação do cliente: `npm run lint` em `frontend`, `npm run build` em `frontend`, `npm run test:responsive` em `frontend`, `npm run test:hero` em `frontend`, `git diff --check`, `docker compose up --build -d`, checagens HTTP com `Invoke-WebRequest`.
 - Observação operacional: Docker foi atualizado nesta etapa conforme rotina atual do projeto.
+- Arquivos alterados na etapa de validação real de senha do cliente: `backend/src/database/mysql.js`, `backend/src/server.js`, `backend/src/controllers/customerController.js`, `backend/src/routes/customerRoutes.js`, `backend/src/services/customerSecurity.js`, `frontend/src/pages/CustomerPortal.jsx`, `frontend/src/services/api.js`, `frontend/src/styles/app.css`, `PLANS.MD`.
+- Comandos usados na etapa de validação real de senha do cliente: `node --check src/server.js` em `backend`, `node --check src/controllers/customerController.js` em `backend`, `node --check src/services/customerSecurity.js` em `backend`, `npm run lint` em `frontend`, `npm run build` em `frontend`, `npm run test:responsive` em `frontend`, `npm run test:hero` em `frontend`, `git diff --check`, `docker compose up --build -d`, checagens HTTP com `Invoke-WebRequest`/`Invoke-RestMethod`, cleanup da conta de teste com `docker compose exec -T mysql mysql ... DELETE FROM customers WHERE email = ...`.
+- Observação operacional: contas de cliente por email agora ficam na tabela `customers`; ambientes existentes recebem a tabela no startup do backend.
 
 # Validation Pending
 

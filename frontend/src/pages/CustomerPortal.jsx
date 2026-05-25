@@ -13,43 +13,66 @@ import {
   User,
 } from 'lucide-react'
 import { AccountSidebar } from '../components/AccountSidebar'
+import { api } from '../services/api'
 
 export function CustomerLogin({ onLogin, customer }) {
   const navigate = useNavigate()
   const [mode, setMode] = useState('login')
+  const [authError, setAuthError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   if (customer) {
     return <Navigate to="/account" replace />
   }
 
-  const login = (event) => {
+  const setCustomerSession = (session) => ({
+    ...session.user,
+    token: session.token,
+    expiresAt: session.expiresAt,
+  })
+
+  const login = async (event) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
-    const session = {
-      name: data.get('email')?.split('@')[0] || 'Cliente Vertex',
-      email: data.get('email'),
-      phone: '',
-      provider: 'email',
-      createdAt: new Date().toISOString(),
-    }
+    setAuthError('')
+    setIsSubmitting(true)
 
-    onLogin(session)
-    navigate('/account')
+    try {
+      const session = await api.loginCustomer({
+        email: data.get('email'),
+        password: data.get('password'),
+      })
+
+      onLogin(setCustomerSession(session))
+      navigate('/account')
+    } catch {
+      setAuthError('Email ou senha incorretos.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  const register = (event) => {
+  const register = async (event) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
-    const session = {
-      name: data.get('name') || 'Cliente Vertex',
-      email: data.get('email'),
-      phone: data.get('phone') || '',
-      provider: 'email',
-      createdAt: new Date().toISOString(),
-    }
+    setAuthError('')
+    setIsSubmitting(true)
 
-    onLogin(session)
-    navigate('/account/edit')
+    try {
+      const session = await api.registerCustomer({
+        name: data.get('name'),
+        email: data.get('email'),
+        phone: data.get('phone'),
+        password: data.get('password'),
+      })
+
+      onLogin(setCustomerSession(session))
+      navigate('/account/edit')
+    } catch (error) {
+      setAuthError(error.message.includes('409') ? 'Este email ja possui uma conta.' : 'Nao foi possivel criar sua conta.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const socialLogin = (provider) => {
@@ -78,7 +101,10 @@ export function CustomerLogin({ onLogin, customer }) {
                 type="button"
                 role="tab"
                 aria-selected={mode === 'login'}
-                onClick={() => setMode('login')}
+                onClick={() => {
+                  setAuthError('')
+                  setMode('login')
+                }}
               >
                 Entrar
               </button>
@@ -86,7 +112,10 @@ export function CustomerLogin({ onLogin, customer }) {
                 type="button"
                 role="tab"
                 aria-selected={mode === 'register'}
-                onClick={() => setMode('register')}
+                onClick={() => {
+                  setAuthError('')
+                  setMode('register')
+                }}
               >
                 Criar conta
               </button>
@@ -103,9 +132,10 @@ export function CustomerLogin({ onLogin, customer }) {
                   <span>Senha</span>
                   <input required name="password" type="password" placeholder="Senha" autoComplete="current-password" />
                 </label>
-                <button type="submit">
+                {authError && <p className="auth-error" role="alert">{authError}</p>}
+                <button type="submit" disabled={isSubmitting}>
                   <User size={18} />
-                  Entrar
+                  {isSubmitting ? 'Entrando...' : 'Entrar'}
                 </button>
               </form>
             ) : (
@@ -127,9 +157,10 @@ export function CustomerLogin({ onLogin, customer }) {
                   <span>Senha</span>
                   <input required name="password" type="password" placeholder="Senha" autoComplete="new-password" />
                 </label>
-                <button type="submit" className="create-account-button">
+                {authError && <p className="auth-error" role="alert">{authError}</p>}
+                <button type="submit" className="create-account-button" disabled={isSubmitting}>
                   <User size={18} />
-                  Criar conta
+                  {isSubmitting ? 'Criando...' : 'Criar conta'}
                 </button>
               </form>
             )}
@@ -148,7 +179,14 @@ export function CustomerLogin({ onLogin, customer }) {
               <Apple size={19} />
               Entrar com Apple
             </button>
-            <button type="button" className="secondary-create-account" onClick={() => setMode('register')}>
+            <button
+              type="button"
+              className="secondary-create-account"
+              onClick={() => {
+                setAuthError('')
+                setMode('register')
+              }}
+            >
               Criar conta com email
             </button>
           </section>
