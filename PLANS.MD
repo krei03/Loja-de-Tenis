@@ -32,8 +32,8 @@ O foco atual deixa de ser reconstrução da base e passa a ser evolução de pro
 - [x] Persistir tamanho selecionado e dados completos do item dentro do pedido.
 - [x] Integrar pagamento real ou preparar camada de checkout para gateway futuro.
 - [x] Melhorar cadastro de marcas/categorias com campos de descrição, banner e metadados para perfis de marca.
-- [ ] Revisar visualmente perfis de marca em mobile, tablet e desktop após cadastro de dados reais.
-- [ ] Revisar acessibilidade básica: labels, foco visível, aria-labels e navegação por teclado.
+- [x] Revisar visualmente perfis de marca em mobile, tablet e desktop após cadastro de dados reais.
+- [x] Revisar acessibilidade básica: labels, foco visível, aria-labels e navegação por teclado.
 - [x] Criar página detalhada de vendas ao clicar em “Total de vendas”.
 - [x] Exibir detalhes completos das vendas para envio ao destinatário.
 - [x] Criar registro mensal geral com base nos dados do cadastro/login do cliente.
@@ -58,6 +58,9 @@ O foco atual deixa de ser reconstrução da base e passa a ser evolução de pro
 - [x] Corrigir organização do menu lateral da conta do cliente.
 - [x] Colocar “Alterar dados” e “Meus endereços” dentro da seção “Meu Cadastro”.
 - [x] Remover o texto “Minha Conta” da navbar e deixar apenas o ícone de usuário/bonequinho.
+- [x] Refinar visual da aba “Meu Cadastro” usando a referência visual que esta na pasta assets nomo da imagem meu_cadastro enviada pelo usuário.
+- [x] Reestruturar layout da área “Meus endereços”.
+- [x] Adicionar botão “Cadastrar endereço”.
 
 ---
 
@@ -78,9 +81,9 @@ Possíveis pontos para observar nas próximas alterações:
 
 1. Validar visualmente o fluxo completo no Docker: home, carrossel, perfil de marca, perfil do produto, carrinho, checkout e admin.
 2. Evoluir autenticação real do cliente com backend/OAuth quando houver credenciais de provedor.
-3. Revisar acessibilidade básica em formulários, foco e navegação por teclado.
-4. Revisar visualmente perfis de marca e portal do cliente com dados reais em mobile/tablet/desktop.
-5. Substituir cotação interna de frete por integração com transportadora quando o provedor comercial for escolhido.
+3. Evoluir revisão visual manual completa do fluxo em navegador real com dados de produção.
+4. Substituir cotação interna de frete por integração com transportadora quando o provedor comercial for escolhido.
+5. Persistir dados reais do cliente no backend, incluindo endereços e cartões.
 
 ---
 
@@ -105,6 +108,8 @@ Possíveis pontos para observar nas próximas alterações:
 - Reduzir a escala visual geral com `--page-max` menor, navbar mais compacta, grids mais estreitos e paddings menores.
 - Usar ViaCEP como serviço real de validação/consulta de CEP no simulador de frete, mantendo cálculo interno de preço/prazo até escolha de transportadora.
 - Manter “Meu Cadastro” como grupo visual no menu da conta, com subitens de dados, endereços, comunicação e cartões.
+- Refinar “Meu Cadastro” com cards de dados de acesso/pessoais inspirados em `assets/meu_cadastro.png`, adaptando a referência para a identidade escura premium da Vertex.
+- Tratar a área “Meus endereços” como gerenciamento visual local, com card principal e botão “Cadastrar endereco”, até persistência real no backend.
 
 ---
 
@@ -167,6 +172,7 @@ assets/carrosel_categoria .png
 assets/navbar.png
 assets/foter.png
 assets/perfil_marca.png
+assets/meu_cadastro.png
 assets/video_hero.mp4
 ```
 
@@ -183,6 +189,21 @@ npm run test:hero
 ---
 
 # Plan of Work
+
+
+A área “Meu Cadastro” deverá ser refinada visualmente utilizando como base a referência enviada pelo usuário.
+
+O layout deverá seguir aparência premium semelhante ao exemplo mostrado, mantendo:
+
+- menu lateral elegante;
+- hierarquia visual organizada;
+- espaçamentos modernos;
+- aparência clean;
+- identidade premium do ecommerce.
+
+A seção “Meus endereços” deverá ser melhorada para funcionar como gerenciamento real de endereços do cliente.
+
+Dentro da página de endereços deverá existir um botão principal
 
 O menu lateral da área do cliente precisa ser reorganizado.
 
@@ -262,6 +283,10 @@ Minha Conta
 
 # Concrete Steps
 
+Usar a referência visual enviada pelo usuário como base para refinamento da conta do cliente.
+
+Revisar arquivos:
+
 Alterar o componente do menu lateral da conta:
 
 ```txt
@@ -274,6 +299,25 @@ Validação desta organização:
 - [x] agrupar opções de cadastro sob “Meu Cadastro”;
 - [x] remover link textual “Minha Conta” da navbar desktop, mantendo apenas o ícone de usuário;
 - [x] manter acesso mobile para conta no menu responsivo.
+
+Validação visual da conta e perfil:
+
+- [x] revisar `/brand/nike` em mobile por screenshot;
+- [x] revisar `/brand/nike` em tablet por screenshot;
+- [x] revisar `/brand/nike` em desktop por screenshot;
+- [x] revisar `/account/edit` em desktop por screenshot usando sessão local;
+- [x] revisar `/account/addresses` em desktop por screenshot usando sessão local;
+- [x] refinar “Meu Cadastro” com base em `assets/meu_cadastro.png`;
+- [x] reestruturar “Meus endereços”;
+- [x] adicionar botão “Cadastrar endereco”.
+
+Validação de acessibilidade básica:
+
+- [x] manter foco visível global em links, botões e campos;
+- [x] adicionar labels visíveis em login do cliente e checkout;
+- [x] adicionar `aria-label` no CEP do simulador de frete;
+- [x] manter navegação lateral da conta como `nav` com links de teclado;
+- [x] manter ações essenciais com texto acessível.
 
 Para autenticação admin:
 
@@ -423,6 +467,26 @@ backend http://localhost:8080/health: OK com database mysql
 backend http://localhost:8080/api/shipping/quote?cep=01001000: OK com ViaCEP e cotação Vertex Express
 ```
 
+Validação executada na etapa de cadastro, endereços, acessibilidade e revisão visual:
+
+```txt
+frontend npm run lint: OK
+frontend npm run build: OK
+frontend npm run test:responsive: OK, 5 testes aprovados
+frontend npm run test:hero: OK, 2 testes aprovados
+git diff --check: OK, apenas avisos CRLF do Windows
+docker compose up --build -d: OK
+frontend http://localhost:5173/account/edit: HTTP 200
+frontend http://localhost:5173/account/addresses: HTTP 200
+backend http://localhost:8080/health: OK com database mysql
+screenshots Playwright:
+- /brand/nike mobile: OK
+- /brand/nike tablet: OK
+- /brand/nike desktop: OK
+- /account/edit desktop: OK
+- /account/addresses desktop: OK
+```
+
 # Decision Log
 
 - 2026-05-25: Autenticação admin passou a usar hash PBKDF2 (`ADMIN_PASSWORD_HASH` quando definido, ou hash em runtime de `ADMIN_PASSWORD` para desenvolvimento local) e token admin assinado com HMAC e expiração.
@@ -437,6 +501,8 @@ backend http://localhost:8080/api/shipping/quote?cep=01001000: OK com ViaCEP e c
 - 2026-05-25: Menu da conta foi extraído para `AccountSidebar.jsx`, alinhado ao plano, com “Meu Cadastro” como grupo e não como opção no mesmo nível.
 - 2026-05-25: Navbar desktop mantém apenas o ícone de usuário para conta; o texto de conta permanece só no menu mobile para clareza em telas pequenas.
 - 2026-05-25: Simulador de frete usa ViaCEP para validar destino e calcular uma cotação interna `Vertex Express`; integração comercial com transportadora fica como etapa futura.
+- 2026-05-25: “Meu Cadastro” passa a usar cards de “Dados de acesso” e “Dados pessoais” inspirados na referência enviada, sem copiar a paleta clara/vermelha literalmente para preservar a identidade escura da Vertex.
+- 2026-05-25: A revisão de acessibilidade desta rodada é básica e focada em formulários/conta/produto; auditoria formal com axe/leitores de tela fica para etapa futura.
 
 # Surprises & Discoveries
 
@@ -450,6 +516,8 @@ backend http://localhost:8080/api/shipping/quote?cep=01001000: OK com ViaCEP e c
 - O checkout agora preenche dados do cliente logado e vincula pedidos locais quando o email do pedido corresponde à sessão.
 - O plano citava `frontend/src/components/AccountSidebar.jsx`, mas o sidebar estava embutido em `CustomerPortal.jsx`; o componente foi criado para alinhar implementação e documentação.
 - ViaCEP entrega endereço/UF, mas não preço de transportadora; por isso preço e prazo continuam calculados internamente até um provedor logístico ser escolhido.
+- A referência `assets/meu_cadastro.png` tem layout claro com ações vermelhas; a implementação manteve a estrutura e hierarquia, mas adaptou o visual ao tema escuro premium.
+- A primeira tentativa de gerar screenshots fora do projeto não resolveu o módulo Playwright; foi necessário apontar para o `node_modules` do frontend.
 
 # Artifacts and Notes
 
@@ -465,6 +533,9 @@ backend http://localhost:8080/api/shipping/quote?cep=01001000: OK com ViaCEP e c
 - Arquivos alterados na etapa de menu/frete: `frontend/src/components/AccountSidebar.jsx`, `frontend/src/components/Navbar.jsx`, `frontend/src/pages/CustomerPortal.jsx`, `frontend/src/pages/ProductDetail.jsx`, `frontend/src/services/api.js`, `frontend/src/styles/app.css`, `backend/src/controllers/shippingController.js`, `backend/src/routes/shippingRoutes.js`, `backend/src/server.js`, `PLANS.MD`.
 - Comandos usados na etapa de menu/frete: `npm run lint` em `frontend`, `npm run build` em `frontend`, `npm run test:responsive` em `frontend`, `npm run test:hero` em `frontend`, `node --check src/server.js` em `backend`, `node --check src/controllers/shippingController.js` em `backend`, `git diff --check`, `docker compose up --build -d`, checagens HTTP com `Invoke-WebRequest`.
 - Observação operacional: a consulta de CEP depende de disponibilidade externa do ViaCEP; falhas retornam mensagem amigável no frontend.
+- Arquivos alterados na etapa de cadastro/acessibilidade: `frontend/src/pages/CustomerPortal.jsx`, `frontend/src/pages/Checkout.jsx`, `frontend/src/pages/ProductDetail.jsx`, `frontend/src/styles/app.css`, `PLANS.MD`; referência usada: `assets/meu_cadastro.png`.
+- Comandos usados na etapa de cadastro/acessibilidade: `npm run lint` em `frontend`, `npm run build` em `frontend`, `docker compose up --build -d`, script Playwright temporário para screenshots em `%TEMP%\\vertex-visual-review`.
+- Observação operacional: screenshots de revisão foram gerados fora do repo em `%TEMP%\\vertex-visual-review` para evitar poluir o versionamento.
 
 # Validation Pending
 

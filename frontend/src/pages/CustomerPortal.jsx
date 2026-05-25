@@ -1,10 +1,14 @@
 import { Navigate, useNavigate } from 'react-router-dom'
 import {
   Apple,
+  Calendar,
   CreditCard,
+  FilePenLine,
   Heart,
   Home,
+  Mail,
   PackageCheck,
+  Phone,
   User,
 } from 'lucide-react'
 import { AccountSidebar } from '../components/AccountSidebar'
@@ -53,9 +57,18 @@ export function CustomerLogin({ onLogin, customer }) {
         <div className="customer-auth-grid">
           <form className="form-panel customer-auth-form" onSubmit={submit}>
             <h2>Entrar ou criar cadastro</h2>
-            <input required name="name" placeholder="Nome completo" autoComplete="name" />
-            <input required name="email" type="email" placeholder="Email" autoComplete="email" />
-            <input name="phone" placeholder="Telefone" autoComplete="tel" />
+            <label>
+              <span>Nome completo</span>
+              <input required name="name" placeholder="Nome completo" autoComplete="name" />
+            </label>
+            <label>
+              <span>Email</span>
+              <input required name="email" type="email" placeholder="Email" autoComplete="email" />
+            </label>
+            <label>
+              <span>Telefone</span>
+              <input name="phone" placeholder="Telefone" autoComplete="tel" />
+            </label>
             <button type="submit">
               <User size={18} />
               Entrar / Registrar
@@ -135,13 +148,13 @@ function renderAccountPage(page, customer, customerOrders) {
     },
     edit: {
       eyebrow: 'Cadastro',
-      title: 'Alterar dados cadastrais',
-      body: <ProfileForm customer={customer} editable />,
+      title: 'Meu cadastro',
+      body: <RegistrationPanel customer={customer} />,
     },
     addresses: {
       eyebrow: 'Entrega',
       title: 'Meus enderecos',
-      body: <EmptyAccount icon={Home} text="Cadastre enderecos para acelerar proximas compras." />,
+      body: <AddressManager customer={customer} />,
     },
     preferences: {
       eyebrow: 'Comunicacao',
@@ -202,13 +215,115 @@ function EmptyAccount({ icon: Icon, text }) {
   )
 }
 
-function ProfileForm({ customer, editable = false }) {
+function RegistrationPanel({ customer }) {
+  const [firstName, ...lastNameParts] = customer.name.split(' ')
+  const lastName = lastNameParts.join(' ') || 'Nao informado'
+
   return (
-    <form className="form-panel account-profile-form">
-      <input disabled={!editable} defaultValue={customer.name} aria-label="Nome completo" />
-      <input disabled={!editable} defaultValue={customer.email} aria-label="Email" />
-      <input disabled={!editable} defaultValue={customer.phone || ''} placeholder="Telefone" aria-label="Telefone" />
-      {editable && <button type="button">Salvar alteracoes</button>}
-    </form>
+    <div className="registration-panel">
+      <p>Acesse ou altere dados cadastrais da sua conta Vertex.</p>
+
+      <section className="registration-card" aria-labelledby="access-data-title">
+        <h2 id="access-data-title">Dados de acesso</h2>
+        <div className="registration-grid">
+          <EditableData icon={Mail} label="Email" action="Alterar e-mail" value={maskEmail(customer.email)} />
+          <EditableData icon={FilePenLine} label="Senha" action="Alterar senha" value="********" />
+          <EditableData icon={Phone} label="Telefone" action="Alterar telefone" value={maskPhone(customer.phone)} />
+        </div>
+      </section>
+
+      <section className="registration-card" aria-labelledby="personal-data-title">
+        <h2 id="personal-data-title">Dados pessoais</h2>
+        <div className="registration-grid personal-data-grid">
+          <ReadOnlyData label="CPF" value="57*******07" />
+          <ReadOnlyData label="Nome" value={firstName || customer.name} />
+          <ReadOnlyData label="Sobrenome" value={lastName} />
+          <ReadOnlyData label="Data de nascimento" value="1*/**/***3" icon={Calendar} />
+          <ReadOnlyData label="Genero" value="Masculino" />
+        </div>
+        <button className="danger-account-action" type="button">
+          <FilePenLine size={18} />
+          Alterar dados pessoais
+        </button>
+      </section>
+    </div>
   )
+}
+
+function AddressManager({ customer }) {
+  const city = customer.email?.includes('apple') ? 'Rio de Janeiro' : 'Sao Paulo'
+
+  return (
+    <div className="address-manager">
+      <div className="address-toolbar">
+        <p>Gerencie os locais de entrega vinculados a sua conta.</p>
+        <button type="button">
+          <Home size={18} />
+          Cadastrar endereco
+        </button>
+      </div>
+
+      <section className="address-grid" aria-label="Enderecos cadastrados">
+        <article className="address-card selected">
+          <span>Principal</span>
+          <strong>{customer.name}</strong>
+          <p>Praca da Se, 100 / Centro</p>
+          <p>{city} / SP / 01001-000</p>
+          <div>
+            <button type="button">Editar</button>
+            <button type="button">Remover</button>
+          </div>
+        </article>
+        <article className="address-card empty-address">
+          <Home size={28} />
+          <p>Adicione um novo endereco para acelerar proximas compras.</p>
+        </article>
+      </section>
+    </div>
+  )
+}
+
+function EditableData({ action, icon: Icon, label, value }) {
+  return (
+    <article className="editable-data">
+      <div>
+        <strong>{label}</strong>
+        <button type="button">
+          {action}
+          <Icon size={18} />
+        </button>
+      </div>
+      <span>{value}</span>
+    </article>
+  )
+}
+
+function ReadOnlyData({ icon: Icon, label, value }) {
+  return (
+    <article className="readonly-data">
+      <strong>{label}</strong>
+      <span>{value}</span>
+      {Icon && <Icon size={18} aria-hidden="true" />}
+    </article>
+  )
+}
+
+function maskEmail(email = '') {
+  const [name, domain] = email.split('@')
+
+  if (!domain) {
+    return 'Nao informado'
+  }
+
+  return `${name.slice(0, 1)}*****@${domain}`
+}
+
+function maskPhone(phone = '') {
+  const digits = phone.replace(/\D/g, '')
+
+  if (digits.length < 4) {
+    return 'Nao informado'
+  }
+
+  return `(**) 9******${digits.slice(-2)}`
 }

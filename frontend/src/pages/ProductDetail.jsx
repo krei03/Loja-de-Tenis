@@ -141,6 +141,7 @@ export function ProductDetail({ products, onAdd }) {
             </label>
             <div>
               <input
+                aria-label="CEP para calcular frete"
                 inputMode="numeric"
                 maxLength={9}
                 placeholder="Digite seu CEP"

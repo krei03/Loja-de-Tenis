@@ -77,11 +77,26 @@ export function Checkout({ cart, customer, onOrderPlaced }) {
       <form className="checkout-form" onSubmit={submitOrder}>
         <section className="form-panel">
           <h2>Dados de entrega</h2>
-          <input required name="name" placeholder="Nome completo" value={form.name} onChange={updateField} />
-          <input required name="email" type="email" placeholder="Email" value={form.email} onChange={updateField} />
-          <input required name="phone" placeholder="Telefone" value={form.phone} onChange={updateField} />
-          <input required name="cep" placeholder="CEP" value={form.cep} onChange={updateField} />
-          <input required name="address" placeholder="Endereco completo" value={form.address} onChange={updateField} />
+          <label>
+            <span>Nome completo</span>
+            <input required name="name" placeholder="Nome completo" value={form.name} onChange={updateField} />
+          </label>
+          <label>
+            <span>Email</span>
+            <input required name="email" type="email" placeholder="Email" value={form.email} onChange={updateField} />
+          </label>
+          <label>
+            <span>Telefone</span>
+            <input required name="phone" placeholder="Telefone" value={form.phone} onChange={updateField} />
+          </label>
+          <label>
+            <span>CEP</span>
+            <input required name="cep" placeholder="CEP" value={form.cep} onChange={updateField} />
+          </label>
+          <label>
+            <span>Endereco completo</span>
+            <input required name="address" placeholder="Endereco completo" value={form.address} onChange={updateField} />
+          </label>
 
           <div className="payment-options">
             <label>

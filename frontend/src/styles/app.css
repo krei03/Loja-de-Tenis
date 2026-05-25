@@ -1899,6 +1899,8 @@ main {
 .customer-auth-form button,
 .social-login-panel button,
 .account-sidebar button,
+.danger-account-action,
+.address-toolbar button,
 .account-profile-form button {
   min-height: 46px;
   display: inline-flex;
@@ -1911,6 +1913,23 @@ main {
   color: var(--black);
   cursor: pointer;
   font-weight: 900;
+}
+
+.customer-auth-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.form-panel > label {
+  display: grid;
+  gap: 6px;
+}
+
+.customer-auth-form label span,
+.form-panel > label span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
 .social-login-panel {
@@ -2056,6 +2075,163 @@ main {
 .account-order-list span,
 .faq-list span {
   color: var(--muted);
+}
+
+.registration-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.registration-panel > p,
+.address-toolbar p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.registration-card {
+  display: grid;
+  gap: 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: clamp(18px, 3vw, 28px);
+  background: var(--graphite);
+}
+
+.registration-card h2 {
+  margin: 0;
+  color: var(--ice);
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+}
+
+.registration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(18px, 4vw, 48px);
+}
+
+.personal-data-grid {
+  row-gap: 22px;
+}
+
+.editable-data,
+.readonly-data {
+  display: grid;
+  gap: 10px;
+}
+
+.editable-data > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.editable-data strong,
+.readonly-data strong {
+  color: var(--ice);
+  font-weight: 900;
+}
+
+.editable-data button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #ff3b30;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.editable-data span,
+.readonly-data span {
+  color: var(--ice);
+  font-size: 1.08rem;
+}
+
+.danger-account-action {
+  justify-self: start;
+  min-width: min(100%, 280px);
+  background: #ee1616;
+  color: #fff;
+}
+
+.address-manager {
+  display: grid;
+  gap: 16px;
+}
+
+.address-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.address-toolbar button {
+  flex: 0 0 auto;
+}
+
+.address-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.address-card {
+  display: grid;
+  gap: 10px;
+  min-height: 190px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  background: var(--graphite);
+}
+
+.address-card.selected {
+  border-color: rgba(198, 255, 0, 0.42);
+}
+
+.address-card > span {
+  justify-self: start;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.address-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.address-card > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.address-card > div button {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ice);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.empty-address {
+  place-items: center;
+  align-content: center;
+  text-align: center;
 }
 
 .account-order-list {
@@ -2455,6 +2631,8 @@ main {
   .admin-metrics,
   .brand-hero,
   .account-info-grid,
+  .registration-grid,
+  .address-grid,
   .account-order-list article,
   .upload-row,
   .image-url-field,
@@ -2506,6 +2684,11 @@ main {
 
   .shipping-simulator > div {
     grid-template-columns: 1fr;
+  }
+
+  .address-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .admin-table article {
