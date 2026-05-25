@@ -67,6 +67,7 @@ O foco atual deixa de ser reconstrução da base e passa a ser evolução de pro
 - [x] Corrigir validação de senha no login do cliente.
 - [x] Impedir login com qualquer senha.
 - [x] Exibir mensagem de erro quando email ou senha estiverem incorretos.
+- [x] Adicionar fluxo de redefinição de senha para recuperar acesso de contas de cliente.
 
 ---
 
@@ -546,6 +547,24 @@ backend POST http://localhost:8080/api/customers/login com senha correta: HTTP 2
 cleanup MySQL da conta de teste criada na validação: OK
 ```
 
+Validação executada na etapa de recuperação de login do cliente:
+
+```txt
+backend node --check src/controllers/customerController.js: OK
+backend node --check src/routes/customerRoutes.js: OK
+frontend npm run lint: OK
+frontend npm run build: OK
+frontend npm run test:responsive: OK, 5 testes aprovados
+frontend npm run test:hero: OK, 2 testes aprovados
+git diff --check: OK, apenas avisos CRLF do Windows
+docker compose up --build -d: OK
+frontend http://localhost:5173/login: HTTP 200
+backend http://localhost:8080/health: OK com database mysql
+backend reset de senha: OK, senha antiga/incorreta bloqueada antes do reset e senha nova aceita depois
+teste Playwright do fluxo cadastro/logout/redefinir senha/login: OK
+cleanup MySQL das contas de teste criadas na validação: OK
+```
+
 # Decision Log
 
 - 2026-05-25: Autenticação admin passou a usar hash PBKDF2 (`ADMIN_PASSWORD_HASH` quando definido, ou hash em runtime de `ADMIN_PASSWORD` para desenvolvimento local) e token admin assinado com HMAC e expiração.
@@ -564,6 +583,7 @@ cleanup MySQL da conta de teste criada na validação: OK
 - 2026-05-25: A revisão de acessibilidade desta rodada é básica e focada em formulários/conta/produto; auditoria formal com axe/leitores de tela fica para etapa futura.
 - 2026-05-25: Login e registro do cliente foram separados no frontend com controle segmentado; a criação de conta continua usando sessão local até existir backend real de clientes.
 - 2026-05-25: Login/cadastro por email do cliente passam a usar backend com senha PBKDF2 e sessão assinada; Google/Apple continuam como acesso social preparado/local até haver credenciais OAuth.
+- 2026-05-25: Foi adicionado fluxo de redefinição de senha para recuperar acesso de contas de cliente no ambiente atual; em produção, esse fluxo deverá evoluir para token por email antes de exposição pública.
 
 # Surprises & Discoveries
 
@@ -581,6 +601,7 @@ cleanup MySQL da conta de teste criada na validação: OK
 - A primeira tentativa de gerar screenshots fora do projeto não resolveu o módulo Playwright; foi necessário apontar para o `node_modules` do frontend.
 - A tela de autenticação anterior misturava entrada e cadastro em um único submit, o que deixava ambíguo se o cliente estava entrando ou registrando.
 - O bug de senha aceitava qualquer valor porque o login montava a sessão diretamente no frontend, sem consultar um cadastro real.
+- Após a autenticação real, contas criadas antes da persistência backend ou usuários que perderam a senha ficavam sem caminho de recuperação pela interface.
 
 # Artifacts and Notes
 
@@ -605,6 +626,9 @@ cleanup MySQL da conta de teste criada na validação: OK
 - Arquivos alterados na etapa de validação real de senha do cliente: `backend/src/database/mysql.js`, `backend/src/server.js`, `backend/src/controllers/customerController.js`, `backend/src/routes/customerRoutes.js`, `backend/src/services/customerSecurity.js`, `frontend/src/pages/CustomerPortal.jsx`, `frontend/src/services/api.js`, `frontend/src/styles/app.css`, `PLANS.MD`.
 - Comandos usados na etapa de validação real de senha do cliente: `node --check src/server.js` em `backend`, `node --check src/controllers/customerController.js` em `backend`, `node --check src/services/customerSecurity.js` em `backend`, `npm run lint` em `frontend`, `npm run build` em `frontend`, `npm run test:responsive` em `frontend`, `npm run test:hero` em `frontend`, `git diff --check`, `docker compose up --build -d`, checagens HTTP com `Invoke-WebRequest`/`Invoke-RestMethod`, cleanup da conta de teste com `docker compose exec -T mysql mysql ... DELETE FROM customers WHERE email = ...`.
 - Observação operacional: contas de cliente por email agora ficam na tabela `customers`; ambientes existentes recebem a tabela no startup do backend.
+- Arquivos alterados na etapa de recuperação de login do cliente: `backend/src/controllers/customerController.js`, `backend/src/routes/customerRoutes.js`, `frontend/src/pages/CustomerPortal.jsx`, `frontend/src/services/api.js`, `frontend/src/styles/app.css`, `PLANS.MD`.
+- Comandos usados na etapa de recuperação de login do cliente: `node --check src/controllers/customerController.js` em `backend`, `node --check src/routes/customerRoutes.js` em `backend`, `npm run lint` em `frontend`, `npm run build` em `frontend`, `npm run test:responsive` em `frontend`, `npm run test:hero` em `frontend`, `git diff --check`, `docker compose up --build -d`, checagens HTTP com `Invoke-WebRequest`/`Invoke-RestMethod`, script Playwright temporário para o fluxo de redefinição, cleanup de contas de teste com `docker compose exec -T mysql mysql ... DELETE FROM customers WHERE email LIKE ...`.
+- Observação operacional: Docker foi atualizado novamente após a correção do login.
 
 # Validation Pending
 

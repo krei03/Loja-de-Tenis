@@ -89,3 +89,35 @@ export async function loginCustomer(req, res, next) {
     return next(error)
   }
 }
+
+export async function resetCustomerPassword(req, res, next) {
+  try {
+    const email = normalizeEmail(req.body.email)
+    const password = String(req.body.password || '')
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Informe email e nova senha.' })
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'A senha precisa ter pelo menos 6 caracteres.' })
+    }
+
+    const [customer] = await query('SELECT * FROM customers WHERE email = ? LIMIT 1', [email])
+
+    if (!customer) {
+      return res.status(404).json({ message: 'Conta nao encontrada.' })
+    }
+
+    await query('UPDATE customers SET password_hash = ? WHERE id = ?', [
+      createCustomerPasswordHash(password),
+      customer.id,
+    ])
+
+    const [updatedCustomer] = await query('SELECT * FROM customers WHERE id = ? LIMIT 1', [customer.id])
+
+    return res.json(createSession(updatedCustomer))
+  } catch (error) {
+    return next(error)
+  }
+}

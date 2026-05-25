@@ -77,6 +77,12 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }),
+  resetCustomerPassword: (payload) =>
+    request('/customers/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
   createProduct: (payload, token) =>
     request('/products', {
       method: 'POST',
