@@ -8,6 +8,7 @@ import { categoryRoutes } from './routes/categoryRoutes.js'
 import { categoryCarouselRoutes } from './routes/categoryCarouselRoutes.js'
 import { orderRoutes } from './routes/orderRoutes.js'
 import { productRoutes } from './routes/productRoutes.js'
+import { shippingRoutes } from './routes/shippingRoutes.js'
 import { uploadRoutes } from './routes/uploadRoutes.js'
 import { initializeDatabase, isDatabaseReady } from './database/mysql.js'
 import { notFound } from './middleware/notFound.js'
@@ -29,6 +30,7 @@ app.use('/api/products', productRoutes)
 app.use('/api/categories', categoryRoutes)
 app.use('/api/category-carousel', categoryCarouselRoutes)
 app.use('/api/orders', orderRoutes)
+app.use('/api/shipping', shippingRoutes)
 app.use('/api/uploads', uploadRoutes)
 app.use(notFound)
 

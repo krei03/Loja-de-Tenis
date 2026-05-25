@@ -1,29 +1,13 @@
-import { Navigate, NavLink, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import {
   Apple,
-  Bell,
   CreditCard,
   Heart,
   Home,
-  LogOut,
-  MapPin,
   PackageCheck,
-  PenLine,
-  ShieldQuestion,
   User,
 } from 'lucide-react'
-
-const accountLinks = [
-  { to: '/account', label: 'Meus Dados', icon: User, end: true },
-  { to: '/account/orders', label: 'Meus Pedidos', icon: PackageCheck },
-  { to: '/account/favorites', label: 'Favoritos', icon: Heart },
-  { to: '/account/profile', label: 'Meu Cadastro', icon: PenLine },
-  { to: '/account/edit', label: 'Alterar dados', icon: PenLine },
-  { to: '/account/addresses', label: 'Meus enderecos', icon: MapPin },
-  { to: '/account/preferences', label: 'Preferencias', icon: Bell },
-  { to: '/account/cards', label: 'Meus cartoes', icon: CreditCard },
-  { to: '/account/help', label: 'Atendimento e FAQ', icon: ShieldQuestion },
-]
+import { AccountSidebar } from '../components/AccountSidebar'
 
 export function CustomerLogin({ onLogin, customer }) {
   const navigate = useNavigate()
@@ -102,27 +86,7 @@ export function CustomerAccount({ customer, customerOrders, onLogout, page = 'da
   return (
     <main className="customer-account-page">
       <section className="customer-account-shell">
-        <aside className="account-sidebar">
-          <div>
-            <span>Minha Conta</span>
-            <strong>{customer.name}</strong>
-            <small>{customer.email}</small>
-          </div>
-
-          <nav aria-label="Menu da conta">
-            {accountLinks.map(({ end, icon: Icon, label, to }) => (
-              <NavLink end={end} key={to} to={to}>
-                <Icon size={18} />
-                {label}
-              </NavLink>
-            ))}
-          </nav>
-
-          <button type="button" onClick={onLogout}>
-            <LogOut size={18} />
-            Sair
-          </button>
-        </aside>
+        <AccountSidebar customer={customer} onLogout={onLogout} />
 
         <section className="account-content">{renderAccountPage(page, customer, customerOrders)}</section>
       </section>
@@ -168,11 +132,6 @@ function renderAccountPage(page, customer, customerOrders) {
       eyebrow: 'Lista',
       title: 'Favoritos',
       body: <EmptyAccount icon={Heart} text="Seus favoritos ficarao aqui quando voce salvar produtos." />,
-    },
-    profile: {
-      eyebrow: 'Cadastro',
-      title: 'Meu Cadastro',
-      body: <ProfileForm customer={customer} />,
     },
     edit: {
       eyebrow: 'Cadastro',

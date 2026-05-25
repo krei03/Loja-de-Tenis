@@ -1987,6 +1987,18 @@ main {
   gap: 4px;
 }
 
+.account-nav-group {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.account-nav-group > span {
+  padding: 0 10px 4px;
+}
+
 .account-sidebar nav a {
   min-height: 42px;
   display: flex;
@@ -1996,6 +2008,10 @@ main {
   padding-inline: 10px;
   color: var(--muted);
   font-weight: 800;
+}
+
+.account-nav-group a {
+  margin-left: 10px;
 }
 
 .account-sidebar nav a.active,

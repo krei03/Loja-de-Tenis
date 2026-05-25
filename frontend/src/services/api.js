@@ -138,6 +138,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }),
+  quoteShipping: (cep) => request(`/shipping/quote${buildQuery({ cep })}`),
   getOrders: (token, params) =>
     request(`/orders${buildQuery(params)}`, {
       headers: {

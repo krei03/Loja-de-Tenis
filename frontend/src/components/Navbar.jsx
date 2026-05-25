@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
-import { ArrowRight, Menu, Moon, Search, ShoppingBag, Sun, User, X } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
+import { Menu, Moon, Search, ShoppingBag, Sun, User, X } from 'lucide-react'
 
 export function Navbar({ cartCount, customer, onToggleTheme, theme }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -75,10 +75,6 @@ export function Navbar({ cartCount, customer, onToggleTheme, theme }) {
         >
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
-        <NavLink className="sell-link" to={customer ? '/account' : '/login'} onClick={closeMenu}>
-          {customer ? 'Minha Conta' : 'Entrar'}
-          <ArrowRight size={22} />
-        </NavLink>
       </div>
 
       {menuOpen && (

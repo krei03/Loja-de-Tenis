@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ChevronLeft, Ruler, ShieldCheck, ShoppingBag, Truck } from 'lucide-react'
+import { api } from '../services/api'
 
 const money = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -15,13 +16,14 @@ export function ProductDetail({ products, onAdd }) {
   const [descriptionOpenByProduct, setDescriptionOpenByProduct] = useState({})
   const [shippingZip, setShippingZip] = useState('')
   const [shippingQuote, setShippingQuote] = useState(null)
+  const [shippingLoading, setShippingLoading] = useState(false)
   const selectedSize = product ? selectedSizeByProduct[product.id] ?? product.sizes?.[0] ?? null : null
   const galleryImages = product ? [...new Set([product.image, ...(product.gallery || [])].filter(Boolean))] : []
   const hasLongDescription = (product?.description || '').length > 220
   const activeImage = product ? activeImageByProduct[product.id] ?? 0 : 0
   const descriptionOpen = product ? Boolean(descriptionOpenByProduct[product.id]) : false
 
-  const simulateShipping = (event) => {
+  const simulateShipping = async (event) => {
     event.preventDefault()
     const cleanZip = shippingZip.replace(/\D/g, '')
 
@@ -30,14 +32,22 @@ export function ProductDetail({ products, onAdd }) {
       return
     }
 
-    const lastDigit = Number(cleanZip.at(-1))
-    const price = lastDigit % 2 === 0 ? 'Gratis' : 'R$ 19,90'
-    const days = 2 + (lastDigit % 4)
+    setShippingLoading(true)
 
-    setShippingQuote({
-      type: 'success',
-      message: `${price} / entrega estimada em ${days} dias uteis.`,
-    })
+    try {
+      const quote = await api.quoteShipping(cleanZip)
+      const price = quote.price === 0 ? 'Gratis' : money.format(quote.price)
+      const destination = [quote.address?.city, quote.address?.state].filter(Boolean).join('/')
+
+      setShippingQuote({
+        type: 'success',
+        message: `${quote.carrier}: ${price} / ${quote.days} dias uteis para ${destination}.`,
+      })
+    } catch {
+      setShippingQuote({ type: 'error', message: 'Nao foi possivel consultar o frete agora.' })
+    } finally {
+      setShippingLoading(false)
+    }
   }
 
   if (!product) {
@@ -137,7 +147,9 @@ export function ProductDetail({ products, onAdd }) {
                 value={shippingZip}
                 onChange={(event) => setShippingZip(event.target.value)}
               />
-              <button type="submit">Calcular</button>
+              <button type="submit" disabled={shippingLoading}>
+                {shippingLoading ? 'Consultando' : 'Calcular'}
+              </button>
             </div>
             {shippingQuote && <p className={shippingQuote.type}>{shippingQuote.message}</p>}
           </form>

@@ -26,7 +26,7 @@ O foco atual deixa de ser reconstrução da base e passa a ser evolução de pro
 
 # Active Tasks
 
-- [ ] Integrar simulador de frete com API real ou serviço definido.
+- [x] Integrar simulador de frete com API real ou serviço definido.
 - [x] Adicionar autenticação admin robusta com senha com hash e sessão/token mais seguro.
 - [x] Criar histórico/gestão de pedidos no painel admin.
 - [x] Persistir tamanho selecionado e dados completos do item dentro do pedido.
@@ -55,6 +55,9 @@ O foco atual deixa de ser reconstrução da base e passa a ser evolução de pro
 - [x] botao de registro na hora do login
 - [x] Corrigir comportamento de scroll ao trocar de página.
 - [x] Garantir que toda página nova abra automaticamente no topo.
+- [x] Corrigir organização do menu lateral da conta do cliente.
+- [x] Colocar “Alterar dados” e “Meus endereços” dentro da seção “Meu Cadastro”.
+- [x] Remover o texto “Minha Conta” da navbar e deixar apenas o ícone de usuário/bonequinho.
 
 ---
 
@@ -74,10 +77,10 @@ Possíveis pontos para observar nas próximas alterações:
 # Next Steps
 
 1. Validar visualmente o fluxo completo no Docker: home, carrossel, perfil de marca, perfil do produto, carrinho, checkout e admin.
-2. Definir qual serviço/API será usado para frete real.
-3. Evoluir autenticação real do cliente com backend/OAuth quando houver credenciais de provedor.
-4. Revisar acessibilidade básica em formulários, foco e navegação por teclado.
-5. Revisar visualmente perfis de marca e portal do cliente com dados reais em mobile/tablet/desktop.
+2. Evoluir autenticação real do cliente com backend/OAuth quando houver credenciais de provedor.
+3. Revisar acessibilidade básica em formulários, foco e navegação por teclado.
+4. Revisar visualmente perfis de marca e portal do cliente com dados reais em mobile/tablet/desktop.
+5. Substituir cotação interna de frete por integração com transportadora quando o provedor comercial for escolhido.
 
 ---
 
@@ -100,6 +103,8 @@ Possíveis pontos para observar nas próximas alterações:
 - Implementar Portal do Cliente inicialmente no frontend com sessão em `localStorage`, para entregar navegação e telas de conta antes de criar autenticação real de cliente no backend.
 - Tratar Google/Apple como botões sociais funcionais em modo local/preparado; OAuth real dependerá de credenciais e configuração de provedores.
 - Reduzir a escala visual geral com `--page-max` menor, navbar mais compacta, grids mais estreitos e paddings menores.
+- Usar ViaCEP como serviço real de validação/consulta de CEP no simulador de frete, mantendo cálculo interno de preço/prazo até escolha de transportadora.
+- Manter “Meu Cadastro” como grupo visual no menu da conta, com subitens de dados, endereços, comunicação e cartões.
 
 ---
 
@@ -126,6 +131,7 @@ frontend/src/pages/BrandProfile.jsx
 frontend/src/pages/Admin.jsx
 frontend/src/pages/SalesReport.jsx
 frontend/src/pages/CustomerPortal.jsx
+frontend/src/components/AccountSidebar.jsx
 frontend/src/components/CategoryCarousel.jsx
 frontend/src/components/Navbar.jsx
 frontend/src/components/ProductCard.jsx
@@ -143,6 +149,7 @@ backend/src/controllers/productController.js
 backend/src/controllers/categoryCarouselController.js
 backend/src/controllers/orderController.js
 backend/src/controllers/authController.js
+backend/src/controllers/shippingController.js
 backend/src/services/adminSecurity.js
 backend/src/database/mysql.js
 backend/src/database/categoryCarousel.js
@@ -150,6 +157,7 @@ backend/src/routes/productRoutes.js
 backend/src/routes/categoryCarouselRoutes.js
 backend/src/routes/orderRoutes.js
 backend/src/routes/authRoutes.js
+backend/src/routes/shippingRoutes.js
 ```
 
 Assets de referência ainda relevantes:
@@ -175,6 +183,22 @@ npm run test:hero
 ---
 
 # Plan of Work
+
+O menu lateral da área do cliente precisa ser reorganizado.
+
+Atualmente, “Meu Cadastro”, “Alterar dados” e “Meus endereços” aparecem como opções separadas no mesmo nível.
+
+O correto é “Meu Cadastro” funcionar como uma seção/título de grupo, e abaixo dele aparecerem as opções relacionadas ao cadastro do cliente.
+
+A estrutura esperada deverá ficar assim:
+
+```txt
+Meu Cadastro
+  ├── Alterar dados
+  ├── Meus endereços
+  ├── Preferências de comunicação
+  ├── Meus cartões
+```
 
 
 Atualmente, quando o usuário entra em uma nova página, o site mantém a posição anterior do scroll e carrega a tela já embaixo.
@@ -238,6 +262,19 @@ Minha Conta
 
 # Concrete Steps
 
+Alterar o componente do menu lateral da conta:
+
+```txt
+frontend/src/components/AccountSidebar.jsx
+```
+
+Validação desta organização:
+
+- [x] criar `AccountSidebar.jsx`;
+- [x] agrupar opções de cadastro sob “Meu Cadastro”;
+- [x] remover link textual “Minha Conta” da navbar desktop, mantendo apenas o ícone de usuário;
+- [x] manter acesso mobile para conta no menu responsivo.
+
 Para autenticação admin:
 
 - [x] adicionar hash de senha no backend;
@@ -289,10 +326,10 @@ Para Portal do Cliente:
 
 Para frete real:
 
-- escolher provedor/API;
-- criar rota backend para consulta de CEP/frete;
-- trocar cálculo local do frontend por chamada à API;
-- manter mensagens de erro e loading no perfil do produto.
+- [x] escolher provedor/API;
+- [x] criar rota backend para consulta de CEP/frete;
+- [x] trocar cálculo local do frontend por chamada à API;
+- [x] manter mensagens de erro e loading no perfil do produto.
 
 Criar uma nova página no frontend:
 
@@ -370,6 +407,22 @@ frontend http://localhost:5173/account: HTTP 200
 backend http://localhost:8080/health: OK com database mysql
 ```
 
+Validação executada na etapa de menu da conta e frete ViaCEP:
+
+```txt
+frontend npm run lint: OK
+frontend npm run build: OK
+frontend npm run test:responsive: OK, 5 testes aprovados
+frontend npm run test:hero: OK, 2 testes aprovados
+backend node --check src/server.js: OK
+backend node --check src/controllers/shippingController.js: OK
+git diff --check: OK, apenas avisos CRLF do Windows
+docker compose up --build -d: OK
+frontend http://localhost:5173/account/edit: HTTP 200
+backend http://localhost:8080/health: OK com database mysql
+backend http://localhost:8080/api/shipping/quote?cep=01001000: OK com ViaCEP e cotação Vertex Express
+```
+
 # Decision Log
 
 - 2026-05-25: Autenticação admin passou a usar hash PBKDF2 (`ADMIN_PASSWORD_HASH` quando definido, ou hash em runtime de `ADMIN_PASSWORD` para desenvolvimento local) e token admin assinado com HMAC e expiração.
@@ -381,6 +434,9 @@ backend http://localhost:8080/health: OK com database mysql
 - 2026-05-25: Portal do Cliente foi implementado primeiro no frontend com sessão local, rotas protegidas e páginas operacionais, deixando backend/OAuth real para uma etapa com credenciais.
 - 2026-05-25: Botões Google/Apple criam sessão local marcada pelo provedor; não há OAuth externo real nesta etapa.
 - 2026-05-25: Escala visual geral foi reduzida sem trocar a identidade visual: containers, navbar, hero, grids, cards e páginas internas ficaram mais compactos.
+- 2026-05-25: Menu da conta foi extraído para `AccountSidebar.jsx`, alinhado ao plano, com “Meu Cadastro” como grupo e não como opção no mesmo nível.
+- 2026-05-25: Navbar desktop mantém apenas o ícone de usuário para conta; o texto de conta permanece só no menu mobile para clareza em telas pequenas.
+- 2026-05-25: Simulador de frete usa ViaCEP para validar destino e calcular uma cotação interna `Vertex Express`; integração comercial com transportadora fica como etapa futura.
 
 # Surprises & Discoveries
 
@@ -392,6 +448,8 @@ backend http://localhost:8080/health: OK com database mysql
 - O preparo de pagamento não é integração real com gateway; ele cria um contrato persistido e substituível, ainda em modo manual.
 - O botão "Entrar" da navbar apontava para `/admin`; foi redirecionado para login do cliente e o admin permanece acessível por `/admin`.
 - O checkout agora preenche dados do cliente logado e vincula pedidos locais quando o email do pedido corresponde à sessão.
+- O plano citava `frontend/src/components/AccountSidebar.jsx`, mas o sidebar estava embutido em `CustomerPortal.jsx`; o componente foi criado para alinhar implementação e documentação.
+- ViaCEP entrega endereço/UF, mas não preço de transportadora; por isso preço e prazo continuam calculados internamente até um provedor logístico ser escolhido.
 
 # Artifacts and Notes
 
@@ -404,6 +462,9 @@ backend http://localhost:8080/health: OK com database mysql
 - Arquivos alterados na etapa de escala/portal: `frontend/src/App.jsx`, `frontend/src/components/Navbar.jsx`, `frontend/src/pages/Checkout.jsx`, `frontend/src/pages/CustomerPortal.jsx`, `frontend/src/styles/app.css`, `PLANS.MD`.
 - Comandos usados na etapa de escala/portal: `npm run lint` em `frontend`, `npm run build` em `frontend`, `npm run test:responsive` em `frontend`, `npm run test:hero` em `frontend`, `git diff --check`, `docker compose up --build -d`, checagens HTTP com `Invoke-WebRequest`.
 - Observação operacional: login social está em modo local/preparado; para produção será necessário configurar OAuth real e persistência de cliente no backend.
+- Arquivos alterados na etapa de menu/frete: `frontend/src/components/AccountSidebar.jsx`, `frontend/src/components/Navbar.jsx`, `frontend/src/pages/CustomerPortal.jsx`, `frontend/src/pages/ProductDetail.jsx`, `frontend/src/services/api.js`, `frontend/src/styles/app.css`, `backend/src/controllers/shippingController.js`, `backend/src/routes/shippingRoutes.js`, `backend/src/server.js`, `PLANS.MD`.
+- Comandos usados na etapa de menu/frete: `npm run lint` em `frontend`, `npm run build` em `frontend`, `npm run test:responsive` em `frontend`, `npm run test:hero` em `frontend`, `node --check src/server.js` em `backend`, `node --check src/controllers/shippingController.js` em `backend`, `git diff --check`, `docker compose up --build -d`, checagens HTTP com `Invoke-WebRequest`.
+- Observação operacional: a consulta de CEP depende de disponibilidade externa do ViaCEP; falhas retornam mensagem amigável no frontend.
 
 # Validation Pending
 
