@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { ArrowRight, Menu, Moon, Search, ShoppingBag, Sun, X } from 'lucide-react'
+import { ArrowRight, Menu, Moon, Search, ShoppingBag, Sun, User, X } from 'lucide-react'
 
-export function Navbar({ cartCount, onToggleTheme, theme }) {
+export function Navbar({ cartCount, customer, onToggleTheme, theme }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
@@ -63,6 +63,9 @@ export function Navbar({ cartCount, onToggleTheme, theme }) {
           <ShoppingBag size={20} />
           {cartCount > 0 && <span>{cartCount}</span>}
         </Link>
+        <Link className="icon-button" to={customer ? '/account' : '/login'} aria-label="Conta" onClick={closeMenu}>
+          <User size={20} />
+        </Link>
         <button
           className="icon-button mobile-only"
           type="button"
@@ -72,8 +75,8 @@ export function Navbar({ cartCount, onToggleTheme, theme }) {
         >
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
-        <NavLink className="sell-link" to="/admin" onClick={closeMenu}>
-          Entrar
+        <NavLink className="sell-link" to={customer ? '/account' : '/login'} onClick={closeMenu}>
+          {customer ? 'Minha Conta' : 'Entrar'}
           <ArrowRight size={22} />
         </NavLink>
       </div>
@@ -82,6 +85,10 @@ export function Navbar({ cartCount, onToggleTheme, theme }) {
         <nav className="mobile-menu" aria-label="Menu mobile">
           <a href="/#brand-carousel" onClick={scrollToBrands}>Marcas</a>
           <Link to="/" onClick={scrollHome}>Feed</Link>
+          <Link to={customer ? '/account' : '/login'} onClick={closeMenu}>
+            {customer ? 'Minha Conta' : 'Entrar / Registrar'}
+          </Link>
+          <Link to="/admin" onClick={closeMenu}>Admin</Link>
         </nav>
       )}
     </header>

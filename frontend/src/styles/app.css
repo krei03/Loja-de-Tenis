@@ -7,7 +7,7 @@
   --muted: #a1a1aa;
   --accent: #c6ff00;
   --accent-soft: rgba(198, 255, 0, 0.16);
-  --page-max: 1320px;
+  --page-max: 1200px;
   color: var(--ice);
   background: var(--black);
   font-family:
@@ -149,6 +149,15 @@ a {
   text-decoration: none;
 }
 
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 img,
 video {
   display: block;
@@ -163,11 +172,11 @@ video {
   align-items: center;
   justify-content: space-between;
   gap: clamp(12px, 2vw, 24px);
-  width: min(calc(100% - 32px), 1840px);
+  width: min(calc(100% - 32px), 1280px);
   margin-inline: auto;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--line);
-  border-radius: 18px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
   background: rgba(0, 0, 0, 0.88);
   backdrop-filter: blur(18px);
   transition:
@@ -227,12 +236,12 @@ video {
 .nav-search {
   flex: 1 1 360px;
   max-width: 520px;
-  min-height: 52px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   gap: 12px;
-  border-radius: 16px;
-  padding: 0 18px;
+  border-radius: 10px;
+  padding: 0 14px;
   background: var(--ice);
   color: #222;
 }
@@ -251,8 +260,8 @@ video {
 }
 
 .icon-button {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   display: inline-grid;
   place-items: center;
   border: 1px solid var(--line);
@@ -296,7 +305,7 @@ video {
 }
 
 .sell-link {
-  min-height: 42px;
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -388,8 +397,8 @@ video {
 
 .hero h1 {
   margin: 0;
-  font-size: clamp(3rem, 8.6vw, 7.75rem);
-  line-height: 0.88;
+  font-size: clamp(2.75rem, 7.2vw, 6.35rem);
+  line-height: 0.92;
   letter-spacing: 0;
 }
 
@@ -397,8 +406,8 @@ video {
 .admin-page h1,
 .cart-shell h1 {
   margin: 0;
-  font-size: clamp(2.4rem, 6vw, 5.4rem);
-  line-height: 0.92;
+  font-size: clamp(2rem, 4.8vw, 4.25rem);
+  line-height: 0.96;
   letter-spacing: 0;
 }
 
@@ -476,7 +485,7 @@ main {
 .cart-shell,
 .admin-page,
 .product-detail {
-  padding: clamp(64px, 8vw, 118px) clamp(18px, 4vw, 56px);
+  padding: clamp(48px, 6vw, 88px) clamp(16px, 3vw, 40px);
 }
 
 .launches {
@@ -488,7 +497,7 @@ main {
   display: grid;
   gap: 10px;
   width: min(100%, var(--page-max));
-  margin: 0 auto 34px;
+  margin: 0 auto 26px;
 }
 
 .section-heading p {
@@ -505,7 +514,7 @@ main {
   max-width: 700px;
   margin: 0;
   color: var(--ice);
-  font-size: clamp(1.9rem, 3.8vw, 4rem);
+  font-size: clamp(1.65rem, 3vw, 3rem);
   line-height: 1.02;
   letter-spacing: 0;
   text-wrap: balance;
@@ -515,7 +524,7 @@ main {
   width: min(100%, var(--page-max));
   margin-inline: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 320px));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 282px));
   justify-content: center;
   gap: clamp(14px, 1.6vw, 22px);
 }
@@ -540,11 +549,11 @@ main {
 .product-card {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  gap: 18px;
+  gap: 14px;
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 12px;
+  padding: 10px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
 }
 
@@ -694,7 +703,7 @@ main {
 }
 
 .product-detail {
-  padding-top: 116px;
+  padding-top: 96px;
 }
 
 .back-link {
@@ -708,13 +717,13 @@ main {
 .detail-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
-  gap: clamp(24px, 5vw, 64px);
+  gap: clamp(20px, 4vw, 42px);
   align-items: start;
 }
 
 .gallery-shell {
   position: sticky;
-  top: 96px;
+  top: 86px;
   display: grid;
   gap: 12px;
 }
@@ -761,10 +770,10 @@ main {
 
 .detail-panel {
   position: sticky;
-  top: 96px;
+  top: 86px;
   display: grid;
-  gap: 22px;
-  padding: 24px;
+  gap: 18px;
+  padding: 20px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.05);
@@ -777,7 +786,7 @@ main {
 }
 
 .detail-panel h1 {
-  font-size: clamp(2rem, 3.8vw, 3.8rem);
+  font-size: clamp(1.7rem, 3vw, 3rem);
   line-height: 0.96;
 }
 
@@ -933,7 +942,7 @@ main {
 .cart-shell,
 .admin-page,
 .sales-report-page {
-  padding-top: 118px;
+  padding-top: 96px;
   min-height: 100vh;
 }
 
@@ -950,7 +959,7 @@ main {
 
 .brand-profile-page {
   min-height: 100vh;
-  padding: 118px clamp(18px, 4vw, 56px) clamp(64px, 8vw, 118px);
+  padding: 96px clamp(16px, 3vw, 40px) clamp(48px, 6vw, 88px);
   background: var(--black);
 }
 
@@ -1818,7 +1827,7 @@ main {
 }
 
 .checkout-page {
-  padding: 118px clamp(18px, 5vw, 72px) clamp(72px, 9vw, 128px);
+  padding: 96px clamp(16px, 3vw, 40px) clamp(54px, 7vw, 96px);
   min-height: 100vh;
   background: var(--black);
 }
@@ -1863,8 +1872,209 @@ main {
 }
 
 .sales-report-page {
-  padding: 118px clamp(18px, 4vw, 56px) clamp(64px, 8vw, 118px);
+  padding: 96px clamp(16px, 3vw, 40px) clamp(48px, 6vw, 88px);
   background: var(--black);
+}
+
+.customer-auth-page,
+.customer-account-page {
+  min-height: 100vh;
+  padding: 96px clamp(16px, 3vw, 40px) clamp(48px, 6vw, 88px);
+  background: var(--black);
+}
+
+.customer-auth-shell,
+.customer-account-shell {
+  width: min(100%, var(--page-max));
+  margin-inline: auto;
+}
+
+.customer-auth-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 16px;
+  align-items: start;
+}
+
+.customer-auth-form button,
+.social-login-panel button,
+.account-sidebar button,
+.account-profile-form button {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--black);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.social-login-panel {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--graphite);
+}
+
+.social-login-panel button {
+  justify-content: flex-start;
+  padding-inline: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ice);
+}
+
+.social-login-panel button:first-child span {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--ice);
+  color: var(--black);
+  font-weight: 950;
+}
+
+.customer-account-shell {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.account-sidebar {
+  position: sticky;
+  top: 96px;
+  display: grid;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--graphite);
+}
+
+.account-sidebar > div,
+.account-page-title {
+  display: grid;
+  gap: 6px;
+}
+
+.account-sidebar span,
+.account-page-title span {
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.account-sidebar strong,
+.account-page-title h1 {
+  margin: 0;
+  color: var(--ice);
+}
+
+.account-sidebar small {
+  color: var(--muted);
+}
+
+.account-sidebar nav {
+  display: grid;
+  gap: 4px;
+}
+
+.account-sidebar nav a {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-radius: 7px;
+  padding-inline: 10px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.account-sidebar nav a.active,
+.account-sidebar nav a:hover {
+  background: rgba(198, 255, 0, 0.12);
+  color: var(--accent);
+}
+
+.account-sidebar button {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ice);
+}
+
+.account-content {
+  display: grid;
+  gap: 18px;
+}
+
+.account-page-title h1 {
+  font-size: clamp(1.8rem, 3vw, 3.2rem);
+  line-height: 1;
+}
+
+.account-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.account-info-grid article,
+.account-order-list article,
+.faq-list article {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--graphite);
+}
+
+.account-info-grid span,
+.account-order-list span,
+.faq-list span {
+  color: var(--muted);
+}
+
+.account-order-list {
+  display: grid;
+  gap: 10px;
+}
+
+.account-order-list article {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.preference-list,
+.faq-list {
+  display: grid;
+  gap: 10px;
+}
+
+.preference-list label {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding-inline: 14px;
+  background: var(--graphite);
+  color: var(--ice);
+  font-weight: 800;
+}
+
+.preference-list input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
 }
 
 .sales-summary,
@@ -2112,6 +2322,8 @@ main {
   .detail-grid,
   .brand-catalog-layout,
   .cart-grid,
+  .customer-auth-grid,
+  .customer-account-shell,
   .advanced-filters,
   .sales-filters,
   .form-grid,
@@ -2130,6 +2342,10 @@ main {
   }
 
   .brand-filter-panel {
+    position: static;
+  }
+
+  .account-sidebar {
     position: static;
   }
 
@@ -2222,6 +2438,8 @@ main {
   .gallery-thumbs,
   .admin-metrics,
   .brand-hero,
+  .account-info-grid,
+  .account-order-list article,
   .upload-row,
   .image-url-field,
   .image-preview-grid {
@@ -2230,10 +2448,12 @@ main {
 
   .launches,
   .category-band,
-    .cart-shell,
-    .admin-page,
-    .catalog-section,
-    .product-detail {
+  .cart-shell,
+  .admin-page,
+  .catalog-section,
+  .product-detail,
+  .customer-auth-page,
+  .customer-account-page {
     padding-inline: 16px;
   }
 

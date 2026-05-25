@@ -18,7 +18,7 @@ O projeto deve continuar priorizando:
 
 # Current Progress
 
-O projeto já possui base funcional com frontend React/Vite, backend Node/Express, MySQL no Docker, painel admin, autenticação admin com hash/token assinado, cadastro de produtos, upload de imagens, checkout com camada preparada para pagamento, carrinho, carrossel de categorias, página de produto com galeria, perfis de marca/categoria com banner/descrição/metadados, modo claro/escuro, reset global de scroll em navegação, simulador visual de frete e relatório/gestão administrativa de vendas com filtros e status.
+O projeto já possui base funcional com frontend React/Vite, backend Node/Express, MySQL no Docker, painel admin, autenticação admin com hash/token assinado, cadastro de produtos, upload de imagens, checkout com camada preparada para pagamento, carrinho, carrossel de categorias, página de produto com galeria, perfis de marca/categoria com banner/descrição/metadados, modo claro/escuro, reset global de scroll em navegação, portal do cliente com Minha Conta, login/registro local e botões sociais preparados, simulador visual de frete e relatório/gestão administrativa de vendas com filtros e status.
 
 O foco atual deixa de ser reconstrução da base e passa a ser evolução de produto: integrações reais, refinamento administrativo, melhoria de dados e validação visual contínua.
 
@@ -37,22 +37,22 @@ O foco atual deixa de ser reconstrução da base e passa a ser evolução de pro
 - [x] Criar página detalhada de vendas ao clicar em “Total de vendas”.
 - [x] Exibir detalhes completos das vendas para envio ao destinatário.
 - [x] Criar registro mensal geral com base nos dados do cadastro/login do cliente.
-- [ ] Corrigir sensação de zoom excessivo no ecommerce e ajustar escala geral do layout.
-- [ ] Padronizar largura, espaçamento e escala visual para aparência profissional de ecommerce real.
-- [ ] Adicionar login social com Google.
-- [ ] Adicionar login social com Apple.
-- [ ] Criar área “Minha Conta” para clientes autenticados.
-- [ ] Criar menu lateral “Meus Dados” dentro da conta do cliente.
-- [ ] Criar página “Meus Pedidos”.
-- [ ] Criar página “Favoritos”.
-- [ ] Criar área “Meu Cadastro”.
-- [ ] Criar página “Alterar dados cadastrais”.
-- [ ] Criar página “Meus endereços”.
-- [ ] Criar página “Preferências de comunicação”.
-- [ ] Criar página “Meus cartões”.
-- [ ] Criar seção “Atendimento e FAQ”.
-- [ ] Criar “Portal do cliente”.
-- [ ] botao de registro na hora do login
+- [x] Corrigir sensação de zoom excessivo no ecommerce e ajustar escala geral do layout.
+- [x] Padronizar largura, espaçamento e escala visual para aparência profissional de ecommerce real.
+- [x] Adicionar login social com Google.
+- [x] Adicionar login social com Apple.
+- [x] Criar área “Minha Conta” para clientes autenticados.
+- [x] Criar menu lateral “Meus Dados” dentro da conta do cliente.
+- [x] Criar página “Meus Pedidos”.
+- [x] Criar página “Favoritos”.
+- [x] Criar área “Meu Cadastro”.
+- [x] Criar página “Alterar dados cadastrais”.
+- [x] Criar página “Meus endereços”.
+- [x] Criar página “Preferências de comunicação”.
+- [x] Criar página “Meus cartões”.
+- [x] Criar seção “Atendimento e FAQ”.
+- [x] Criar “Portal do cliente”.
+- [x] botao de registro na hora do login
 - [x] Corrigir comportamento de scroll ao trocar de página.
 - [x] Garantir que toda página nova abra automaticamente no topo.
 
@@ -74,10 +74,10 @@ Possíveis pontos para observar nas próximas alterações:
 # Next Steps
 
 1. Validar visualmente o fluxo completo no Docker: home, carrossel, perfil de marca, perfil do produto, carrinho, checkout e admin.
-2. Corrigir escala visual geral do ecommerce e validar em desktop/mobile.
-3. Definir qual serviço/API será usado para frete real.
-4. Evoluir portal do cliente, cadastro/login social e área Minha Conta.
-5. Revisar acessibilidade básica em formulários, foco e navegação por teclado.
+2. Definir qual serviço/API será usado para frete real.
+3. Evoluir autenticação real do cliente com backend/OAuth quando houver credenciais de provedor.
+4. Revisar acessibilidade básica em formulários, foco e navegação por teclado.
+5. Revisar visualmente perfis de marca e portal do cliente com dados reais em mobile/tablet/desktop.
 
 ---
 
@@ -97,6 +97,9 @@ Possíveis pontos para observar nas próximas alterações:
 - Usar `category_carousel` como fonte de dados de perfil de marca, incluindo banner, descrição e metadados.
 - Preparar checkout com uma camada de pagamento interna (`paymentGateway`) em modo manual até escolha de provedor real.
 - Usar um componente global de scroll no topo em mudanças de rota para evitar páginas abrindo na posição anterior.
+- Implementar Portal do Cliente inicialmente no frontend com sessão em `localStorage`, para entregar navegação e telas de conta antes de criar autenticação real de cliente no backend.
+- Tratar Google/Apple como botões sociais funcionais em modo local/preparado; OAuth real dependerá de credenciais e configuração de provedores.
+- Reduzir a escala visual geral com `--page-max` menor, navbar mais compacta, grids mais estreitos e paddings menores.
 
 ---
 
@@ -122,6 +125,7 @@ frontend/src/pages/ProductDetail.jsx
 frontend/src/pages/BrandProfile.jsx
 frontend/src/pages/Admin.jsx
 frontend/src/pages/SalesReport.jsx
+frontend/src/pages/CustomerPortal.jsx
 frontend/src/components/CategoryCarousel.jsx
 frontend/src/components/Navbar.jsx
 frontend/src/components/ProductCard.jsx
@@ -266,6 +270,23 @@ Para comportamento de navegação:
 - [x] criar reset global de scroll ao trocar de rota;
 - [x] garantir abertura de novas páginas no topo.
 
+Para escala visual:
+
+- [x] reduzir largura máxima global;
+- [x] compactar navbar, busca e botões de ação;
+- [x] reduzir escala de títulos, grids, cards, paddings e página de produto;
+- [x] manter responsividade mobile/tablet/desktop validada por testes.
+
+Para Portal do Cliente:
+
+- [x] criar tela de login/registro do cliente;
+- [x] adicionar botão de registro na hora do login;
+- [x] adicionar botões Entrar com Google e Entrar com Apple;
+- [x] criar área Minha Conta autenticada;
+- [x] criar menu lateral Meus Dados;
+- [x] criar páginas Meus Pedidos, Favoritos, Meu Cadastro, Alterar dados cadastrais, Meus endereços, Preferências de comunicação, Meus cartões e Atendimento/FAQ;
+- [x] conectar navbar, checkout e pedidos locais do cliente.
+
 Para frete real:
 
 - escolher provedor/API;
@@ -334,6 +355,21 @@ backend POST http://localhost:8080/api/orders com payment pix: OK, payment manua
 cleanup MySQL do pedido de teste criado na validação: OK
 ```
 
+Validação executada na etapa de escala visual e Portal do Cliente:
+
+```txt
+frontend npm run lint: OK
+frontend npm run build: OK
+frontend npm run test:responsive: OK, 5 testes aprovados
+frontend npm run test:hero: OK, 2 testes aprovados
+git diff --check: OK, apenas avisos CRLF do Windows
+docker compose up --build -d: OK
+frontend http://localhost:5173: HTTP 200
+frontend http://localhost:5173/login: HTTP 200
+frontend http://localhost:5173/account: HTTP 200
+backend http://localhost:8080/health: OK com database mysql
+```
+
 # Decision Log
 
 - 2026-05-25: Autenticação admin passou a usar hash PBKDF2 (`ADMIN_PASSWORD_HASH` quando definido, ou hash em runtime de `ADMIN_PASSWORD` para desenvolvimento local) e token admin assinado com HMAC e expiração.
@@ -342,6 +378,9 @@ cleanup MySQL do pedido de teste criado na validação: OK
 - 2026-05-25: Campos de perfil de marca foram adicionados ao `category_carousel` para evitar criar uma segunda entidade de marca antes de haver necessidade real.
 - 2026-05-25: Checkout passa a gerar dados de pagamento em modo manual por meio de `backend/src/services/paymentGateway.js`, mantendo o contrato pronto para gateway futuro.
 - 2026-05-25: Scroll de navegação passa a ser tratado globalmente em `App.jsx`, no nível do React Router.
+- 2026-05-25: Portal do Cliente foi implementado primeiro no frontend com sessão local, rotas protegidas e páginas operacionais, deixando backend/OAuth real para uma etapa com credenciais.
+- 2026-05-25: Botões Google/Apple criam sessão local marcada pelo provedor; não há OAuth externo real nesta etapa.
+- 2026-05-25: Escala visual geral foi reduzida sem trocar a identidade visual: containers, navbar, hero, grids, cards e páginas internas ficaram mais compactos.
 
 # Surprises & Discoveries
 
@@ -351,6 +390,8 @@ cleanup MySQL do pedido de teste criado na validação: OK
 - O `PLANS.MD` já chegou nesta rodada com itens novos de scroll e registro no login; os itens de scroll foram priorizados por serem bug de navegação confirmado no plano.
 - A tabela `category_carousel` já funcionava como marca/categoria; expandir a tabela foi menor risco do que introduzir uma nova tabela de marcas agora.
 - O preparo de pagamento não é integração real com gateway; ele cria um contrato persistido e substituível, ainda em modo manual.
+- O botão "Entrar" da navbar apontava para `/admin`; foi redirecionado para login do cliente e o admin permanece acessível por `/admin`.
+- O checkout agora preenche dados do cliente logado e vincula pedidos locais quando o email do pedido corresponde à sessão.
 
 # Artifacts and Notes
 
@@ -360,6 +401,9 @@ cleanup MySQL do pedido de teste criado na validação: OK
 - Arquivos alterados na etapa seguinte: `frontend/src/App.jsx`, `frontend/src/pages/Admin.jsx`, `frontend/src/pages/BrandProfile.jsx`, `frontend/src/pages/Checkout.jsx`, `frontend/src/pages/SalesReport.jsx`, `frontend/src/styles/app.css`, `backend/src/database/categoryCarousel.js`, `backend/src/database/mysql.js`, `backend/src/database/seed.js`, `backend/src/controllers/orderController.js`, `backend/src/services/paymentGateway.js`, `PLANS.MD`.
 - Comandos usados na etapa seguinte: `npm run lint` em `frontend`, `npm run build` em `frontend`, `npm run test:responsive` em `frontend`, `npm run test:hero` em `frontend`, `node --check src/server.js` em `backend`, `node --check src/controllers/orderController.js` em `backend`, `git diff --check`, `docker compose up --build -d`, checagens HTTP com `Invoke-WebRequest`/`Invoke-RestMethod`, cleanup do pedido de teste com `docker compose exec -T mysql mysql ... DELETE FROM orders WHERE id = ...`.
 - Observação operacional: bancos MySQL existentes recebem colunas novas por migração defensiva em startup (`banner`, `description`, `meta_title`, `meta_description`, `payment`).
+- Arquivos alterados na etapa de escala/portal: `frontend/src/App.jsx`, `frontend/src/components/Navbar.jsx`, `frontend/src/pages/Checkout.jsx`, `frontend/src/pages/CustomerPortal.jsx`, `frontend/src/styles/app.css`, `PLANS.MD`.
+- Comandos usados na etapa de escala/portal: `npm run lint` em `frontend`, `npm run build` em `frontend`, `npm run test:responsive` em `frontend`, `npm run test:hero` em `frontend`, `git diff --check`, `docker compose up --build -d`, checagens HTTP com `Invoke-WebRequest`.
+- Observação operacional: login social está em modo local/preparado; para produção será necessário configurar OAuth real e persistência de cliente no backend.
 
 # Validation Pending
 

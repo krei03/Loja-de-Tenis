@@ -8,11 +8,11 @@ const money = new Intl.NumberFormat('pt-BR', {
   currency: 'BRL',
 })
 
-export function Checkout({ cart, onOrderPlaced }) {
+export function Checkout({ cart, customer, onOrderPlaced }) {
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
+    name: customer?.name || '',
+    email: customer?.email || '',
+    phone: customer?.phone || '',
     cep: '',
     address: '',
     payment: 'credit',
@@ -51,7 +51,7 @@ export function Checkout({ cart, onOrderPlaced }) {
     })
 
     setStatus(order)
-    onOrderPlaced()
+    onOrderPlaced(order)
   }
 
   if (status) {
