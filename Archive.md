@@ -1482,3 +1482,32 @@ updateProduct()
 deleteProduct()
 ```
 
+---
+
+# 2026-05-26 - Correção dos botões de endereços do cliente
+
+Foi corrigida a área `Meus endereços` do portal do cliente.
+
+O botão `Cadastrar endereco` agora abre um formulário local para inclusão de novo endereço.
+
+Os botões `Editar` e `Remover` dos cards de endereço agora funcionam:
+
+- `Editar` carrega os dados do endereço no formulário e permite salvar alterações;
+- `Remover` exclui o endereço da lista local;
+- `Cancelar` fecha o formulário sem alterar os dados.
+
+Arquivos alterados:
+
+```txt
+frontend/src/pages/CustomerPortal.jsx
+frontend/src/styles/app.css
+```
+
+Validação executada:
+
+```txt
+frontend npm run lint: OK
+frontend npm run build: OK
+teste Playwright em /account/addresses: OK, cadastrar, editar e remover abriram/executaram como esperado
+```
+

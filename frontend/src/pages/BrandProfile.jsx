@@ -23,6 +23,7 @@ export function BrandProfile({ onAdd, products }) {
   const [selectedModel, setSelectedModel] = useState('')
   const [selectedPrice, setSelectedPrice] = useState('')
   const [selectedSize, setSelectedSize] = useState('')
+  const [selectedBrandId, setSelectedBrandId] = useState('')
 
   useEffect(() => {
     api.getCategoryCarousel().then(setCarouselItems)
@@ -34,6 +35,26 @@ export function BrandProfile({ onAdd, products }) {
   )
   const modelOptions = brand.models || []
   const activeSelectedModel = modelOptions.includes(selectedModel) ? selectedModel : ''
+  const brandOptions = useMemo(() => {
+    const registeredBrands = carouselItems.map((item) => ({
+      id: item.id,
+      name: item.name,
+    }))
+    const productBrands = products.map((product) => ({
+      id: createBrandId(product.brand),
+      name: product.brand,
+    }))
+    const brandsById = new Map()
+
+    ;[...registeredBrands, ...productBrands].forEach((item) => {
+      if (item.id && item.name && !brandsById.has(item.id)) {
+        brandsById.set(item.id, item)
+      }
+    })
+
+    return [...brandsById.values()].sort((first, second) => first.name.localeCompare(second.name))
+  }, [carouselItems, products])
+  const activeSelectedBrand = brandOptions.find((option) => option.id === selectedBrandId)
 
   useEffect(() => {
     const previousTitle = document.title
@@ -65,9 +86,16 @@ export function BrandProfile({ onAdd, products }) {
   }, [brand, products])
 
   const visibleProducts = useMemo(() => {
-    const sourceProducts = brandProducts.length ? brandProducts : products
+    const sourceProducts = selectedBrandId ? products : brandProducts.length ? brandProducts : products
 
     return sourceProducts.filter((product) => {
+      const normalizedProductBrand = product.brand.toLowerCase()
+      const normalizedProductCategory = product.category.toLowerCase()
+      const matchesBrand = activeSelectedBrand
+        ? normalizedProductBrand === activeSelectedBrand.name.toLowerCase()
+          || normalizedProductBrand.includes(activeSelectedBrand.name.toLowerCase())
+          || normalizedProductCategory === activeSelectedBrand.id.toLowerCase()
+        : true
       const matchesSize = selectedSize ? product.sizes?.includes(selectedSize) : true
       const productGender = product.gender || product.genero
       const matchesGender = selectedGender && productGender ? productGender === selectedGender : true
@@ -77,9 +105,9 @@ export function BrandProfile({ onAdd, products }) {
       const priceRange = priceOptions.find((option) => option.label === selectedPrice)
       const matchesPrice = priceRange ? product.price >= priceRange.min && product.price < priceRange.max : true
 
-      return matchesSize && matchesGender && matchesModel && matchesPrice
+      return matchesBrand && matchesSize && matchesGender && matchesModel && matchesPrice
     })
-  }, [activeSelectedModel, brandProducts, products, selectedGender, selectedPrice, selectedSize])
+  }, [activeSelectedBrand, activeSelectedModel, brandProducts, products, selectedBrandId, selectedGender, selectedPrice, selectedSize])
 
   return (
     <main className="brand-profile-page">
@@ -87,21 +115,6 @@ export function BrandProfile({ onAdd, products }) {
         <ChevronLeft size={18} />
         Voltar
       </Link>
-
-      <section
-        className={`brand-hero ${brand.banner ? 'has-banner' : ''}`}
-        style={brand.banner ? { backgroundImage: `url(${brand.banner})` } : undefined}
-      >
-        <div className="brand-hero-logo">
-          {brand.logo ? <img src={brand.logo} alt={brand.name} /> : getLogoFallback(brand.name)}
-        </div>
-        <div className="brand-results-heading">
-          <p>Perfil da marca</p>
-          <h1>{brand.name}</h1>
-          <span>{brand.description || 'Selecao premium com curadoria de sneakers, roupas e drops especiais.'}</span>
-        </div>
-        <strong>{visibleProducts.length} produto(s)</strong>
-      </section>
 
       <section className="brand-catalog-layout">
         <aside className="brand-filter-panel" aria-label="Filtros da marca">
@@ -116,7 +129,12 @@ export function BrandProfile({ onAdd, products }) {
                 aria-expanded={expandedFilter === filter}
                 onClick={() => setExpandedFilter((current) => (current === filter ? '' : filter))}
               >
-                {getFilterLabel(filter, { selectedGender, selectedModel: activeSelectedModel, selectedPrice })}
+                {getFilterLabel(filter, {
+                  selectedBrand: activeSelectedBrand,
+                  selectedGender,
+                  selectedModel: activeSelectedModel,
+                  selectedPrice,
+                })}
                 <ChevronDown size={18} />
               </button>
 
@@ -183,6 +201,25 @@ export function BrandProfile({ onAdd, products }) {
                   )}
                 </div>
               )}
+
+              {filter === 'Marca' && expandedFilter === 'Marca' && (
+                <div className="brand-option-list">
+                  {brandOptions.length > 0 ? (
+                    brandOptions.map((option) => (
+                      <label key={option.id}>
+                        <input
+                          type="checkbox"
+                          checked={selectedBrandId === option.id}
+                          onChange={() => setSelectedBrandId((current) => (current === option.id ? '' : option.id))}
+                        />
+                        <span>{option.name}</span>
+                      </label>
+                    ))
+                  ) : (
+                    <p className="brand-filter-empty">Nenhuma marca cadastrada.</p>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </aside>
@@ -190,7 +227,7 @@ export function BrandProfile({ onAdd, products }) {
         <div className="brand-product-area">
           <div className="brand-results-heading">
             <p>Catalogo</p>
-            <h2>{activeSelectedModel || brand.name}</h2>
+            <h2>{activeSelectedModel || activeSelectedBrand?.name || brand.name}</h2>
           </div>
 
           <div className="product-grid brand-product-grid">
@@ -204,7 +241,7 @@ export function BrandProfile({ onAdd, products }) {
   )
 }
 
-function getFilterLabel(filter, { selectedGender, selectedModel, selectedPrice }) {
+function getFilterLabel(filter, { selectedBrand, selectedGender, selectedModel, selectedPrice }) {
   if (filter === 'Genero' && selectedGender) {
     return `${filter} (1)`
   }
@@ -217,7 +254,20 @@ function getFilterLabel(filter, { selectedGender, selectedModel, selectedPrice }
     return `${filter} (1)`
   }
 
+  if (filter === 'Marca' && selectedBrand) {
+    return `${filter} (1)`
+  }
+
   return filter
+}
+
+function createBrandId(brand = '') {
+  return brand
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
 }
 
 function createFallbackBrand(id = '') {
@@ -237,14 +287,4 @@ function createFallbackBrand(id = '') {
     meta_title: '',
     meta_description: '',
   }
-}
-
-function getLogoFallback(name = '') {
-  return name
-    .split(/\s|-/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 3)
-    .toUpperCase()
 }

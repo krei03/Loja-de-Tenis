@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import {
   Apple,
   Calendar,
+  ChevronDown,
   CreditCard,
   FilePenLine,
   Heart,
@@ -332,8 +333,8 @@ function RegistrationPanel({ customer }) {
         <h2 id="access-data-title">Dados de acesso</h2>
         <div className="registration-grid">
           <EditableData icon={Mail} label="Email" action="Alterar e-mail" value={maskEmail(customer.email)} />
-          <EditableData icon={FilePenLine} label="Senha" action="Alterar senha" value="********" />
-          <EditableData icon={Phone} label="Telefone" action="Alterar telefone" value={maskPhone(customer.phone)} />
+          <EditableData icon={FilePenLine} label="Senha" action="Alterar senha" value="********" field="password" />
+          <EditableData icon={Phone} label="Telefone" action="Alterar telefone" value={maskPhone(customer.phone)} field="phone" />
         </div>
       </section>
 
@@ -357,28 +358,147 @@ function RegistrationPanel({ customer }) {
 
 function AddressManager({ customer }) {
   const city = customer.email?.includes('apple') ? 'Rio de Janeiro' : 'Sao Paulo'
+  const initialAddress = {
+    id: 'principal',
+    label: 'Principal',
+    recipient: customer.name,
+    street: 'Praca da Se',
+    number: '100',
+    complement: 'Centro',
+    city,
+    state: 'SP',
+    cep: '01001-000',
+  }
+  const emptyAddressForm = {
+    recipient: customer.name,
+    street: '',
+    number: '',
+    complement: '',
+    city: '',
+    state: '',
+    cep: '',
+  }
+  const [addresses, setAddresses] = useState([initialAddress])
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingId, setEditingId] = useState('')
+  const [addressForm, setAddressForm] = useState(emptyAddressForm)
+
+  const openCreateForm = () => {
+    setEditingId('')
+    setAddressForm(emptyAddressForm)
+    setIsFormOpen(true)
+  }
+
+  const editAddress = (address) => {
+    setEditingId(address.id)
+    setAddressForm({
+      recipient: address.recipient,
+      street: address.street,
+      number: address.number,
+      complement: address.complement,
+      city: address.city,
+      state: address.state,
+      cep: address.cep,
+    })
+    setIsFormOpen(true)
+  }
+
+  const removeAddress = (id) => {
+    setAddresses((current) => current.filter((address) => address.id !== id))
+
+    if (editingId === id) {
+      setEditingId('')
+      setIsFormOpen(false)
+    }
+  }
+
+  const updateAddressForm = (event) => {
+    const { name, value } = event.target
+    setAddressForm((current) => ({ ...current, [name]: value }))
+  }
+
+  const saveAddress = (event) => {
+    event.preventDefault()
+    const nextAddress = {
+      ...addressForm,
+      id: editingId || `address-${Date.now()}`,
+      label: addresses.length === 0 || editingId === 'principal' ? 'Principal' : 'Entrega',
+      state: addressForm.state.toUpperCase(),
+    }
+
+    setAddresses((current) => {
+      if (editingId) {
+        return current.map((address) => (address.id === editingId ? nextAddress : address))
+      }
+
+      return [...current, nextAddress]
+    })
+    setEditingId('')
+    setIsFormOpen(false)
+  }
 
   return (
     <div className="address-manager">
       <div className="address-toolbar">
         <p>Gerencie os locais de entrega vinculados a sua conta.</p>
-        <button type="button">
+        <button type="button" onClick={openCreateForm}>
           <Home size={18} />
           Cadastrar endereco
         </button>
       </div>
 
-      <section className="address-grid" aria-label="Enderecos cadastrados">
-        <article className="address-card selected">
-          <span>Principal</span>
-          <strong>{customer.name}</strong>
-          <p>Praca da Se, 100 / Centro</p>
-          <p>{city} / SP / 01001-000</p>
-          <div>
-            <button type="button">Editar</button>
-            <button type="button">Remover</button>
+      {isFormOpen && (
+        <form className="address-form" onSubmit={saveAddress}>
+          <div className="address-form-grid">
+            <label>
+              <span>Destinatario</span>
+              <input required name="recipient" value={addressForm.recipient} onChange={updateAddressForm} />
+            </label>
+            <label>
+              <span>CEP</span>
+              <input required name="cep" value={addressForm.cep} onChange={updateAddressForm} placeholder="00000-000" />
+            </label>
+            <label>
+              <span>Rua</span>
+              <input required name="street" value={addressForm.street} onChange={updateAddressForm} />
+            </label>
+            <label>
+              <span>Numero</span>
+              <input required name="number" value={addressForm.number} onChange={updateAddressForm} />
+            </label>
+            <label>
+              <span>Complemento</span>
+              <input name="complement" value={addressForm.complement} onChange={updateAddressForm} />
+            </label>
+            <label>
+              <span>Cidade</span>
+              <input required name="city" value={addressForm.city} onChange={updateAddressForm} />
+            </label>
+            <label>
+              <span>UF</span>
+              <input required name="state" value={addressForm.state} onChange={updateAddressForm} maxLength={2} />
+            </label>
           </div>
-        </article>
+          <div className="address-form-actions">
+            <button type="submit">{editingId ? 'Salvar alteracoes' : 'Salvar endereco'}</button>
+            <button type="button" onClick={() => setIsFormOpen(false)}>Cancelar</button>
+          </div>
+        </form>
+      )}
+
+      <section className="address-grid" aria-label="Enderecos cadastrados">
+        {addresses.map((address) => (
+          <article className={`address-card ${address.label === 'Principal' ? 'selected' : ''}`} key={address.id}>
+            <span>{address.label}</span>
+            <strong>{address.recipient}</strong>
+            <p>{formatStreetAddress(address)}</p>
+            <p>{address.city} / {address.state} / {address.cep}</p>
+            <div>
+              <button type="button" onClick={() => editAddress(address)}>Editar</button>
+              <button type="button" onClick={() => removeAddress(address.id)}>Remover</button>
+            </div>
+          </article>
+        ))}
         <article className="address-card empty-address">
           <Home size={28} />
           <p>Adicione um novo endereco para acelerar proximas compras.</p>
@@ -388,18 +508,73 @@ function AddressManager({ customer }) {
   )
 }
 
-function EditableData({ action, icon: Icon, label, value }) {
+function formatStreetAddress(address) {
+  return [address.street, address.number, address.complement].filter(Boolean).join(' / ')
+}
+
+function EditableData({ action, field = 'email', icon: Icon, label, value }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownId = `edit-${field}-dropdown`
+
   return (
     <article className="editable-data">
       <div>
         <strong>{label}</strong>
-        <button type="button">
+        <button
+          type="button"
+          className="editable-link"
+          aria-controls={dropdownId}
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen((current) => !current)}
+        >
           {action}
           <Icon size={18} />
+          <ChevronDown size={16} className={isOpen ? 'dropdown-icon open' : 'dropdown-icon'} aria-hidden="true" />
         </button>
       </div>
       <span>{value}</span>
+      {isOpen && <EditableDropdown field={field} id={dropdownId} label={label} onClose={() => setIsOpen(false)} />}
     </article>
+  )
+}
+
+function EditableDropdown({ field, id, label, onClose }) {
+  const isPassword = field === 'password'
+  const inputType = isPassword ? 'password' : field === 'phone' ? 'tel' : 'email'
+  const primaryLabel = isPassword ? 'Nova senha' : `Novo ${label.toLowerCase()}`
+
+  return (
+    <form
+      id={id}
+      className="editable-dropdown"
+      onSubmit={(event) => {
+        event.preventDefault()
+        onClose()
+      }}
+    >
+      <label>
+        <span>{primaryLabel}</span>
+        <input
+          required
+          type={inputType}
+          placeholder={primaryLabel}
+          autoComplete={isPassword ? 'new-password' : field}
+          minLength={isPassword ? 6 : undefined}
+        />
+      </label>
+
+      {isPassword && (
+        <label>
+          <span>Confirmar senha</span>
+          <input required type="password" placeholder="Confirmar senha" autoComplete="new-password" minLength={6} />
+        </label>
+      )}
+
+      <div className="editable-dropdown-actions">
+        <button type="submit">Salvar</button>
+        <button type="button" onClick={onClose}>Cancelar</button>
+      </div>
+    </form>
   )
 }
 
