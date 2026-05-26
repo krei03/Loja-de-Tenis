@@ -16,7 +16,7 @@ function App() {
   const [products, setProducts] = useState([])
   const [cart, setCart] = useState([])
   const [theme, setTheme] = useState(() => localStorage.getItem('vertex-theme') || 'dark')
-  const [customer, setCustomer] = useState(() => readStorage('vertex-customer-session'))
+  const [customer, setCustomer] = useState(readCustomerSession)
   const [customerOrders, setCustomerOrders] = useState(() => readStorage('vertex-customer-orders') || [])
 
   useEffect(() => {
@@ -182,6 +182,27 @@ function readStorage(key) {
   } catch {
     return null
   }
+}
+
+function readCustomerSession() {
+  const session = readStorage('vertex-customer-session')
+
+  if (!session || !session.email || !session.provider) {
+    localStorage.removeItem('vertex-customer-session')
+    return null
+  }
+
+  if (session.expiresAt && Date.parse(session.expiresAt) <= Date.now()) {
+    localStorage.removeItem('vertex-customer-session')
+    return null
+  }
+
+  if (session.provider === 'email' && !session.token) {
+    localStorage.removeItem('vertex-customer-session')
+    return null
+  }
+
+  return session
 }
 
 function ScrollToTop() {

@@ -7,6 +7,14 @@ import {
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const API_ORIGIN = API_URL.replace(/\/api$/, '')
 
+export class ApiError extends Error {
+  constructor(message, status) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+  }
+}
+
 function buildQuery(params = {}) {
   const search = new URLSearchParams()
 
@@ -24,7 +32,16 @@ async function request(path, options) {
     const response = await fetch(`${API_URL}${path}`, options)
 
     if (!response.ok) {
-      throw new Error(`API error ${response.status}`)
+      let message = `API error ${response.status}`
+
+      try {
+        const body = await response.json()
+        message = body.message || message
+      } catch {
+        // Keep the generic message when the API returns an empty error body.
+      }
+
+      throw new ApiError(message, response.status)
     }
 
     if (response.status === 204) {
@@ -73,12 +90,6 @@ export const api = {
     }),
   loginCustomer: (payload) =>
     request('/customers/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    }),
-  resetCustomerPassword: (payload) =>
-    request('/customers/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

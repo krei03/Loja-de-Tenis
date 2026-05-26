@@ -3,6 +3,7 @@ import { query } from '../database/mysql.js'
 import {
   createCustomerPasswordHash,
   createCustomerToken,
+  shouldRehashCustomerPassword,
   verifyCustomerPassword,
 } from '../services/customerSecurity.js'
 
@@ -82,6 +83,12 @@ export async function loginCustomer(req, res, next) {
 
     if (!customer || !verifyCustomerPassword(password, customer.password_hash)) {
       return res.status(401).json({ message: 'Email ou senha incorretos.' })
+    }
+
+    if (shouldRehashCustomerPassword(customer.password_hash)) {
+      const passwordHash = createCustomerPasswordHash(password)
+      await query('UPDATE customers SET password_hash = ? WHERE id = ?', [passwordHash, customer.id])
+      customer.password_hash = passwordHash
     }
 
     return res.json(createSession(customer))

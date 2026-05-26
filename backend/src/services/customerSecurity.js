@@ -23,13 +23,22 @@ export function verifyCustomerPassword(password, storedHash = '') {
   const [algorithm, iterations, salt, expectedHash] = String(storedHash).split('$')
 
   if (algorithm !== 'pbkdf2' || !iterations || !salt || !expectedHash) {
-    return false
+    const passwordBuffer = Buffer.from(String(password))
+    const storedBuffer = Buffer.from(String(storedHash))
+
+    return storedBuffer.length > 0
+      && storedBuffer.length === passwordBuffer.length
+      && timingSafeEqual(storedBuffer, passwordBuffer)
   }
 
   const actualHash = pbkdf2Sync(password, salt, Number(iterations), HASH_KEY_LENGTH, HASH_DIGEST)
   const expectedBuffer = Buffer.from(expectedHash, 'hex')
 
   return expectedBuffer.length === actualHash.length && timingSafeEqual(expectedBuffer, actualHash)
+}
+
+export function shouldRehashCustomerPassword(storedHash = '') {
+  return !String(storedHash).startsWith('pbkdf2$')
 }
 
 export function createCustomerToken(customer) {

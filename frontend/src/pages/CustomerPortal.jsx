@@ -19,7 +19,6 @@ export function CustomerLogin({ onLogin, customer }) {
   const navigate = useNavigate()
   const [mode, setMode] = useState('login')
   const [authError, setAuthError] = useState('')
-  const [authSuccess, setAuthSuccess] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   if (customer) {
@@ -36,7 +35,6 @@ export function CustomerLogin({ onLogin, customer }) {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
     setAuthError('')
-    setAuthSuccess('')
     setIsSubmitting(true)
 
     try {
@@ -47,8 +45,8 @@ export function CustomerLogin({ onLogin, customer }) {
 
       onLogin(setCustomerSession(session))
       navigate('/account')
-    } catch {
-      setAuthError('Email ou senha incorretos.')
+    } catch (error) {
+      setAuthError(error.status === 401 ? 'Email ou senha incorretos.' : error.message)
     } finally {
       setIsSubmitting(false)
     }
@@ -58,7 +56,6 @@ export function CustomerLogin({ onLogin, customer }) {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
     setAuthError('')
-    setAuthSuccess('')
     setIsSubmitting(true)
 
     try {
@@ -72,29 +69,7 @@ export function CustomerLogin({ onLogin, customer }) {
       onLogin(setCustomerSession(session))
       navigate('/account/edit')
     } catch (error) {
-      setAuthError(error.message.includes('409') ? 'Este email ja possui uma conta.' : 'Nao foi possivel criar sua conta.')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const resetPassword = async (event) => {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    setAuthError('')
-    setAuthSuccess('')
-    setIsSubmitting(true)
-
-    try {
-      const session = await api.resetCustomerPassword({
-        email: data.get('email'),
-        password: data.get('password'),
-      })
-
-      onLogin(setCustomerSession(session))
-      navigate('/account')
-    } catch (error) {
-      setAuthError(error.message.includes('404') ? 'Conta nao encontrada.' : 'Nao foi possivel redefinir a senha.')
+      setAuthError(error.status === 409 ? 'Este email ja possui uma conta.' : error.message)
     } finally {
       setIsSubmitting(false)
     }
@@ -128,7 +103,6 @@ export function CustomerLogin({ onLogin, customer }) {
                 aria-selected={mode === 'login'}
                 onClick={() => {
                   setAuthError('')
-                  setAuthSuccess('')
                   setMode('login')
                 }}
               >
@@ -140,23 +114,10 @@ export function CustomerLogin({ onLogin, customer }) {
                 aria-selected={mode === 'register'}
                 onClick={() => {
                   setAuthError('')
-                  setAuthSuccess('')
                   setMode('register')
                 }}
               >
                 Criar conta
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={mode === 'reset'}
-                onClick={() => {
-                  setAuthError('')
-                  setAuthSuccess('')
-                  setMode('reset')
-                }}
-              >
-                Redefinir senha
               </button>
             </div>
 
@@ -177,7 +138,7 @@ export function CustomerLogin({ onLogin, customer }) {
                   {isSubmitting ? 'Entrando...' : 'Entrar'}
                 </button>
               </form>
-            ) : mode === 'register' ? (
+            ) : (
               <form className="form-panel customer-auth-form" onSubmit={register}>
                 <h2>Criar conta</h2>
                 <label>
@@ -202,24 +163,6 @@ export function CustomerLogin({ onLogin, customer }) {
                   {isSubmitting ? 'Criando...' : 'Criar conta'}
                 </button>
               </form>
-            ) : (
-              <form className="form-panel customer-auth-form" onSubmit={resetPassword}>
-                <h2>Redefinir senha</h2>
-                <label>
-                  <span>Email</span>
-                  <input required name="email" type="email" placeholder="Email" autoComplete="email" />
-                </label>
-                <label>
-                  <span>Nova senha</span>
-                  <input required name="password" type="password" placeholder="Nova senha" autoComplete="new-password" minLength={6} />
-                </label>
-                {authError && <p className="auth-error" role="alert">{authError}</p>}
-                {authSuccess && <p className="auth-success" role="status">{authSuccess}</p>}
-                <button type="submit" disabled={isSubmitting}>
-                  <FilePenLine size={18} />
-                  {isSubmitting ? 'Salvando...' : 'Salvar nova senha'}
-                </button>
-              </form>
             )}
           </section>
 
@@ -241,7 +184,6 @@ export function CustomerLogin({ onLogin, customer }) {
               className="secondary-create-account"
               onClick={() => {
                 setAuthError('')
-                setAuthSuccess('')
                 setMode('register')
               }}
             >
