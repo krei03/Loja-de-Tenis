@@ -33,7 +33,7 @@ export function Home({ onAdd }) {
         <section className="launches" id="launches">
           <div className="section-heading">
             <p>Lancamentos</p>
-            <h2>Melhores drops premium para entrar no radar</h2>
+            <h2>Drops exclusivos para elevar seu estilo</h2>
           </div>
 
           <div className="product-grid launches-grid">
@@ -48,7 +48,7 @@ export function Home({ onAdd }) {
         <section className="catalog-section">
           <div className="section-heading">
             <p>{activeCarouselItem ? 'Categoria selecionada' : 'Vitrine'}</p>
-            <h2>Selecao premium em tempo real</h2>
+            <h2>Mais moderno/streetwear</h2>
           </div>
 
           <div className="product-grid">

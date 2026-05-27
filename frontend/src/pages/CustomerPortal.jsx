@@ -276,7 +276,7 @@ function renderAccountPage(page, customer, customerOrders) {
     cards: {
       eyebrow: 'Pagamento',
       title: 'Meus cartoes',
-      body: <EmptyAccount icon={CreditCard} text="Cartoes salvos serao exibidos quando houver gateway real." />,
+      body: <PaymentCardManager customer={customer} />,
     },
     help: {
       eyebrow: 'Suporte',
@@ -502,6 +502,129 @@ function AddressManager({ customer }) {
         <article className="address-card empty-address">
           <Home size={28} />
           <p>Adicione um novo endereco para acelerar proximas compras.</p>
+        </article>
+      </section>
+    </div>
+  )
+}
+
+function PaymentCardManager({ customer }) {
+  const initialCard = {
+    id: 'principal',
+    label: 'Principal',
+    holder: customer.name,
+    brand: 'Visa',
+    lastDigits: '4242',
+    expiresAt: '12/29',
+  }
+  const emptyCardForm = {
+    holder: customer.name,
+    number: '',
+    expiresAt: '',
+    brand: 'Visa',
+  }
+  const [cards, setCards] = useState([initialCard])
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [cardForm, setCardForm] = useState(emptyCardForm)
+
+  const openCreateForm = () => {
+    setCardForm(emptyCardForm)
+    setIsFormOpen(true)
+  }
+
+  const updateCardForm = (event) => {
+    const { name, value } = event.target
+    setCardForm((current) => ({ ...current, [name]: value }))
+  }
+
+  const saveCard = (event) => {
+    event.preventDefault()
+    const digits = cardForm.number.replace(/\D/g, '')
+
+    setCards((current) => [
+      ...current,
+      {
+        id: `card-${Date.now()}`,
+        label: current.length === 0 ? 'Principal' : 'Pagamento',
+        holder: cardForm.holder,
+        brand: cardForm.brand,
+        lastDigits: digits.slice(-4) || '0000',
+        expiresAt: cardForm.expiresAt,
+      },
+    ])
+    setCardForm(emptyCardForm)
+    setIsFormOpen(false)
+  }
+
+  const removeCard = (id) => {
+    setCards((current) => current.filter((card) => card.id !== id))
+  }
+
+  return (
+    <div className="payment-card-manager">
+      <div className="payment-card-toolbar">
+        <p>Gerencie os cartoes vinculados a sua conta para proximas compras.</p>
+        <button type="button" onClick={openCreateForm}>
+          <CreditCard size={18} />
+          Cadastrar cartao
+        </button>
+      </div>
+
+      {isFormOpen && (
+        <form className="payment-card-form" onSubmit={saveCard}>
+          <div className="payment-card-form-grid">
+            <label>
+              <span>Nome impresso</span>
+              <input required name="holder" value={cardForm.holder} onChange={updateCardForm} />
+            </label>
+            <label>
+              <span>Numero do cartao</span>
+              <input
+                required
+                inputMode="numeric"
+                name="number"
+                value={cardForm.number}
+                onChange={updateCardForm}
+                placeholder="0000 0000 0000 0000"
+              />
+            </label>
+            <label>
+              <span>Validade</span>
+              <input required name="expiresAt" value={cardForm.expiresAt} onChange={updateCardForm} placeholder="MM/AA" />
+            </label>
+            <label>
+              <span>Bandeira</span>
+              <select name="brand" value={cardForm.brand} onChange={updateCardForm}>
+                <option>Visa</option>
+                <option>Mastercard</option>
+                <option>Elo</option>
+                <option>Amex</option>
+              </select>
+            </label>
+          </div>
+          <div className="payment-card-form-actions">
+            <button type="submit">Salvar cartao</button>
+            <button type="button" onClick={() => setIsFormOpen(false)}>Cancelar</button>
+          </div>
+        </form>
+      )}
+
+      <section className="payment-card-grid" aria-label="Cartoes cadastrados">
+        {cards.map((card) => (
+          <article className={`payment-card ${card.label === 'Principal' ? 'selected' : ''}`} key={card.id}>
+            <span>{card.label}</span>
+            <CreditCard size={28} aria-hidden="true" />
+            <strong>{card.brand} final {card.lastDigits}</strong>
+            <p>{card.holder}</p>
+            <p>Validade {card.expiresAt}</p>
+            <div>
+              <button type="button" onClick={() => removeCard(card.id)}>Remover</button>
+            </div>
+          </article>
+        ))}
+        <article className="payment-card empty-payment-card">
+          <CreditCard size={28} />
+          <p>Cadastre um novo cartao para acelerar proximas compras.</p>
         </article>
       </section>
     </div>

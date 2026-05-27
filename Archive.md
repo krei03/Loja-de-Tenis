@@ -1511,3 +1511,133 @@ frontend npm run build: OK
 teste Playwright em /account/addresses: OK, cadastrar, editar e remover abriram/executaram como esperado
 ```
 
+---
+
+# 2026-05-27 - Botao para cadastrar cartao do cliente
+
+Foi adicionada uma area funcional em `Meus cartoes` no portal do cliente.
+
+O estado vazio foi substituido por um gerenciador local de cartoes com o botao `Cadastrar cartao`.
+
+Ao clicar no botao, a tela abre um formulario para incluir:
+
+- nome impresso;
+- numero do cartao;
+- validade;
+- bandeira.
+
+Depois de salvar, o cartao aparece na lista com bandeira, final do numero, titular, validade e acao para remover.
+
+Arquivos alterados:
+
+```txt
+frontend/src/pages/CustomerPortal.jsx
+frontend/src/styles/app.css
+```
+
+Validacao executada:
+
+```txt
+frontend npm run lint apos botao de cadastrar cartao: OK
+frontend npm run build apos botao de cadastrar cartao: OK
+docker compose up --build -d apos botao de cadastrar cartao: OK
+frontend Docker em http://localhost:5173 apos botao de cadastrar cartao: HTTP 200
+backend Docker em http://localhost:8080/health apos botao de cadastrar cartao: OK com database mysql
+```
+
+---
+
+# 2026-05-27 - Ajuste de chamada dos drops premium
+
+Foi atualizado o titulo da secao de drops na home.
+
+Texto anterior:
+
+```txt
+Melhores drops premium para entrar no radar
+```
+
+Texto novo:
+
+```txt
+Drops exclusivos para elevar seu estilo
+```
+
+Arquivo alterado:
+
+```txt
+frontend/src/pages/Home.jsx
+```
+
+Validacao executada:
+
+```txt
+frontend npm run lint apos ajuste de chamada dos drops: OK
+frontend npm run build apos ajuste de chamada dos drops: OK
+docker compose up --build -d apos ajuste de chamada dos drops: OK
+frontend Docker em http://localhost:5173 apos ajuste de chamada dos drops: HTTP 200
+backend Docker em http://localhost:8080/health apos ajuste de chamada dos drops: OK com database mysql
+```
+
+---
+
+# 2026-05-27 - Ajuste de chamada streetwear da vitrine
+
+Foi atualizado o titulo da secao de selecao premium na home.
+
+Texto anterior:
+
+```txt
+Selecao premium em tempo real
+```
+
+Texto novo:
+
+```txt
+Mais moderno/streetwear:
+```
+
+Arquivo alterado:
+
+```txt
+frontend/src/pages/Home.jsx
+```
+
+Validacao executada:
+
+```txt
+frontend npm run lint apos ajuste de chamada streetwear: OK
+frontend npm run build apos ajuste de chamada streetwear: OK
+docker compose up --build -d apos ajuste de chamada streetwear: OK
+frontend Docker em http://localhost:5173 apos ajuste de chamada streetwear: HTTP 200
+backend Docker em http://localhost:8080/health apos ajuste de chamada streetwear: OK com database mysql
+```
+
+---
+
+# 2026-05-27 - Remocao dos dois pontos da chamada streetwear
+
+Foi ajustado o titulo da secao na home para ficar exatamente como solicitado.
+
+Texto final:
+
+```txt
+Mais moderno/streetwear
+```
+
+Arquivo alterado:
+
+```txt
+frontend/src/pages/Home.jsx
+```
+
+Validacao executada:
+
+```txt
+frontend npm run lint apos remocao dos dois pontos da chamada streetwear: OK
+frontend npm run build apos remocao dos dois pontos da chamada streetwear: OK
+docker compose up --build -d apos remocao dos dois pontos da chamada streetwear: OK
+frontend Docker em http://localhost:5173 apos remocao dos dois pontos da chamada streetwear: HTTP 200
+backend Docker em http://localhost:8080/health apos remocao dos dois pontos da chamada streetwear: OK com database mysql
+```
+
