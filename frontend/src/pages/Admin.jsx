@@ -1,20 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
 import {
   ChevronDown,
   ChevronUp,
   ImagePlus,
   LockKeyhole,
   LogOut,
-  PackagePlus,
   Pencil,
-  ReceiptText,
   Save,
   Tags,
   Trash2,
   X,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { AdminMetrics } from '../components/AdminMetrics'
 import { CategoryCarousel } from '../components/CategoryCarousel'
 import { api } from '../services/api'
 
@@ -734,28 +732,13 @@ export function Admin({ products, onProductsChanged }) {
         </button>
       </div>
 
-      <section className="admin-metrics">
-        <article>
-          <PackagePlus size={24} />
-          <span>Produtos ativos</span>
-          <strong>{totalInventory}</strong>
-        </article>
-        <article>
-          <Tags size={24} />
-          <span>Valor de vitrine</span>
-          <strong>{money.format(totalValue)}</strong>
-        </article>
-        <article>
-          <Tags size={24} />
-          <span>Marcas</span>
-          <strong>{brands.length}</strong>
-        </article>
-        <Link className="admin-metric-link" to="/admin/sales">
-          <ReceiptText size={24} />
-          <span>Total de vendas</span>
-          <strong>{money.format(totalSales)}</strong>
-        </Link>
-      </section>
+      <AdminMetrics
+        brandCount={brands.length}
+        formatMoney={(value) => money.format(value)}
+        totalInventory={totalInventory}
+        totalSales={totalSales}
+        totalValue={totalValue}
+      />
 
       {!editingProductId && renderProductForm('Cadastrar produto')}
       {message && <p className="admin-message">{message}</p>}

@@ -1,0 +1,134 @@
+.sales-report-page {
+  padding: 96px clamp(16px, 3vw, 40px) clamp(48px, 6vw, 88px);
+  background: var(--black);
+}
+
+.sales-summary,
+.monthly-report-list,
+.sales-order-list {
+  width: min(100%, var(--page-max));
+  margin-inline: auto;
+}
+
+.sales-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.sales-filters {
+  width: min(100%, var(--page-max));
+  margin: 0 auto 20px;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 170px 170px;
+  gap: 12px;
+}
+
+.sales-filters label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sales-filters select,
+.sales-filters input,
+.sales-status-select select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ice);
+  color-scheme: dark;
+}
+
+.sales-status-select {
+  display: grid;
+  gap: 6px;
+  min-width: 180px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.monthly-report-list,
+.sales-order-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.monthly-report-heading,
+.sales-order-header,
+.sales-order-footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.monthly-report-heading h2,
+.sales-order-header h2,
+.sales-item-row h3,
+.sales-item-row p {
+  margin: 0;
+}
+
+.monthly-report-heading h2,
+.sales-order-header h2 {
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  line-height: 1.05;
+}
+
+.monthly-report-heading > div > span,
+.sales-order-header > div > span {
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.monthly-report-metrics,
+.sales-customer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.monthly-report-metrics span,
+.sales-customer-grid span,
+.sales-order-footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.sales-items-table {
+  display: grid;
+  gap: 8px;
+}
+
+.sales-item-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto auto auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sales-item-row img {
+  width: 64px;
+  height: 64px;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.sales-item-row p {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+

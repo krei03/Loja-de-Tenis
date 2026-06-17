@@ -1,0 +1,90 @@
+.site-footer {
+  padding: clamp(46px, 6vw, 72px) clamp(18px, 4vw, 56px) 26px;
+  border-top: 1px solid var(--line);
+  background: #000;
+}
+
+.footer-grid {
+  width: min(100%, var(--page-max));
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1.3fr;
+  gap: clamp(26px, 5vw, 74px);
+}
+
+.footer-grid section {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+.footer-grid h2 {
+  margin: 0 0 10px;
+  font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.footer-grid a {
+  color: var(--ice);
+  font-weight: 700;
+}
+
+.app-badges,
+.social-row,
+.payment-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.app-badges {
+  margin-top: 54px;
+}
+
+.app-badges span,
+.payment-row span,
+.rating-badge {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 7px;
+  padding-inline: 12px;
+  background: var(--ice);
+  color: var(--black);
+  font-weight: 900;
+}
+
+.social-row a {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--ice);
+  color: var(--black);
+}
+
+.payment-row span {
+  min-height: 34px;
+  font-size: 0.8rem;
+}
+
+.footer-bottom {
+  width: min(100%, var(--page-max));
+  margin: 54px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  color: var(--ice);
+}
+
+.footer-bottom strong {
+  font-size: 1.8rem;
+  letter-spacing: 0;
+}

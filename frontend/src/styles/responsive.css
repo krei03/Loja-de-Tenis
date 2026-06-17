@@ -1,0 +1,231 @@
+@media (max-width: 980px) {
+  .navbar {
+    padding-block: 14px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .nav-search {
+    display: none;
+  }
+
+  .mobile-only {
+    display: inline-grid;
+  }
+
+  .hero-copy {
+    top: 54vh;
+    width: min(520px, calc(100% - 36px));
+  }
+
+  .detail-grid,
+  .brand-catalog-layout,
+  .cart-grid,
+  .customer-auth-grid,
+  .customer-account-shell,
+  .advanced-filters,
+  .sales-filters,
+  .form-grid,
+  .sales-summary,
+  .footer-grid,
+  .checkout-form {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-panel {
+    position: static;
+  }
+
+  .gallery-shell {
+    position: static;
+  }
+
+  .brand-filter-panel {
+    position: static;
+  }
+
+  .account-sidebar {
+    position: static;
+  }
+
+  .launches-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .carousel-admin-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .carousel-admin-controls {
+    justify-content: flex-start;
+  }
+
+  .brand-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-hero strong {
+    justify-self: start;
+  }
+
+  .sales-order-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sales-status-select {
+    width: 100%;
+  }
+}
+
+@media (min-width: 981px) and (max-width: 1180px) {
+  .nav-actions button[aria-label='Conta'] {
+    display: none;
+  }
+
+  .nav-search {
+    max-width: 380px;
+  }
+
+  .hero-copy {
+    top: 52%;
+    width: min(500px, calc(100% - 40px));
+  }
+
+  .hero h1 {
+    font-size: clamp(4.4rem, 8vw, 6.2rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar {
+    padding-inline: 14px;
+  }
+
+  .nav-actions .icon-button:not(.cart-link):not(.mobile-only) {
+    display: none;
+  }
+
+  .hero-copy {
+    left: 18px;
+    top: 55vh;
+    width: calc(100% - 36px);
+    transform: translateY(-48%);
+  }
+
+  .hero h1 {
+    font-size: clamp(2.75rem, 17vw, 4.2rem);
+  }
+
+  .hero-subtitle {
+    max-width: 330px;
+    font-size: 0.96rem;
+    line-height: 1.48;
+  }
+
+  .hero-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .gallery-thumbs,
+  .admin-metrics,
+  .brand-hero,
+  .account-info-grid,
+  .registration-grid,
+  .address-grid,
+  .payment-card-grid,
+  .payment-card-form-grid,
+  .account-order-list article,
+  .upload-row,
+  .image-url-field,
+  .image-preview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .launches,
+  .category-band,
+  .cart-shell,
+  .admin-page,
+  .catalog-section,
+  .product-detail,
+  .customer-auth-page,
+  .customer-account-page {
+    padding-inline: 16px;
+  }
+
+  .section-heading h1,
+  .section-heading h2 {
+    font-size: clamp(1.8rem, 10vw, 2.8rem);
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .launches-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-carousel img {
+    width: 1120px;
+  }
+
+  .cart-item {
+    grid-template-columns: 82px 1fr;
+  }
+
+  .cart-item img {
+    width: 82px;
+    height: 82px;
+  }
+
+  .quantity,
+  .cart-item > button {
+    justify-self: start;
+  }
+
+  .shipping-simulator > div {
+    grid-template-columns: 1fr;
+  }
+
+  .address-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .payment-card-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-table article {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .sales-item-row {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .admin-table img {
+    width: 64px;
+    height: 64px;
+  }
+
+  .admin-table span,
+  .admin-actions {
+    justify-self: start;
+  }
+
+  .admin-modal-backdrop {
+    padding: 12px;
+  }
+}

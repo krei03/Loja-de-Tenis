@@ -1,0 +1,649 @@
+.customer-auth-page,
+.customer-account-page {
+  min-height: 100vh;
+  padding: 96px clamp(16px, 3vw, 40px) clamp(48px, 6vw, 88px);
+  background: var(--black);
+}
+
+.customer-auth-shell,
+.customer-account-shell {
+  width: min(100%, var(--page-max));
+  margin-inline: auto;
+}
+
+.customer-auth-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 16px;
+  align-items: start;
+}
+
+.customer-auth-main {
+  display: grid;
+  gap: 12px;
+}
+
+.auth-mode-switch {
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  width: min(100%, 520px);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px;
+  background: var(--graphite);
+}
+
+.auth-mode-switch button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.auth-mode-switch button[aria-selected='true'] {
+  background: var(--accent);
+  color: var(--black);
+}
+
+.customer-auth-form button,
+.social-login-panel button,
+.account-sidebar button,
+.danger-account-action,
+.address-toolbar button,
+.payment-card-toolbar button,
+.account-profile-form button {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--black);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.customer-auth-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.form-panel > label {
+  display: grid;
+  gap: 6px;
+}
+
+.customer-auth-form label span,
+.form-panel > label span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.auth-error {
+  margin: 0;
+  border: 1px solid rgba(255, 80, 80, 0.34);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 80, 80, 0.1);
+  color: #ff6b6b;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.auth-success {
+  margin: 0;
+  border: 1px solid rgba(84, 214, 126, 0.34);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: rgba(84, 214, 126, 0.1);
+  color: #54d67e;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.social-login-panel {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--graphite);
+}
+
+.social-login-panel > div {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.social-login-panel > div span {
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.social-login-panel > div strong {
+  color: var(--ice);
+  font-size: 1.15rem;
+}
+
+.social-login-panel button {
+  justify-content: flex-start;
+  padding-inline: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ice);
+}
+
+.social-login-panel button:first-child span {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--ice);
+  color: var(--black);
+  font-weight: 950;
+}
+
+.social-login-panel .secondary-create-account {
+  justify-content: center;
+  border-style: dashed;
+  background: rgba(198, 255, 0, 0.12);
+  color: var(--accent);
+}
+
+.customer-auth-form .create-account-button {
+  background: rgba(198, 255, 0, 0.18);
+  color: var(--accent);
+  border-color: rgba(198, 255, 0, 0.36);
+}
+
+.customer-account-shell {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.account-sidebar {
+  position: sticky;
+  top: 96px;
+  display: grid;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--graphite);
+}
+
+.account-sidebar > div,
+.account-page-title {
+  display: grid;
+  gap: 6px;
+}
+
+.account-sidebar span,
+.account-page-title span {
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.account-sidebar strong,
+.account-page-title h1 {
+  margin: 0;
+  color: var(--ice);
+}
+
+.account-sidebar small {
+  color: var(--muted);
+}
+
+.account-sidebar nav {
+  display: grid;
+  gap: 4px;
+}
+
+.account-nav-group {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.account-nav-group > span {
+  padding: 0 10px 4px;
+}
+
+.account-sidebar nav a {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-radius: 7px;
+  padding-inline: 10px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.account-nav-group a {
+  margin-left: 10px;
+}
+
+.account-sidebar nav a.active,
+.account-sidebar nav a:hover {
+  background: rgba(198, 255, 0, 0.12);
+  color: var(--accent);
+}
+
+.account-sidebar button {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ice);
+}
+
+.account-content {
+  display: grid;
+  gap: 18px;
+}
+
+.account-page-title h1 {
+  font-size: clamp(1.8rem, 3vw, 3.2rem);
+  line-height: 1;
+}
+
+.account-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.account-info-grid article,
+.account-order-list article,
+.faq-list article {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--graphite);
+}
+
+.account-info-grid span,
+.account-order-list span,
+.faq-list span {
+  color: var(--muted);
+}
+
+.registration-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.registration-panel > p,
+.address-toolbar p,
+.payment-card-toolbar p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.registration-card {
+  display: grid;
+  gap: 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: clamp(18px, 3vw, 28px);
+  background: var(--graphite);
+}
+
+.registration-card h2 {
+  margin: 0;
+  color: var(--ice);
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+}
+
+.registration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(18px, 4vw, 48px);
+}
+
+.personal-data-grid {
+  row-gap: 22px;
+}
+
+.editable-data,
+.readonly-data {
+  display: grid;
+  gap: 10px;
+}
+
+.editable-data > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.editable-data strong,
+.readonly-data strong {
+  color: var(--ice);
+  font-weight: 900;
+}
+
+.editable-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.editable-link:hover,
+.editable-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.dropdown-icon {
+  transition: transform 0.2s ease;
+}
+
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+.editable-data span,
+.readonly-data span {
+  color: var(--ice);
+  font-size: 1.08rem;
+}
+
+.editable-dropdown {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 360px);
+  margin-top: 4px;
+  border: 1px solid rgba(198, 255, 0, 0.28);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(6, 8, 8, 0.86);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.2);
+}
+
+.editable-dropdown label {
+  display: grid;
+  gap: 6px;
+}
+
+.editable-dropdown label span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.editable-dropdown input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px 12px;
+  background: var(--black);
+  color: var(--ice);
+}
+
+.editable-dropdown-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.editable-dropdown-actions button {
+  min-height: 38px;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 0.88rem;
+}
+
+.editable-dropdown-actions button:first-child {
+  border-color: rgba(198, 255, 0, 0.42);
+  background: var(--accent);
+  color: #101400;
+}
+
+.editable-dropdown-actions button:last-child {
+  background: transparent;
+  color: var(--muted);
+}
+
+.danger-account-action {
+  justify-self: start;
+  min-width: min(100%, 280px);
+  border-color: rgba(198, 255, 0, 0.34);
+  background: rgba(198, 255, 0, 0.18);
+  color: var(--accent);
+}
+
+.address-manager {
+  display: grid;
+  gap: 16px;
+}
+
+.address-toolbar,
+.payment-card-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.address-toolbar button,
+.payment-card-toolbar button {
+  flex: 0 0 auto;
+}
+
+.address-form,
+.payment-card-form {
+  display: grid;
+  gap: 14px;
+  border: 1px solid rgba(198, 255, 0, 0.28);
+  border-radius: 8px;
+  padding: 18px;
+  background: var(--graphite);
+}
+
+.address-form-grid,
+.payment-card-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.address-form label,
+.payment-card-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.address-form label span,
+.payment-card-form label span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.address-form input,
+.payment-card-form input,
+.payment-card-form select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px 12px;
+  background: var(--black);
+  color: var(--ice);
+}
+
+.payment-card-form select {
+  color-scheme: dark;
+}
+
+.address-form-actions,
+.payment-card-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.address-form-actions button,
+.payment-card-form-actions button {
+  min-height: 40px;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 0.9rem;
+}
+
+.address-form-actions button:first-child,
+.payment-card-form-actions button:first-child {
+  border-color: rgba(198, 255, 0, 0.42);
+  background: var(--accent);
+  color: #101400;
+}
+
+.address-form-actions button:last-child,
+.payment-card-form-actions button:last-child {
+  background: transparent;
+  color: var(--muted);
+}
+
+.address-grid,
+.payment-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.address-card,
+.payment-card {
+  display: grid;
+  gap: 10px;
+  min-height: 190px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  background: var(--graphite);
+}
+
+.address-card.selected,
+.payment-card.selected {
+  border-color: rgba(198, 255, 0, 0.42);
+}
+
+.address-card > span,
+.payment-card > span {
+  justify-self: start;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.address-card p,
+.payment-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.address-card > div,
+.payment-card > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.address-card > div button,
+.payment-card > div button {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ice);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.empty-address {
+  place-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.payment-card-manager {
+  display: grid;
+  gap: 16px;
+}
+
+.payment-card > svg {
+  color: var(--accent);
+}
+
+.empty-payment-card {
+  place-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.account-order-list {
+  display: grid;
+  gap: 10px;
+}
+
+.account-order-list article {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.preference-list,
+.faq-list {
+  display: grid;
+  gap: 10px;
+}
+
+.preference-list label {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding-inline: 14px;
+  background: var(--graphite);
+  color: var(--ice);
+  font-weight: 800;
+}
+
+.preference-list input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+

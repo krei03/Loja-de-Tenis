@@ -4,6 +4,160 @@ Histórico técnico completo do projeto.
 Validações antigas, troubleshooting, retrospectivas, logs e execuções anteriores foram movidos para este arquivo para manter o `PLANS.md` limpo e sustentável.
 
 ---
+
+# 2026-06-17 - Auditoria do PLANS.md
+
+Esta seção registra os itens arquivados durante a auditoria atual do `PLANS.md`. O objetivo foi deixar o plano vivo focado apenas no estado atual, bugs ativos, próximas tarefas reais, decisões ainda relevantes e validações atuais.
+
+Conteúdo movido do `PLANS.md` para este histórico:
+
+- tarefas concluídas que ainda apareciam em `Active Tasks`;
+- blocos antigos de `Plan of Work` e `Concrete Steps`;
+- validações executadas em etapas anteriores;
+- decisões antigas que já viraram histórico;
+- descobertas e observações de troubleshooting;
+- listas de arquivos alterados e comandos usados em execuções anteriores;
+- planos duplicados entre `Plan of Work`, `Concrete Steps`, `Active Tasks` e `Current Progress`.
+
+Tarefas concluídas arquivadas:
+
+- integração do simulador de frete com API/serviço definido;
+- autenticação admin robusta com senha com hash e sessão/token assinado;
+- histórico e gestão de pedidos no painel admin;
+- persistência de tamanho selecionado e dados completos do item no pedido;
+- camada de checkout preparada para gateway futuro;
+- cadastro de marcas/categorias com descrição, banner e metadados;
+- revisão visual dos perfis de marca em mobile, tablet e desktop;
+- acessibilidade básica com labels, foco visível, `aria-labels` e navegação por teclado;
+- página detalhada de vendas ao clicar em “Total de vendas”;
+- detalhes completos das vendas para envio ao destinatário;
+- registro mensal geral com base nos dados do cliente;
+- correção da escala visual geral do ecommerce;
+- padronização de largura, espaçamento e proporção visual;
+- botões sociais preparados para Google e Apple;
+- área “Minha Conta” para clientes autenticados;
+- menu lateral do portal do cliente;
+- páginas Meus Pedidos, Favoritos, Meu Cadastro, Alterar dados cadastrais, Meus endereços, Preferências de comunicação, Meus cartões e Atendimento/FAQ;
+- botão de registro na tela de login;
+- reset global de scroll em navegações internas;
+- reorganização do menu lateral da conta;
+- agrupamento de “Alterar dados” e “Meus endereços” sob “Meu Cadastro”;
+- remoção do texto “Minha Conta” da navbar desktop, mantendo ícone de usuário;
+- refinamento visual de “Meu Cadastro” com base em `assets/meu_cadastro.png`;
+- reestruturação de “Meus endereços”;
+- botão “Cadastrar endereço”;
+- separação dos fluxos de login e criação de conta;
+- botão exclusivo “Criar conta”;
+- melhoria de UX da autenticação do cliente;
+- validação real de senha no login do cliente;
+- bloqueio de login com senha incorreta;
+- mensagem de erro para email ou senha incorretos;
+- fluxo de redefinição de senha no backend;
+- remoção do botão “Redefinir senha” da tela de login;
+- correção do erro de “senha incorreta” com senha válida;
+- revisão do fluxo completo de login entre frontend e backend;
+- persistência correta da sessão do cliente após login;
+- validação de login com contas já existentes no MySQL.
+
+Blocos de planejamento antigo arquivados:
+
+- refinamento da tela de login do cliente;
+- remoção do botão “Redefinir senha” da interface;
+- correção do login que aceitava qualquer senha;
+- separação entre entrada de cliente existente e criação de conta;
+- refinamento visual de “Meu Cadastro”;
+- melhoria da seção “Meus endereços”;
+- reorganização do menu lateral do portal do cliente;
+- correção do scroll que mantinha posição anterior ao trocar de página;
+- redução da sensação de zoom excessivo do ecommerce;
+- criação/preparação da área “Minha Conta”.
+
+Validações antigas arquivadas:
+
+```txt
+frontend npm run lint: OK
+frontend npm run build: OK
+frontend npm run test:responsive: OK, 5 testes aprovados
+frontend npm run test:hero: OK, 2 testes aprovados
+backend node --check src/server.js: OK
+backend node --check src/controllers/orderController.js: OK
+backend node --check src/controllers/shippingController.js: OK
+backend node --check src/controllers/customerController.js: OK
+backend node --check src/routes/customerRoutes.js: OK
+backend node --check src/services/customerSecurity.js: OK
+backend teste via node --input-type=module para hash/token admin: OK
+git diff --check: OK, apenas avisos CRLF do Windows
+docker compose up --build -d: OK
+frontend http://localhost:5173: HTTP 200
+frontend http://localhost:5173/login: HTTP 200
+frontend http://localhost:5173/account: HTTP 200
+frontend http://localhost:5173/account/edit: HTTP 200
+frontend http://localhost:5173/account/addresses: HTTP 200
+frontend http://localhost:5173/admin/sales: HTTP 200
+frontend http://localhost:5173/brand/nike: HTTP 200
+backend http://localhost:8080/health: OK com database mysql
+backend http://localhost:8080/api/category-carousel: OK com descrição/metadados em Nike
+backend http://localhost:8080/api/shipping/quote?cep=01001000: OK com ViaCEP e cotação Vertex Express
+backend http://localhost:8080/api/orders sem token: HTTP 401 esperado
+backend login admin + GET http://localhost:8080/api/orders com token: HTTP 200
+backend POST http://localhost:8080/api/orders com payment pix: OK, payment manual_review persistido
+backend POST http://localhost:8080/api/customers/register: OK, conta de teste criada
+backend POST http://localhost:8080/api/customers/login com senha errada: HTTP 401 esperado
+backend POST http://localhost:8080/api/customers/login com senha correta: HTTP 200 com token e expiresAt
+backend login com conta legada inserida previamente no MySQL: HTTP 200 e senha migrada para PBKDF2
+backend reset de senha: OK, senha antiga/incorreta bloqueada antes do reset e senha nova aceita depois
+teste Playwright do fluxo cadastro/logout/redefinir senha/login: OK
+teste Playwright da tela de login: OK, texto/botao "Redefinir senha" ausente e apenas 2 tabs de autenticacao
+teste Playwright de sessao expirada: OK, localStorage limpo ao recarregar
+screenshots Playwright: /brand/nike mobile/tablet/desktop OK, /account/edit desktop OK, /account/addresses desktop OK
+cleanup MySQL das contas/pedidos de teste criados nas validações: OK
+```
+
+Decisões antigas arquivadas:
+
+- autenticação admin passou a usar hash PBKDF2 e token assinado com HMAC e expiração;
+- `GET /api/orders` e `PATCH /api/orders/:id/status` exigem autenticação admin;
+- `POST /api/orders` permanece público para checkout;
+- sessão admin é persistida no `localStorage` como `vertex-admin-session`;
+- campos de perfil de marca foram adicionados ao `category_carousel`;
+- checkout passou a gerar dados de pagamento em modo manual por `backend/src/services/paymentGateway.js`;
+- scroll de navegação passou a ser tratado globalmente em `App.jsx`;
+- Portal do Cliente foi implementado primeiro no frontend e depois conectado ao backend para login/cadastro por email;
+- botões Google/Apple ficaram em modo local/preparado enquanto não houver OAuth real;
+- escala visual geral foi reduzida sem trocar identidade visual;
+- menu da conta foi extraído para `AccountSidebar.jsx`;
+- navbar desktop mantém apenas ícone de usuário para conta;
+- simulador de frete usa ViaCEP para validar destino e calcular cotação interna `Vertex Express`;
+- “Meu Cadastro” usa cards inspirados na referência enviada;
+- revisão de acessibilidade foi básica e focada em formulários/conta/produto;
+- login/cadastro por email usam backend com senha PBKDF2 e sessão assinada;
+- fluxo de redefinição de senha existe no backend, mas foi removido da interface atual;
+- contas legadas com senha sem PBKDF2 podem ser migradas automaticamente após login bem-sucedido;
+- sessões locais expiradas, malformadas ou sem token são descartadas;
+- frontend preserva mensagens de erro/status retornadas pela API.
+
+Descobertas e observações arquivadas:
+
+- o `PLANS.MD` tinha uma cerca Markdown aberta em `Minha Conta`, depois corrigida;
+- o relatório de vendas consumia `/api/orders` sem token antes da proteção admin;
+- a geração de hash foi feita com `node:crypto`, sem nova dependência;
+- `category_carousel` já funcionava como marca/categoria, então expandir a tabela foi menor risco do que criar nova entidade;
+- o preparo de pagamento ainda não é gateway real;
+- o botão "Entrar" da navbar foi redirecionado do admin para login do cliente;
+- o checkout passou a preencher dados do cliente logado e vincular pedidos locais quando o email corresponde à sessão;
+- o plano citava `AccountSidebar.jsx`, mas o sidebar estava embutido em `CustomerPortal.jsx` antes da extração;
+- ViaCEP entrega endereço/UF, mas não preço de transportadora;
+- a referência `assets/meu_cadastro.png` tem layout claro com ações vermelhas, adaptado para a identidade escura premium;
+- Playwright precisou ser executado apontando para o `node_modules` do frontend em uma revisão visual;
+- a tela de autenticação antiga misturava entrada e cadastro em um único submit;
+- o bug de senha acontecia porque o login montava sessão diretamente no frontend;
+- o cliente HTTP descartava mensagens reais do backend antes do ajuste;
+- a sessão local de cliente era carregada sem checar expiração, formato ou token;
+- não foi possível validar a senha real da conta `rei15kr@gmail.com` por não haver conhecimento da senha cadastrada; a validação foi feita com conta legada inserida no MySQL.
+
+Arquivos e comandos das etapas antigas foram consolidados nesta seção para manter o `PLANS.md` focado na execução atual. Abaixo desta auditoria permanece o histórico técnico anterior do projeto.
+
+---
 # Criar ecommerce premium de tênis estilo Droper
 
 Este ExecPlan é um documento vivo. As seções Progress, Surprises & Discoveries,
